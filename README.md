@@ -73,7 +73,7 @@
 Install via NuGet:
 
 ```shell
-dotnet add package CivitaiSharp.Core
+dotnet add package CivitaiSharp.Core --prerelease
 ```
 
 ---

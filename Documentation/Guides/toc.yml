@@ -1,4 +1,5 @@
 - name: Getting Started
+  href: installation.md
   items:
     - name: Installation
       href: installation.md
@@ -12,6 +13,7 @@
       href: configuration.md
 
 - name: Core Library
+  href: introduction.md
   items:
     - name: Introduction
       href: introduction.md
@@ -33,6 +35,7 @@
       href: api-quirks.md
 
 - name: SDK Library
+  href: sdk-introduction.md
   items:
     - name: Introduction
       href: sdk-introduction.md

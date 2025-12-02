@@ -180,7 +180,7 @@ Todas las configuraciones tienen valores predeterminados sensatos, por lo que un
 | `TimeoutSeconds` | `int` | `30` | Tiempo de espera de solicitud HTTP (1-300 segundos) |
 | `StrictJsonParsing` | `bool` | `false` | Lanzar excepción en propiedades JSON no mapeadas |
 
-> **Nota de Autenticación:** La biblioteca Core puede consultar endpoints públicos (modelos, imágenes, tags, creadores) sin clave API. Una clave API solo es necesaria para funcionalidades autenticadas como favoritos, modelos ocultos y límites de tasa más altos. Esto es diferente a CivitaiSharp.Sdk que **siempre requiere un token de API** para todas las operaciones.
+> **Nota de Autenticación:** La biblioteca Core puede consultar endpoints públicos (modelos, imágenes, tags, creadores) sin clave API. Una clave API solo es necesaria para funcionalidades autenticadas como favoritos, modelos ocultos, contenido NSFW y límites de tasa más altos. Esto es diferente a CivitaiSharp.Sdk que **siempre requiere un token de API** para todas las operaciones.
 
 </details>
 

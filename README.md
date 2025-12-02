@@ -176,7 +176,7 @@ All settings have sensible defaults, so an empty section is valid.
 | `TimeoutSeconds` | `int` | `30` | HTTP request timeout (1-300 seconds) |
 | `StrictJsonParsing` | `bool` | `false` | Throw on unmapped JSON properties |
 
-> **Authentication Note:** The Core library can query public endpoints (models, images, tags, creators) without an API key. An API key is only required for authenticated features like favorites, hidden models, and higher rate limits. This is different from CivitaiSharp.Sdk which **always requires an API token** for all operations.
+> **Authentication Note:** The Core library can query public endpoints (models, images, tags, creators) without an API key. An API key is only required for authenticated features like favorites, hidden models, NSFW content, and higher rate limits. This is different from CivitaiSharp.Sdk which **always requires an API token** for all operations.
 
 </details>
 

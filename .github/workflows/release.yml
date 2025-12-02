@@ -1,0 +1,201 @@
+name: Create Release
+
+# This workflow creates GitHub releases and publishes NuGet packages using Trusted Publishing.
+# Libraries are platform-agnostic (DLLs), so only NuGet packages are distributed.
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'  # Matches v0.1.0, v1.0.0-alpha, etc.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to create release for (e.g., v0.1.0)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+          fetch-depth: 0  # Required for MinVer to calculate version from tags
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run unit tests
+        run: dotnet test --configuration Release --no-build --verbosity normal
+
+      - name: Pack NuGet packages
+        run: dotnet pack --configuration Release --no-build --output ./nupkgs
+
+      - name: Upload NuGet packages artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: nuget-packages
+          path: ./nupkgs/*.nupkg
+          retention-days: 1
+          if-no-files-found: error
+
+  create-release:
+    name: Create GitHub Release
+    needs: build-and-test
+    runs-on: windows-latest
+
+    outputs:
+      release_id: ${{ steps.create_release.outputs.id }}
+      release_url: ${{ steps.create_release.outputs.html_url }}
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - name: Get version from tag
+        id: version
+        shell: pwsh
+        run: |
+          $Tag = "${{ github.event.inputs.tag || github.ref_name }}"
+          $Version = $Tag -replace '^v', ''
+          "tag=$Tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "version=$Version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          
+          # Determine if this is a pre-release based on version string or input
+          if ("${{ github.event.inputs.prerelease }}" -eq "true" -or $Version -match '-' -or $Version -match '^0\.') {
+            "prerelease=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          } else {
+            "prerelease=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          }
+
+      - name: Download NuGet packages
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-packages
+          path: release-artifacts
+
+      - name: List artifacts
+        shell: pwsh
+        run: Get-ChildItem -Path release-artifacts -Filter *.nupkg -Recurse
+
+      - name: Create draft release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: CivitaiSharp ${{ steps.version.outputs.version }}
+          draft: true
+          prerelease: ${{ steps.version.outputs.prerelease == 'true' }}
+          generate_release_notes: true
+          files: |
+            release-artifacts/*.nupkg
+          body: |
+            ## CivitaiSharp ${{ steps.version.outputs.version }}
+
+            ### Installation
+
+            ```bash
+            # Core library (public API - models, images, tags, creators)
+            dotnet add package CivitaiSharp.Core --version ${{ steps.version.outputs.version }}
+
+            # SDK library (Generator API - image generation, jobs, usage)
+            dotnet add package CivitaiSharp.Sdk --version ${{ steps.version.outputs.version }}
+            ```
+
+            ### What's Changed
+            See the auto-generated release notes below.
+
+            ---
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/.../${{ steps.version.outputs.tag }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Output release information
+        shell: pwsh
+        run: |
+          "## Release Created" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          "" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          "**Release URL**: ${{ steps.create_release.outputs.html_url }}" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+
+  publish-nuget:
+    name: Publish to NuGet
+    needs: [build-and-test, create-release]
+    runs-on: windows-latest
+    permissions:
+      id-token: write  # Required for OIDC token issuance (Trusted Publishing)
+      contents: read
+
+    steps:
+      - name: Download NuGet packages
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-packages
+          path: ./nupkgs
+
+      - name: List downloaded files
+        shell: pwsh
+        run: |
+          Write-Host "Current directory:"
+          Get-Location
+          Write-Host "Contents of current directory:"
+          Get-ChildItem -Recurse | ForEach-Object { Write-Host $_.FullName }
+          Write-Host "Contents of nupkgs:"
+          Get-ChildItem -Path ./nupkgs -Recurse -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.FullName }
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Authenticate to NuGet (Trusted Publishing)
+        uses: NuGet/login@v1
+        id: nuget_login
+        with:
+          user: ${{ vars.NUGET_USERNAME }}
+
+      - name: Push to NuGet
+        shell: pwsh
+        run: |
+          $packages = Get-ChildItem -Path ./nupkgs -Filter *.nupkg -Recurse
+          if ($packages.Count -eq 0) {
+            Write-Error "No .nupkg files found in ./nupkgs"
+            exit 1
+          }
+          foreach ($package in $packages) {
+            Write-Host "Pushing $($package.FullName)"
+            dotnet nuget push $package.FullName --api-key ${{ steps.nuget_login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          }
+
+      - name: Output NuGet information
+        shell: pwsh
+        run: |
+          "## NuGet Packages Published" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          "" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          "The following packages have been published:" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          "" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          Get-ChildItem -Path ./nupkgs -Filter *.nupkg | ForEach-Object {
+            "- ``$($_.Name)``" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          }
+          "" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          "The packages will be available on NuGet.org within a few minutes." | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append

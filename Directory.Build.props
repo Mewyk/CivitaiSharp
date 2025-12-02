@@ -1,0 +1,31 @@
+<Project>
+
+  <!-- Shared versioning for all projects -->
+  <PropertyGroup>
+    <!-- Base version - update MAJOR.MINOR manually, PATCH auto-increments via MinVer -->
+    <MinVerMinimumMajorMinor>0.8</MinVerMinimumMajorMinor>
+    <MinVerDefaultPreReleaseIdentifiers>alpha</MinVerDefaultPreReleaseIdentifiers>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <!-- Fallback version when no git history (e.g., fresh clone or new repo) -->
+    <MinVerAutoIncrement>minor</MinVerAutoIncrement>
+  </PropertyGroup>
+
+  <!-- AOT and Trimming Compatibility -->
+  <PropertyGroup>
+    <IsAotCompatible>true</IsAotCompatible>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <!-- Enable configuration binding source generator for AOT-compatible IConfiguration binding -->
+    <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
+  </PropertyGroup>
+
+  <!-- Versioning policy documentation (for reference):
+       
+       MAJOR.MINOR.PATCH versioning scheme:
+       - MAJOR: Significant, breaking API changes
+       - MINOR: New features; may include limited breaking changes unlikely to affect most users  
+       - PATCH: Backwards-compatible bug fixes and improvements (auto-incremented per commit)
+       
+       Pre-release versions use: MAJOR.MINOR.PATCH-alpha.N (where N = commits since tag)
+  -->
+
+</Project>

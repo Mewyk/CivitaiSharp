@@ -1,0 +1,84 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- AOT compatibility enabled -->
+    <IsAotCompatible>true</IsAotCompatible>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+
+    <!-- NuGet Package Metadata -->
+    <PackageId>CivitaiSharp.Sdk</PackageId>
+    <Title>CivitaiSharp.Sdk - Civitai SDK Client (Pre-Alpha)</Title>
+    <Description>PRE-ALPHA: This package is under active development and APIs may change significantly. Extended SDK for CivitaiSharp providing additional features for the Civitai.com API including AIR (Artificial Intelligence Resource) identifier parsing, image generation job management, and advanced model operations. Builds on CivitaiSharp.Core. CivitaiSharp is an independent open-source project and is not affiliated with, endorsed by, or associated with Civitai.com or Civitai, Inc.</Description>
+    <Authors>Mewyk</Authors>
+    <Company>Mewyk</Company>
+    <Copyright>Copyright © Mewyk 2025</Copyright>
+    
+    <!-- Licensing -->
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    
+    <!-- Repository and Project URLs -->
+    <PackageProjectUrl>https://github.com/Mewyk/CivitaiSharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Mewyk/CivitaiSharp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryBranch>alpha</RepositoryBranch>
+    
+    <!-- Package Assets -->
+    <PackageIcon>CivitaiSharp.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>civitai;sdk;api-client;stable-diffusion;flux;ai;generative-ai;dotnet;dotnet10;aot;trimming;http-client;rest-api;image-generation;comfyui;automatic1111</PackageTags>
+    
+    <!-- Symbol Packages for Debugging -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    
+    <!-- Source Link for debugging support -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <!-- Include package assets -->
+  <ItemGroup>
+    <None Include="..\Resources\Logo\CivitaiSharp.png" Pack="true" PackagePath="\" />
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\CivitaiSharp.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.0" />
+    <PackageReference Include="MinVer" Version="6.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <!-- Generate version info at compile time for AOT compatibility (no reflection) -->
+  <Target Name="GenerateVersionInfo" BeforeTargets="BeforeCompile;CoreCompile" DependsOnTargets="MinVer">
+    <PropertyGroup>
+      <GeneratedVersionFile>$(IntermediateOutputPath)VersionInfo.g.cs</GeneratedVersionFile>
+      <CleanVersion>$(MinVerVersion)</CleanVersion>
+      <!-- Remove metadata suffix like +abc123 -->
+      <CleanVersion Condition="$(CleanVersion.Contains('+'))">$(CleanVersion.Substring(0, $(CleanVersion.IndexOf('+'))))</CleanVersion>
+    </PropertyGroup>
+    <WriteLinesToFile 
+      File="$(GeneratedVersionFile)" 
+      Lines="// &lt;auto-generated/&gt;&#10;namespace CivitaiSharp.Sdk%3B&#10;&#10;internal static class VersionInfo&#10;{&#10;    public const string Version = &quot;$(CleanVersion)&quot;%3B&#10;}" 
+      Overwrite="true" 
+      WriteOnlyWhenDifferent="true" />
+    <ItemGroup>
+      <Compile Include="$(GeneratedVersionFile)" />
+    </ItemGroup>
+  </Target>
+
+</Project>

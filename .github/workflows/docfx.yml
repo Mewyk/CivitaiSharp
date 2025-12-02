@@ -1,0 +1,65 @@
+name: Generate Documentation
+
+on:
+  push:
+    branches:
+      - alpha
+    paths:
+      - 'Core/**'
+      - 'Sdk/**'
+      - 'Documentation/**'
+      - '.github/workflows/docfx.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install DocFX
+        run: dotnet tool install -g docfx
+
+      - name: Restore dependencies
+        run: dotnet restore CivitaiSharp.slnx
+
+      - name: Build solution for metadata
+        run: dotnet build CivitaiSharp.slnx --configuration Release --no-restore
+
+      - name: Generate documentation
+        working-directory: Documentation
+        run: docfx docfx.json
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./Documentation/_site
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/alpha'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

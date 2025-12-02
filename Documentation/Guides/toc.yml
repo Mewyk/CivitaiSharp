@@ -1,0 +1,38 @@
+- name: Getting Started
+  items:
+    - name: Installation
+      href: installation.md
+    - name: Getting an API Key
+      href: getting-api-key.md
+    - name: AI Resource Identifier (AIR)
+      href: air-identifier.md
+    - name: Quick Start
+      href: quick-start.md
+    - name: Configuration
+      href: configuration.md
+
+- name: Core Library
+  items:
+    - name: Introduction
+      href: introduction.md
+    - name: Request Builders
+      href: request-builders.md
+    - name: Models
+      href: models.md
+    - name: Tags
+      href: tags.md
+    - name: Creators
+      href: creators.md
+    - name: Images
+      href: images.md
+    - name: Error Handling
+      href: error-handling.md
+    - name: Pagination
+      href: pagination.md
+    - name: API Behavior & Quirks
+      href: api-quirks.md
+
+- name: SDK Library
+  items:
+    - name: Introduction
+      href: sdk-introduction.md

@@ -1,0 +1,105 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "..",
+          "files": [
+            "Core/CivitaiSharp.Core.csproj",
+            "Sdk/CivitaiSharp.Sdk.csproj"
+          ],
+          "exclude": [
+            "**/obj/**",
+            "**/bin/**"
+          ]
+        }
+      ],
+      "dest": "Api",
+      "includePrivateMembers": false,
+      "disableGitFeatures": false,
+      "disableDefaultFilter": false,
+      "noRestore": false,
+      "namespaceLayout": "flattened",
+      "memberLayout": "samePage",
+      "allowCompilationErrors": false
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "index.md",
+          "toc.yml"
+        ]
+      },
+      {
+        "files": [
+          "Api/**.yml",
+          "Api/index.md"
+        ]
+      },
+      {
+        "files": [
+          "Guides/**.md",
+          "Guides/**/toc.yml"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "Images/**"
+        ]
+      },
+      {
+        "src": "..",
+        "files": [
+          "Resources/Logo/CivitaiSharp.png"
+        ],
+        "dest": "."
+      },
+      {
+        "files": [
+          "Guides/**/*.cs",
+          "Guides/**/*.csproj"
+        ],
+        "exclude": [
+          "**/obj/**",
+          "**/bin/**"
+        ]
+      }
+    ],
+    "dest": "_site",
+    "sitemap": {
+      "baseUrl": "https://mewyk.github.io/CivitaiSharp",
+      "changefreq": "weekly",
+      "priority": 0.5,
+      "fileOptions": {
+        "Guides/**": {
+          "priority": 0.8
+        },
+        "Api/**": {
+          "priority": 0.6
+        }
+      }
+    },
+    "globalMetadataFiles": [],
+    "fileMetadataFiles": [],
+    "template": [
+      "default",
+      "modern"
+    ],
+    "postProcessors": [],
+    "keepFileLink": false,
+    "disableGitFeatures": false,
+    "globalMetadata": {
+      "_appTitle": "CivitaiSharp",
+      "_appName": "CivitaiSharp",
+      "_appFooter": "CivitaiSharp - A modern, lightweight, and AOT-ready .NET 10 client library for all things Civitai.com",
+      "_appLogoPath": "Resources/Logo/CivitaiSharp.png",
+      "_appFaviconPath": "Resources/Logo/CivitaiSharp.png",
+      "_enableSearch": true,
+      "_enableNewTab": true
+    }
+  }
+}

@@ -1,0 +1,28 @@
+<Solution>
+  <Folder Name="/Documentation/">
+    <File Path="Documentation/docfx.json" />
+  </Folder>
+  <Folder Name="/Documentation/Guides/">
+    <Project Path="Documentation/Guides/Configuration/Configuration.csproj" />
+    <Project Path="Documentation/Guides/Creators/Creators.csproj" />
+    <Project Path="Documentation/Guides/ErrorHandling/ErrorHandling.csproj" />
+    <Project Path="Documentation/Guides/Images/Images.csproj" />
+    <Project Path="Documentation/Guides/Models/Models.csproj" />
+    <Project Path="Documentation/Guides/Pagination/Pagination.csproj" />
+    <Project Path="Documentation/Guides/QuickStart/QuickStart.csproj" />
+    <Project Path="Documentation/Guides/RequestBuilders/RequestBuilders.csproj" />
+    <Project Path="Documentation/Guides/Tags/Tags.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/CivitaiSharp.Core.Tests/CivitaiSharp.Core.Tests.csproj" />
+    <Project Path="Tests/CivitaiSharp.Sdk.Tests/CivitaiSharp.Sdk.Tests.csproj" />
+  </Folder>
+  <Project Path="Core/CivitaiSharp.Core.csproj" />
+  <Project Path="Sdk/CivitaiSharp.Sdk.csproj" />
+</Solution>

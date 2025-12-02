@@ -1,0 +1,41 @@
+name: Build Verification
+
+on:
+  push:
+    branches: [alpha]
+  pull_request:
+    branches: [alpha]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test --configuration Release --no-build --verbosity normal
+
+      - name: Pack NuGet packages
+        run: dotnet pack --configuration Release --no-build --output ./nupkgs
+
+      - name: Upload NuGet packages
+        uses: actions/upload-artifact@v5
+        with:
+          name: nuget-packages
+          path: ./nupkgs/*.nupkg
+          retention-days: 5
+          if-no-files-found: error

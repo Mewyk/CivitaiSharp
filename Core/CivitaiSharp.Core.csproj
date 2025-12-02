@@ -29,7 +29,7 @@
     
     <!-- Package Assets -->
     <PackageIcon>CivitaiSharp.png</PackageIcon>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReadmeFile>NUGET.md</PackageReadmeFile>
     <PackageTags>civitai;api-client;stable-diffusion;flux;ai;generative-ai;dotnet;dotnet10;aot;trimming;http-client;rest-api;comfyui;automatic1111</PackageTags>
     
     <!-- Symbol Packages for Debugging -->
@@ -46,7 +46,7 @@
   <!-- Include package assets -->
   <ItemGroup>
     <None Include="..\Resources\Logo\CivitaiSharp.png" Pack="true" PackagePath="\" />
-    <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\NUGET.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>

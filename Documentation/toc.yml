@@ -1,7 +1,7 @@
 - name: Home
-  href: index.md
+  href: index.html
 - name: Guides
   href: Guides/toc.yml
-  topicHref: Guides/introduction.md
+  topicHref: Guides/index.md
 - name: API Reference
   href: Api/

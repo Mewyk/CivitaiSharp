@@ -1,46 +1,10 @@
-<p align="center">
-  <img src="Resources/Logo/CivitaiSharp.png" alt="CivitaiSharp Logo - Temporary Ai generated image" width="120"/>
-</p>
+# CivitaiSharp
 
-<h1 align="center" style="border-bottom: none;">CivitaiSharp</h1>
+![CivitaiSharp Logo](https://raw.githubusercontent.com/Mewyk/CivitaiSharp/alpha/Resources/Logo/CivitaiSharp.128.png)
 
-<p align="center">
-  A modern, lightweight, and AOT-ready .NET 10 client library for all things Civitai.com
-</p>
+A modern, lightweight, and AOT-ready .NET 10 client library for all things Civitai.com.
 
-<p align="center">
-  <!-- Status -->
-  <img src="https://img.shields.io/badge/Status-Alpha-4682B4?style=flat&logo=beaker" alt="Status: Alpha"/>
-  <!-- License -->
-  <a href="https://opensource.org/licenses/MIT">
-    <img src="https://img.shields.io/badge/License-MIT-4682B4?style=flat&logo=book" alt="License MIT"/>
-  </a>
-  <!-- .NET -->
-  <a href="https://dotnet.microsoft.com/">
-    <img src="https://img.shields.io/badge/.NET-10.0-4682B4?style=flat&logo=dotnet" alt=".NET 10"/>
-  </a>
-  <!-- GitHub -->
-  <a href="https://github.com/Mewyk/CivitaiSharp">
-    <img src="https://img.shields.io/badge/GitHub-Mewyk%2FCivitaiSharp-4682B4?style=flat&logo=github" alt="GitHub"/>
-  </a>
-  <!-- NuGet (dynamic) -->
-  <a href="https://www.nuget.org/packages/CivitaiSharp.Core">
-    <img src="https://img.shields.io/nuget/v/CivitaiSharp.Core?label=NuGet%20Core&logo=nuget" alt="NuGet Core"/>
-  </a>
-</p>
-
-<p align="center">
-  <strong>English</strong> |
-  <a href="README.es-AR.md">Español (Argentina)</a> |
-  <a href="README.ja.md">日本語</a>
-</p>
-
-<p align="center">
-<strong>
-  CivitaiSharp is currently in Alpha: APIs, features, and stability are subject to change.
-</strong>
-</p>
-
+> **Note:** CivitaiSharp is currently in Alpha. APIs, features, and stability are subject to change.
 ## Table of Contents
 1. [Packages and Release Schedule](#1-packages-and-release-schedule)
 2. [Installation](#2-installation)
@@ -54,7 +18,6 @@
 10. [License](#10-license)
 11. [Contributing](#11-contributing)
 
-
 ## 1. Packages and Release Schedule
 | Package | Status | Description |
 |---------|--------|-------------|
@@ -66,14 +29,12 @@
 
 > **Warning:** CivitaiSharp.Sdk is not fully tested and should not be used in production environments. Use at your own risk.
 
-
 ## 2. Installation
 Install via NuGet:
 
 ```shell
 dotnet add package CivitaiSharp.Core --prerelease
 ```
-
 
 ## 3. Quick Start
 ### Minimal Example
@@ -134,13 +95,11 @@ else
 }
 ```
 
-
 ## 4. Configuration
 ### Using appsettings.json
 CivitaiSharp.Core reads configuration from the `CivitaiApi` section by default.
 
-<details>
-<summary><strong>Minimal Configuration (appsettings.json)</strong></summary>
+**Minimal Configuration (appsettings.json)**
 
 ```json
 {
@@ -151,10 +110,7 @@ CivitaiSharp.Core reads configuration from the `CivitaiApi` section by default.
 
 All settings have sensible defaults, so an empty section is valid.
 
-</details>
-
-<details>
-<summary><strong>Full Configuration (appsettings.json)</strong></summary>
+**Full Configuration (appsettings.json)**
 
 ```json
 {
@@ -178,10 +134,7 @@ All settings have sensible defaults, so an empty section is valid.
 
 > **Authentication Note:** The Core library can query public endpoints (models, images, tags, creators) without an API key. An API key is only required for authenticated features like favorites, hidden models, and higher rate limits. This is different from CivitaiSharp.Sdk which **always requires an API token** for all operations.
 
-</details>
-
-<details>
-<summary><strong>Configuration with IConfiguration</strong></summary>
+**Configuration with IConfiguration**
 
 ```csharp
 using CivitaiSharp.Core.Extensions;
@@ -200,14 +153,10 @@ services.AddCivitaiApi(configuration);
 await using var provider = services.BuildServiceProvider();
 ```
 
-</details>
-
-
 ## 5. API Examples
 CivitaiSharp.Core provides fluent builders for each endpoint. Each builder is immutable and thread-safe.
 
-<details>
-<summary><strong>Models Endpoint</strong></summary>
+**Models Endpoint**
 
 ```csharp
 // Get all models (default query)
@@ -266,10 +215,7 @@ var result = await client.Models
     .ExecuteAsync();
 ```
 
-</details>
-
-<details>
-<summary><strong>Images Endpoint</strong></summary>
+**Images Endpoint**
 
 ```csharp
 // Get all images (default query)
@@ -306,10 +252,7 @@ var result = await client.Images
     .ExecuteAsync();
 ```
 
-</details>
-
-<details>
-<summary><strong>Tags Endpoint</strong></summary>
+**Tags Endpoint**
 
 ```csharp
 // Get all tags (default query)
@@ -322,10 +265,7 @@ var result = await client.Tags
     .ExecuteAsync();
 ```
 
-</details>
-
-<details>
-<summary><strong>Creators Endpoint</strong></summary>
+**Creators Endpoint**
 
 ```csharp
 // Get all creators (default query)
@@ -344,10 +284,7 @@ var result = await client.Creators
     .ExecuteAsync();
 ```
 
-</details>
-
-<details>
-<summary><strong>Pagination</strong></summary>
+**Pagination**
 
 ```csharp
 // Cursor-based pagination (Models, Images, Tags)
@@ -366,7 +303,7 @@ do
 
     allModels.AddRange(result.Value.Items);
     cursor = result.Value.Metadata?.NextCursor;
-    
+
 } while (cursor is not null);
 
 // Page-based pagination (Creators only)
@@ -374,10 +311,7 @@ var page1 = await client.Creators.WithPageIndex(1).ExecuteAsync();
 var page2 = await client.Creators.WithPageIndex(2).ExecuteAsync();
 ```
 
-</details>
-
-<details>
-<summary><strong>Error Handling</strong></summary>
+**Error Handling**
 
 ```csharp
 var result = await client.Models.ExecuteAsync();
@@ -407,9 +341,6 @@ else
 }
 ```
 
-</details>
-
-
 ## 6. Features
 - **Modern .NET 10** - Built with nullable reference types, records, and primary constructors
 - **Fluent Query Builders** - Type-safe, immutable builders for constructing API requests
@@ -419,11 +350,9 @@ else
 - **Streaming Downloads** - Memory-efficient response handling with `ResponseHeadersRead`
 - **Explicit JSON Contract** - All model properties use `[JsonPropertyName]` for type safety
 
-
 ## 7. Documentation
 - [API Reference](https://CivitaiSharp.Mewyk.com/Docs/api/)
 - [Getting Started Guide](https://CivitaiSharp.Mewyk.com/Guides/introduction.html)
-
 
 ## 8. Known API Quirks
 CivitaiSharp interacts with the Civitai.com API, which has several known quirks. Some are mitigated automatically; others are documented and under investigation.
@@ -467,7 +396,6 @@ if (!result.IsSuccess)
 
 Additional quirks are being tracked and will be addressed in future releases.
 
-
 ## 9. Versioning
 CivitaiSharp follows **MAJOR.MINOR.PATCH** semantic versioning:
 
@@ -481,14 +409,11 @@ Pre-release versions use the format: `MAJOR.MINOR.PATCH-alpha.N`
 
 > **Note**: While in Alpha (0.x.x), APIs may change between minor versions. Stability is guaranteed from v1.0.0 onwards.
 
-
 ## 10. License
 This repository is released under the [MIT License](LICENSE).
 
-
 ## 11. Contributing
 Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
 
 ## Legal Notice
 
@@ -496,8 +421,4 @@ CivitaiSharp is an independent open-source project and is not affiliated with, s
 
 ---
 
-<p align="center">
-  <a href="https://github.com/Mewyk/CivitaiSharp">GitHub</a> |
-  <a href="https://CivitaiSharp.Mewyk.com">Documentation</a> |
-  <a href="https://civitai.com">Civitai</a>
-</p>
+[GitHub](https://github.com/Mewyk/CivitaiSharp) | [Documentation](https://CivitaiSharp.Mewyk.com) | [Civitai](https://civitai.com)

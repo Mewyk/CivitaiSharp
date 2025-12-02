@@ -34,13 +34,14 @@
       {
         "files": [
           "Api/**.yml",
-          "Api/index.md"
+          "Api/index.md",
+          "Api/toc.yml"
         ]
       },
       {
         "files": [
           "Guides/**.md",
-          "Guides/**/toc.yml"
+          "Guides/toc.yml"
         ]
       }
     ],

@@ -12,7 +12,7 @@
 
     <!-- NuGet Package Metadata -->
     <PackageId>CivitaiSharp.Core</PackageId>
-    <Title>CivitaiSharp.Core - Civitai API Client</Title>
+    <Title>CivitaiSharp.Core - API Client</Title>
     <Description>A modern, lightweight, and AOT-ready .NET 10 client library for all things Civitai.com. Core package for the documented Public API. Provides type-safe, fluent builders for querying models, images, tags, and creators with built-in resilience, structured error handling, and first-class dependency injection support. CivitaiSharp is an independent open-source project and is not affiliated with, endorsed by, or associated with Civitai.com or Civitai, Inc.</Description>
     <Authors>Mewyk</Authors>
     <Company>Mewyk</Company>

@@ -6,13 +6,14 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    
     <!-- AOT compatibility enabled -->
     <IsAotCompatible>true</IsAotCompatible>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
 
     <!-- NuGet Package Metadata -->
     <PackageId>CivitaiSharp.Sdk</PackageId>
-    <Title>CivitaiSharp.Sdk - Civitai SDK Client (Pre-Alpha)</Title>
+    <Title>CivitaiSharp.Sdk - SDK Client (Pre-Alpha)</Title>
     <Description>PRE-ALPHA: This package is under active development and APIs may change significantly. Extended SDK for CivitaiSharp providing additional features for the Civitai.com API including AIR (Artificial Intelligence Resource) identifier parsing, image generation job management, and advanced model operations. Builds on CivitaiSharp.Core. CivitaiSharp is an independent open-source project and is not affiliated with, endorsed by, or associated with Civitai.com or Civitai, Inc.</Description>
     <Authors>Mewyk</Authors>
     <Company>Mewyk</Company>

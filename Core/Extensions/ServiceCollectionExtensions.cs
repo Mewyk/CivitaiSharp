@@ -21,6 +21,21 @@ public static class ServiceCollectionExtensions
     private const string UserAgentValue = $"CivitaiSharp.Core/{Core.VersionInfo.Version}";
 
     /// <summary>
+    /// Registers the API client and related services using default configuration.
+    /// </summary>
+    /// <param name="services">The service collection to register services into.</param>
+    /// <returns>The service collection for chaining.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if services is null.</exception>
+    public static IServiceCollection AddCivitaiApi(this IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+
+        services.Configure<ApiClientOptions>(_ => { });
+        RegisterApiServices(services);
+        return services;
+    }
+
+    /// <summary>
     /// Registers the API client and related services with the specified configuration action.
     /// </summary>
     /// <param name="services">The service collection to register services into.</param>

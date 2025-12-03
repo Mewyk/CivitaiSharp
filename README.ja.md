@@ -269,6 +269,22 @@ var result = await client.Models
 var result = await client.Models
     .WhereIds(12345, 67890, 11111)
     .ExecuteAsync();
+
+// バージョンIDで特定のモデルバージョンを取得
+var versionResult = await client.Models.GetByVersionIdAsync(130072);
+if (versionResult.IsSuccess)
+{
+    Console.WriteLine($"バージョン: {versionResult.Value.Name}");
+    Console.WriteLine($"AIR: {versionResult.Value.AirIdentifier}");
+}
+
+// ファイルハッシュでモデルバージョンを取得（SHA256、AutoV2、CRC32など）
+var hashResult = await client.Models.GetByVersionHashAsync("ABC123DEF456");
+if (hashResult.IsSuccess)
+{
+    Console.WriteLine($"見つかりました: {hashResult.Value.Model?.Name}");
+    Console.WriteLine($"AIR: {hashResult.Value.AirIdentifier}");
+}
 ```
 
 </details>

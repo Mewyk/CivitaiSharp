@@ -264,6 +264,22 @@ var result = await client.Models
 var result = await client.Models
     .WhereIds(12345, 67890, 11111)
     .ExecuteAsync();
+
+// Get a specific model version by version ID
+var versionResult = await client.Models.GetByVersionIdAsync(130072);
+if (versionResult.IsSuccess)
+{
+    Console.WriteLine($"Version: {versionResult.Value.Name}");
+    Console.WriteLine($"AIR: {versionResult.Value.AirIdentifier}");
+}
+
+// Get a model version by file hash (SHA256, AutoV2, CRC32, etc.)
+var hashResult = await client.Models.GetByVersionHashAsync("ABC123DEF456");
+if (hashResult.IsSuccess)
+{
+    Console.WriteLine($"Found: {hashResult.Value.Model?.Name}");
+    Console.WriteLine($"AIR: {hashResult.Value.AirIdentifier}");
+}
 ```
 
 </details>

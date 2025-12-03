@@ -10,19 +10,16 @@ obj/
 *.user
 *.suo
 
-# OS files
-.DS_Store
-
 # Logs
 *.log
 
 # Local configuration
 appsettings.Development.json
 
-# DocFX auto-generated
+# DocFX auto generated
 Documentation/Api/
 Documentation/_site/
 
-# Project-specific
-Extra/
+# Project specific
+Sampler/
 ScratchPad.md

@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var builder = Host.CreateApplicationBuilder(args);
-builder.Services.AddCivitaiApi(_ => { });
+builder.Services.AddCivitaiApi();
 var host = builder.Build();
 var apiClient = host.Services.GetRequiredService<IApiClient>();
 

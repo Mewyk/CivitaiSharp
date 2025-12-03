@@ -85,7 +85,7 @@ using CivitaiSharp.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
-services.AddCivitaiApi(_ => { });
+services.AddCivitaiApi();
 
 await using var provider = services.BuildServiceProvider();
 var client = provider.GetRequiredService<IApiClient>();

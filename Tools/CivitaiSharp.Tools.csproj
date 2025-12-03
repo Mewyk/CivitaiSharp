@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- AOT compatibility enabled -->
+    <IsAotCompatible>true</IsAotCompatible>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+
+    <!-- NuGet Package Metadata -->
+    <PackageId>CivitaiSharp.Tools</PackageId>
+    <Title>CivitaiSharp.Tools - CivitaiSharp Tools (Pre-Alpha)</Title>
+    <Description>PRE-ALPHA: This package is under active development and APIs may change significantly. Utility tools for CivitaiSharp including file hashing (BLAKE3, SHA256, SHA512, CRC32), download management with pattern-based file organization, HTML-to-Markdown/PlainText parsing for model descriptions, and file format detection. Builds on CivitaiSharp.Core. CivitaiSharp is an independent open-source project and is not affiliated with, endorsed by, or associated with Civitai.com or Civitai, Inc.</Description>
+    <Authors>Mewyk</Authors>
+    <Company>Mewyk</Company>
+    <Copyright>Copyright © Mewyk 2025</Copyright>
+    
+    <!-- Licensing -->
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    
+    <!-- Repository and Project URLs -->
+    <PackageProjectUrl>https://github.com/Mewyk/CivitaiSharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Mewyk/CivitaiSharp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryBranch>alpha</RepositoryBranch>
+    
+    <!-- Package Assets -->
+    <PackageIcon>CivitaiSharp.png</PackageIcon>
+    <PackageReadmeFile>NUGET.md</PackageReadmeFile>
+    <PackageTags>civitai;tools;utilities;file-hashing;blake3;sha256;download-manager;html-parser;markdown;dotnet;dotnet10;aot;trimming</PackageTags>
+    
+    <!-- Symbol Packages for Debugging -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    
+    <!-- Source Link for debugging support -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <!-- Include package assets -->
+  <ItemGroup>
+    <None Include="..\Resources\Logo\CivitaiSharp.png" Pack="true" PackagePath="\" />
+    <None Include="..\NUGET.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Blake3" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.0" />
+    <PackageReference Include="System.IO.Hashing" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\CivitaiSharp.Core.csproj" />
+  </ItemGroup>
+
+</Project>

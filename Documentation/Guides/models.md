@@ -48,6 +48,14 @@ Civitai hosts many types of AI models:
 
 [!code-csharp[Program.cs](Models/Program.cs#by-id)]
 
+### Getting a Model Version by ID
+
+[!code-csharp[Program.cs](Models/Program.cs#by-version-id)]
+
+### Getting a Model Version by Hash
+
+[!code-csharp[Program.cs](Models/Program.cs#by-version-hash)]
+
 ## The Model Record
 
 The `Model` record contains comprehensive information:

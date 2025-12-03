@@ -86,6 +86,53 @@ else if (modelResult is Result<Model>.Failure failure)
 }
 // #endregion by-id
 
+// #region by-version-id
+// Get a specific model version by its version ID
+var versionResult = await apiClient.Models.GetByVersionIdAsync(130072);
+
+if (versionResult is Result<ModelVersion>.Success versionSuccess)
+{
+    var version = versionSuccess.Data;
+    Console.WriteLine($"Version: {version.Name}");
+    Console.WriteLine($"Base Model: {version.BaseModel}");
+    Console.WriteLine($"AIR: {version.AirIdentifier}");
+    Console.WriteLine($"Parent Model: {version.Model?.Name}");
+    Console.WriteLine($"Downloads: {version.Stats?.DownloadCount}");
+}
+else if (versionResult is Result<ModelVersion>.Failure versionFailure)
+{
+    Console.WriteLine($"Version not found: {versionFailure.Error.Message}");
+}
+// #endregion by-version-id
+
+// #region by-version-hash
+// Get a model version by one of its file hashes (SHA256, AutoV2, CRC32, etc.)
+var hashResult = await apiClient.Models.GetByVersionHashAsync("ABC123DEF456");
+
+if (hashResult is Result<ModelVersion>.Success hashSuccess)
+{
+    var version = hashSuccess.Data;
+    Console.WriteLine($"Found: {version.Model?.Name} - {version.Name}");
+    Console.WriteLine($"AIR: {version.AirIdentifier}");
+    Console.WriteLine($"Base Model: {version.BaseModel}");
+
+    // Access file information
+    foreach (var file in version.Files ?? [])
+    {
+        Console.WriteLine($"  File: {file.Name}");
+        if (file.Hashes is { } hashes)
+        {
+            Console.WriteLine($"    SHA256: {hashes.Sha256}");
+            Console.WriteLine($"    AutoV2: {hashes.AutoV2}");
+        }
+    }
+}
+else if (hashResult is Result<ModelVersion>.Failure hashFailure)
+{
+    Console.WriteLine($"Hash not found: {hashFailure.Error.Message}");
+}
+// #endregion by-version-hash
+
 // #region permissions
 // Filter by usage permissions
 var commercialFriendly = await apiClient.Models

@@ -1,11 +1,11 @@
 ---
 title: Getting a Civitai API Key
-description: Learn how to obtain a Civitai API key for authenticated requests, accessing favorites, hidden models, and higher rate limits.
+description: Learn how to obtain a Civitai API key for authenticated requests, accessing favorites, hidden models, NSFW content, and higher rate limits.
 ---
 
 # Getting a Civitai.com API Key
 
-This guide walks you through the process of obtaining an API key from Civitai. An API key is required for authenticated requests, including accessing your favorites, hidden models, and getting higher rate limits.
+This guide walks you through the process of obtaining an API key from Civitai. An API key is required for authenticated requests, including accessing your favorites, hidden models, NSFW content (Mature/X levels), and getting higher rate limits.
 
 ## Prerequisites
 

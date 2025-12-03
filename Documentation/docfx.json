@@ -6,7 +6,8 @@
           "src": "..",
           "files": [
             "Core/CivitaiSharp.Core.csproj",
-            "Sdk/CivitaiSharp.Sdk.csproj"
+            "Sdk/CivitaiSharp.Sdk.csproj",
+            "Tools/CivitaiSharp.Tools.csproj"
           ],
           "exclude": [
             "**/obj/**",

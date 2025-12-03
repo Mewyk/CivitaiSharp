@@ -217,8 +217,7 @@ var baseResult = await builder.ExecuteAsync();
 // Add more filters after confirming base works
 var refinedResult = await builder
     .WherePeriod(TimePeriod.Month)
-    .WithResultsLimit(10)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 10);
 ```
 
 ### Error Handling

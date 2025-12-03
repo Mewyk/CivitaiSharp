@@ -13,8 +13,7 @@ var apiClient = provider.GetRequiredService<IApiClient>();
 #region Search by Username
 var searchResult = await apiClient.Creators
     .WhereName("popular")
-    .WithResultsLimit(20)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 20);
 
 if (searchResult is Result<PagedResult<Creator>>.Success success)
 {
@@ -27,8 +26,7 @@ if (searchResult is Result<PagedResult<Creator>>.Success success)
 
 #region List All Creators
 var allCreators = await apiClient.Creators
-    .WithResultsLimit(50)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 50);
 
 if (allCreators is Result<PagedResult<Creator>>.Success allSuccess)
 {
@@ -39,9 +37,8 @@ if (allCreators is Result<PagedResult<Creator>>.Success allSuccess)
 #region Page-Based Pagination
 // Get first page
 var page1 = await apiClient.Creators
-    .WithResultsLimit(50)
     .WithPageIndex(1)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 50);
 
 if (page1 is Result<PagedResult<Creator>>.Success firstPage)
 {
@@ -49,9 +46,8 @@ if (page1 is Result<PagedResult<Creator>>.Success firstPage)
     
     // Get second page
     var page2 = await apiClient.Creators
-        .WithResultsLimit(50)
         .WithPageIndex(2)
-        .ExecuteAsync();
+        .ExecuteAsync(resultsLimit: 50);
     
     if (page2 is Result<PagedResult<Creator>>.Success secondPage)
     {
@@ -60,8 +56,7 @@ if (page1 is Result<PagedResult<Creator>>.Success firstPage)
     
     // Navigate to specific page
     var page5 = await apiClient.Creators
-        .WithResultsLimit(50)
         .WithPageIndex(5)
-        .ExecuteAsync();
+        .ExecuteAsync(resultsLimit: 50);
 }
 #endregion

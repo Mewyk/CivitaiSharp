@@ -14,8 +14,7 @@ var apiClient = host.Services.GetRequiredService<IApiClient>();
 // Set the number of results per page
 var result = await apiClient.Models
     .WhereType(ModelType.Lora)
-    .WithResultsLimit(25)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 25);
 
 if (result is Result<PagedResult<Model>>.Success success)
 {
@@ -70,27 +69,25 @@ Console.WriteLine($"Collected {allModels.Count} models total.");
 // #endregion cursor-pagination
 
 // #region page-index
-// For images, you can use page index-based pagination
-var imagesPage1 = await apiClient.Images
-    .WhereModelId(123456)
+// For models, tags, and creators, you can use page index-based pagination
+var modelsPage1 = await apiClient.Models
+    .WhereType(ModelType.Lora)
     .WithPageIndex(1)
-    .WithResultsLimit(20)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 20);
 
-if (imagesPage1 is Result<PagedResult<Image>>.Success imageSuccess)
+if (modelsPage1 is Result<PagedResult<Model>>.Success modelSuccess)
 {
-    Console.WriteLine($"Page 1: {imageSuccess.Data.Items.Count} images");
+    Console.WriteLine($"Page 1: {modelSuccess.Data.Items.Count} models");
 
     // Fetch page 2
-    var imagesPage2 = await apiClient.Images
-        .WhereModelId(123456)
+    var modelsPage2 = await apiClient.Models
+        .WhereType(ModelType.Lora)
         .WithPageIndex(2)
-        .WithResultsLimit(20)
-        .ExecuteAsync();
+        .ExecuteAsync(resultsLimit: 20);
 
-    if (imagesPage2 is Result<PagedResult<Image>>.Success page2Success)
+    if (modelsPage2 is Result<PagedResult<Model>>.Success page2Success)
     {
-        Console.WriteLine($"Page 2: {page2Success.Data.Items.Count} images");
+        Console.WriteLine($"Page 2: {page2Success.Data.Items.Count} models");
     }
 }
 // #endregion page-index

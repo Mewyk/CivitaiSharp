@@ -24,8 +24,7 @@ var apiClient = host.Services.GetRequiredService<IApiClient>();
 var result = await apiClient.Models
     .WhereType(ModelType.Lora)
     .WhereTag("anime")
-    .WithResultsLimit(10)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 10);
 // #endregion query
 
 // The result is always checked with pattern matching

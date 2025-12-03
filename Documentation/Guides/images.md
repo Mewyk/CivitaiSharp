@@ -108,6 +108,8 @@ var softImages = await apiClient.Images
 Available NSFW levels:
 - `None` - Safe for work
 - `Soft` - Mildly suggestive
+
+> **Note**: Accessing `ImageNsfwLevel.Mature` and `ImageNsfwLevel.X` requires authentication with an API key. Without authentication, these levels will return no results.
 - `Mature` - Mature content
 - `Explicit` - Explicit content (maps to API value "X")
 
@@ -117,8 +119,7 @@ Available NSFW levels:
 var mostReacted = await apiClient.Images
     .OrderBy(ImageSort.MostReactions)
     .WherePeriod(TimePeriod.Week)
-    .WithResultsLimit(20)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 20);
 ```
 
 Available sort options:

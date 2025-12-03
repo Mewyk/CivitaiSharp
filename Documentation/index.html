@@ -276,8 +276,7 @@
 <span class="keyword">var</span> result = <span class="keyword">await</span> client.Models<br>
 &nbsp;&nbsp;&nbsp;&nbsp;.WhereType(<span class="type">ModelType</span>.Checkpoint)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;.OrderBy(<span class="type">ModelSort</span>.MostDownloaded)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;.WithResultsLimit(<span class="number">10</span>)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;.ExecuteAsync();
+&nbsp;&nbsp;&nbsp;&nbsp;.ExecuteAsync(resultsLimit: <span class="number">10</span>);
             </code>
         </div>
     </section>

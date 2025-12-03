@@ -12,6 +12,7 @@
     <Project Path="Documentation/Guides/QuickStart/QuickStart.csproj" />
     <Project Path="Documentation/Guides/RequestBuilders/RequestBuilders.csproj" />
     <Project Path="Documentation/Guides/Tags/Tags.csproj" />
+    <Project Path="Documentation/Guides/Tools/Tools.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
@@ -22,7 +23,9 @@
   <Folder Name="/Tests/">
     <Project Path="Tests/CivitaiSharp.Core.Tests/CivitaiSharp.Core.Tests.csproj" />
     <Project Path="Tests/CivitaiSharp.Sdk.Tests/CivitaiSharp.Sdk.Tests.csproj" />
+    <Project Path="Tests/CivitaiSharp.Tools.Tests/CivitaiSharp.Tools.Tests.csproj" />
   </Folder>
   <Project Path="Core/CivitaiSharp.Core.csproj" />
   <Project Path="Sdk/CivitaiSharp.Sdk.csproj" />
+  <Project Path="Tools/CivitaiSharp.Tools.csproj" />
 </Solution>

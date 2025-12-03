@@ -207,6 +207,31 @@ public enum ErrorCode
     FileWriteFailed = 604,
 
     /// <summary>
+    /// Failed to create a directory.
+    /// </summary>
+    DirectoryCreationFailed = 605,
+
+    /// <summary>
+    /// Hash verification failed because the computed hash does not match the expected hash.
+    /// </summary>
+    HashVerificationFailed = 606,
+
+    /// <summary>
+    /// The download URL is missing or null.
+    /// </summary>
+    DownloadUrlMissing = 607,
+
+    /// <summary>
+    /// The image URL is missing or null.
+    /// </summary>
+    ImageUrlMissing = 608,
+
+    /// <summary>
+    /// A path pattern contains invalid tokens or is malformed.
+    /// </summary>
+    PatternValidationFailed = 609,
+
+    /// <summary>
     /// A requested resource is not available or not ready.
     /// </summary>
     ResourceUnavailable = 700

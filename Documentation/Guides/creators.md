@@ -79,8 +79,7 @@ if (models is Result<PagedResult<Model>>.Success success)
 
 ```csharp
 var topCreators = await apiClient.Creators
-    .WithResultsLimit(50)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 50);
 
 if (topCreators is Result<PagedResult<Creator>>.Success success)
 {
@@ -94,10 +93,9 @@ if (topCreators is Result<PagedResult<Creator>>.Success success)
 ### Search for Specific Creator
 
 ```csharp
-var searchResult = await apiClient.Creators
+var result = await apiClient.Creators
     .WhereName("artist")
-    .WithResultsLimit(20)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 50);
 ```
 
 ### Get All Models by Creator
@@ -106,8 +104,7 @@ var searchResult = await apiClient.Creators
 var creatorModels = await apiClient.Models
     .WhereUsername("specific-creator")
     .OrderBy(ModelSort.Newest)
-    .WithResultsLimit(100)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 100);
 
 if (creatorModels is Result<PagedResult<Model>>.Success success)
 {
@@ -125,7 +122,7 @@ if (creatorModels is Result<PagedResult<Model>>.Success success)
 
 **Username Matching**: The `WhereName` filter performs partial username matching. Searching for "art" will match "artist", "artworks", "art123", etc.
 
-**Page-Based Pagination**: Remember that creators use page indexes (starting from 1) instead of cursors. Use `WithPageIndex(n)` to navigate pages.
+**Page-Based Pagination**: Creators (along with Models and Tags) use page indexes (starting from 1) instead of cursor-based pagination. Use `WithPageIndex(n)` to navigate pages. Only Images endpoint uses cursor pagination.
 
 **Link Property**: The `Link` property provides a convenience URL, but using `Models.WhereUsername(creator.Username)` is recommended in code.
 
@@ -149,7 +146,7 @@ if (creatorModels is Result<PagedResult<Model>>.Success success)
 
 ```csharp
 // Example: Handling Creator endpoint unreliability
-var result = await client.Creators.WithResultsLimit(10).ExecuteAsync();
+var result = await client.Creators.ExecuteAsync(resultsLimit: 10);
 
 if (!result.IsSuccess)
 {

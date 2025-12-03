@@ -61,19 +61,26 @@
 |---------|--------|-------------|
 | **CivitaiSharp.Core** | Alpha | Cliente API publico para modelos, imagenes, etiquetas y creadores |
 | **CivitaiSharp.Sdk** | Alpha | Cliente API de Generacion/Orquestacion para trabajos de generacion de imagenes |
-| **CivitaiSharp.Tools** | Planificado | Utilidades para descargas, hash y analisis de HTML |
+| **CivitaiSharp.Tools** | Alpha | Utilidades para descargas, hash de archivos y analisis de HTML |
 
-> **Nota:** Tanto los paquetes Core como Sdk estan actualmente en Alpha. Las APIs pueden cambiar entre versiones menores.
+> **Nota:** Todos los paquetes estan actualmente en Alpha. Las APIs pueden cambiar entre versiones menores.
 
 > **Advertencia:** CivitaiSharp.Sdk no esta completamente probado y no debe usarse en entornos de produccion. Uselo bajo su propio riesgo.
 
 ---
 
-## 2. Instalación
-Instalar vía NuGet:
+## 2. Instalacion
+Instalar via NuGet:
 
 ```shell
+# Biblioteca Core - Cliente API para modelos, imagenes, etiquetas y creadores
 dotnet add package CivitaiSharp.Core --prerelease
+
+# SDK - Generacion de imagenes y gestion de trabajos (requiere token de API)
+dotnet add package CivitaiSharp.Sdk --prerelease
+
+# Tools - Hash de archivos, descargas y analisis de HTML
+dotnet add package CivitaiSharp.Tools --prerelease
 ```
 
 ---
@@ -383,10 +390,107 @@ do
     
 } while (cursor is not null);
 
-// Paginación basada en páginas (Modelos, Etiquetas, Creadores)
+// Paginacion basada en paginas (Modelos, Etiquetas, Creadores)
 var page1 = await client.Models.WithPageIndex(1).ExecuteAsync();
 var page2 = await client.Tags.WithPageIndex(2).ExecuteAsync();
 var page3 = await client.Creators.WithPageIndex(3).ExecuteAsync();
+```
+
+</details>
+
+<details>
+<summary><strong>Tools - Hash de Archivos</strong></summary>
+
+```csharp
+using CivitaiSharp.Tools.Hashing;
+using CivitaiSharp.Tools.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+
+var services = new ServiceCollection();
+services.AddCivitaiDownloads();
+
+await using var provider = services.BuildServiceProvider();
+var hashingService = provider.GetRequiredService<IFileHashingService>();
+
+// Calcular hash SHA256
+var result = await hashingService.ComputeHashAsync(
+    @"C:\Models\model.safetensors",
+    HashAlgorithm.Sha256);
+
+if (result.IsSuccess)
+{
+    Console.WriteLine($"Hash: {result.Value.Hash}");
+    Console.WriteLine($"Tamano: {result.Value.FileSize:N0} bytes");
+}
+
+// Algoritmos soportados: Sha256, Sha512, Blake3, Crc32
+var blake3Result = await hashingService.ComputeHashAsync(filePath, HashAlgorithm.Blake3);
+```
+
+</details>
+
+<details>
+<summary><strong>Tools - Descarga de Archivos</strong></summary>
+
+```csharp
+using CivitaiSharp.Core;
+using CivitaiSharp.Core.Extensions;
+using CivitaiSharp.Tools.Downloads;
+using CivitaiSharp.Tools.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+
+var services = new ServiceCollection();
+services.AddCivitaiApi();
+services.AddCivitaiDownloads(options =>
+{
+    options.Images.BaseDirectory = @"C:\Descargas\Imagenes";
+    options.Images.PathPattern = "{Username}/{Id}.{Extension}";
+    
+    options.Models.BaseDirectory = @"C:\Modelos";
+    options.Models.PathPattern = "{ModelType}/{ModelName}/{FileName}";
+    options.Models.VerifyHash = true;
+});
+
+await using var provider = services.BuildServiceProvider();
+var apiClient = provider.GetRequiredService<IApiClient>();
+var downloadService = provider.GetRequiredService<IDownloadService>();
+
+// Descargar un archivo de modelo con verificacion de hash
+var modelResult = await apiClient.Models.GetByIdAsync(4201);
+if (modelResult.IsSuccess)
+{
+    var version = modelResult.Value.ModelVersions?.FirstOrDefault();
+    var file = version?.Files?.FirstOrDefault(f => f.Primary == true);
+    
+    if (file is not null && version is not null)
+    {
+        var downloadResult = await downloadService.DownloadAsync(file, version);
+        if (downloadResult.IsSuccess)
+        {
+            Console.WriteLine($"Descargado: {downloadResult.Value.FilePath}");
+            Console.WriteLine($"Verificado: {downloadResult.Value.IsVerified}");
+        }
+    }
+}
+```
+
+</details>
+
+<details>
+<summary><strong>Tools - Analisis de HTML</strong></summary>
+
+```csharp
+using CivitaiSharp.Tools.Parsing;
+
+// Convertir descripcion HTML a Markdown
+var markdown = HtmlParser.ToMarkdown(model.Description);
+
+// Convertir a texto plano
+var plainText = HtmlParser.ToPlainText(model.Description);
+
+// O usar metodos de extension en Model/ModelVersion
+var markdown = model.GetDescriptionAsMarkdown();
+var plainText = modelVersion.GetDescriptionAsPlainText();
 ```
 
 </details>

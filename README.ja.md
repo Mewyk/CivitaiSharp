@@ -61,9 +61,9 @@
 |-----------|-----------|------|
 | **CivitaiSharp.Core** | Alpha | モデル、画像、タグ、クリエイター用のパブリックAPIクライアント |
 | **CivitaiSharp.Sdk** | Alpha | 画像生成ジョブ用のGenerator/Orchestration APIクライアント |
-| **CivitaiSharp.Tools** | 計画中 | ダウンロード、ハッシュ、HTML解析用のユーティリティ |
+| **CivitaiSharp.Tools** | Alpha | ダウンロード、ファイルハッシュ、HTML解析用のユーティリティ |
 
-> **注意:** CoreとSdkの両パッケージは現在Alpha版です。マイナーバージョン間でAPIが変更される可能性があります。
+> **注意:** すべてのパッケージは現在Alpha版です。マイナーバージョン間でAPIが変更される可能性があります。
 
 > **警告:** CivitaiSharp.Sdkは完全にテストされておらず、本番環境での使用は推奨されません。自己責任でご使用ください。
 
@@ -73,7 +73,14 @@
 NuGet経由でインストール:
 
 ```shell
+# Coreライブラリ - モデル、画像、タグ、クリエイター用のAPIクライアント
 dotnet add package CivitaiSharp.Core --prerelease
+
+# SDK - 画像生成とジョブ管理（APIトークンが必要）
+dotnet add package CivitaiSharp.Sdk --prerelease
+
+# Tools - ファイルハッシュ、ダウンロード、HTML解析
+dotnet add package CivitaiSharp.Tools --prerelease
 ```
 
 ---
@@ -387,6 +394,103 @@ do
 var page1 = await client.Models.WithPageIndex(1).ExecuteAsync();
 var page2 = await client.Tags.WithPageIndex(2).ExecuteAsync();
 var page3 = await client.Creators.WithPageIndex(3).ExecuteAsync();
+```
+
+</details>
+
+<details>
+<summary><strong>Tools - ファイルハッシュ</strong></summary>
+
+```csharp
+using CivitaiSharp.Tools.Hashing;
+using CivitaiSharp.Tools.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+
+var services = new ServiceCollection();
+services.AddCivitaiDownloads();
+
+await using var provider = services.BuildServiceProvider();
+var hashingService = provider.GetRequiredService<IFileHashingService>();
+
+// SHA256ハッシュを計算
+var result = await hashingService.ComputeHashAsync(
+    @"C:\Models\model.safetensors",
+    HashAlgorithm.Sha256);
+
+if (result.IsSuccess)
+{
+    Console.WriteLine($"ハッシュ: {result.Value.Hash}");
+    Console.WriteLine($"サイズ: {result.Value.FileSize:N0} バイト");
+}
+
+// サポートされているアルゴリズム: Sha256, Sha512, Blake3, Crc32
+var blake3Result = await hashingService.ComputeHashAsync(filePath, HashAlgorithm.Blake3);
+```
+
+</details>
+
+<details>
+<summary><strong>Tools - ファイルダウンロード</strong></summary>
+
+```csharp
+using CivitaiSharp.Core;
+using CivitaiSharp.Core.Extensions;
+using CivitaiSharp.Tools.Downloads;
+using CivitaiSharp.Tools.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+
+var services = new ServiceCollection();
+services.AddCivitaiApi();
+services.AddCivitaiDownloads(options =>
+{
+    options.Images.BaseDirectory = @"C:\Downloads\Images";
+    options.Images.PathPattern = "{Username}/{Id}.{Extension}";
+    
+    options.Models.BaseDirectory = @"C:\Models";
+    options.Models.PathPattern = "{ModelType}/{ModelName}/{FileName}";
+    options.Models.VerifyHash = true;
+});
+
+await using var provider = services.BuildServiceProvider();
+var apiClient = provider.GetRequiredService<IApiClient>();
+var downloadService = provider.GetRequiredService<IDownloadService>();
+
+// ハッシュ検証付きでモデルファイルをダウンロード
+var modelResult = await apiClient.Models.GetByIdAsync(4201);
+if (modelResult.IsSuccess)
+{
+    var version = modelResult.Value.ModelVersions?.FirstOrDefault();
+    var file = version?.Files?.FirstOrDefault(f => f.Primary == true);
+    
+    if (file is not null && version is not null)
+    {
+        var downloadResult = await downloadService.DownloadAsync(file, version);
+        if (downloadResult.IsSuccess)
+        {
+            Console.WriteLine($"ダウンロード完了: {downloadResult.Value.FilePath}");
+            Console.WriteLine($"検証済み: {downloadResult.Value.IsVerified}");
+        }
+    }
+}
+```
+
+</details>
+
+<details>
+<summary><strong>Tools - HTML解析</strong></summary>
+
+```csharp
+using CivitaiSharp.Tools.Parsing;
+
+// HTML説明をMarkdownに変換
+var markdown = HtmlParser.ToMarkdown(model.Description);
+
+// プレーンテキストに変換
+var plainText = HtmlParser.ToPlainText(model.Description);
+
+// またはModel/ModelVersionの拡張メソッドを使用
+var markdown = model.GetDescriptionAsMarkdown();
+var plainText = modelVersion.GetDescriptionAsPlainText();
 ```
 
 </details>

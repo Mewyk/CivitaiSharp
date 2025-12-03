@@ -60,9 +60,9 @@
 |---------|--------|-------------|
 | **CivitaiSharp.Core** | Alpha | Public API client for models, images, tags, and creators |
 | **CivitaiSharp.Sdk** | Alpha | Generator/Orchestration API client for image generation jobs |
-| **CivitaiSharp.Tools** | Planned | Utilities for downloads, hashing, and HTML parsing |
+| **CivitaiSharp.Tools** | Alpha | Utilities for downloads, file hashing, and HTML parsing |
 
-> **Note:** Both Core and Sdk packages are currently in Alpha. APIs may change between minor versions.
+> **Note:** All packages are currently in Alpha. APIs may change between minor versions.
 
 > **Warning:** CivitaiSharp.Sdk is not fully tested and should not be used in production environments. Use at your own risk.
 
@@ -71,7 +71,14 @@
 Install via NuGet:
 
 ```shell
+# Core library - API client for models, images, tags, and creators
 dotnet add package CivitaiSharp.Core --prerelease
+
+# SDK - Image generation and job management (requires API token)
+dotnet add package CivitaiSharp.Sdk --prerelease
+
+# Tools - File hashing, downloads, and HTML parsing
+dotnet add package CivitaiSharp.Tools --prerelease
 ```
 
 
@@ -382,6 +389,103 @@ do
 var page1 = await client.Models.WithPageIndex(1).ExecuteAsync();
 var page2 = await client.Tags.WithPageIndex(2).ExecuteAsync();
 var page3 = await client.Creators.WithPageIndex(3).ExecuteAsync();
+```
+
+</details>
+
+<details>
+<summary><strong>Tools - File Hashing</strong></summary>
+
+```csharp
+using CivitaiSharp.Tools.Hashing;
+using CivitaiSharp.Tools.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+
+var services = new ServiceCollection();
+services.AddCivitaiDownloads();
+
+await using var provider = services.BuildServiceProvider();
+var hashingService = provider.GetRequiredService<IFileHashingService>();
+
+// Compute SHA256 hash
+var result = await hashingService.ComputeHashAsync(
+    @"C:\Models\model.safetensors",
+    HashAlgorithm.Sha256);
+
+if (result.IsSuccess)
+{
+    Console.WriteLine($"Hash: {result.Value.Hash}");
+    Console.WriteLine($"Size: {result.Value.FileSize:N0} bytes");
+}
+
+// Supported algorithms: Sha256, Sha512, Blake3, Crc32
+var blake3Result = await hashingService.ComputeHashAsync(filePath, HashAlgorithm.Blake3);
+```
+
+</details>
+
+<details>
+<summary><strong>Tools - Downloading Files</strong></summary>
+
+```csharp
+using CivitaiSharp.Core;
+using CivitaiSharp.Core.Extensions;
+using CivitaiSharp.Tools.Downloads;
+using CivitaiSharp.Tools.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+
+var services = new ServiceCollection();
+services.AddCivitaiApi();
+services.AddCivitaiDownloads(options =>
+{
+    options.Images.BaseDirectory = @"C:\Downloads\Images";
+    options.Images.PathPattern = "{Username}/{Id}.{Extension}";
+    
+    options.Models.BaseDirectory = @"C:\Models";
+    options.Models.PathPattern = "{ModelType}/{ModelName}/{FileName}";
+    options.Models.VerifyHash = true;
+});
+
+await using var provider = services.BuildServiceProvider();
+var apiClient = provider.GetRequiredService<IApiClient>();
+var downloadService = provider.GetRequiredService<IDownloadService>();
+
+// Download a model file with hash verification
+var modelResult = await apiClient.Models.GetByIdAsync(4201);
+if (modelResult.IsSuccess)
+{
+    var version = modelResult.Value.ModelVersions?.FirstOrDefault();
+    var file = version?.Files?.FirstOrDefault(f => f.Primary == true);
+    
+    if (file is not null && version is not null)
+    {
+        var downloadResult = await downloadService.DownloadAsync(file, version);
+        if (downloadResult.IsSuccess)
+        {
+            Console.WriteLine($"Downloaded: {downloadResult.Value.FilePath}");
+            Console.WriteLine($"Verified: {downloadResult.Value.IsVerified}");
+        }
+    }
+}
+```
+
+</details>
+
+<details>
+<summary><strong>Tools - HTML Parsing</strong></summary>
+
+```csharp
+using CivitaiSharp.Tools.Parsing;
+
+// Convert HTML description to Markdown
+var markdown = HtmlParser.ToMarkdown(model.Description);
+
+// Convert to plain text
+var plainText = HtmlParser.ToPlainText(model.Description);
+
+// Or use extension methods on Model/ModelVersion
+var markdown = model.GetDescriptionAsMarkdown();
+var plainText = modelVersion.GetDescriptionAsPlainText();
 ```
 
 </details>

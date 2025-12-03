@@ -19,12 +19,12 @@ using CivitaiSharp.Core.Validation;
 public sealed record ModelBuilder : RequestBuilder<ModelBuilder, Model>
 {
     /// <summary>
-    /// The minimum allowed value for <see cref="RequestBuilder{TBuilder, TEntity}.WithResultsLimit"/> (1).
+    /// The minimum allowed value for the <c>resultsLimit</c> parameter in <c>ExecuteAsync</c> (1).
     /// </summary>
     public const int MinimumResultsPerPage = 1;
 
     /// <summary>
-    /// The maximum allowed value for <see cref="RequestBuilder{TBuilder, TEntity}.WithResultsLimit"/> (100).
+    /// The maximum allowed value for the <c>resultsLimit</c> parameter in <c>ExecuteAsync</c> (100).
     /// </summary>
     public const int MaximumResultsPerPage = 100;
 

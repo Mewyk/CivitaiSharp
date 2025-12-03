@@ -200,18 +200,7 @@ public abstract record RequestBuilder<TBuilder, TEntity>
         _ => value.ToString() ?? string.Empty
     };
 
-    /// <summary>
-    /// Sets the number of results to return per page. Omit to use the API default (which returns all available results up to the endpoint's maximum).
-    /// </summary>
-    /// <param name="count">Number of results per page. Must be between <see cref="MinResultsLimit"/> and <see cref="MaxResultsLimit"/>.</param>
-    /// <returns>A new builder instance with the updated results limit.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if count is less than <see cref="MinResultsLimit"/> or greater than <see cref="MaxResultsLimit"/>.</exception>
-    public TBuilder WithResultsLimit(int count)
-    {
-        ArgumentOutOfRangeException.ThrowIfLessThan(count, MinResultsLimit);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(count, MaxResultsLimit);
-        return With(_filters, _sort, count);
-    }
+
 
     /// <summary>
     /// Adds or updates a filter parameter with a typed value.
@@ -238,7 +227,7 @@ public abstract record RequestBuilder<TBuilder, TEntity>
     /// <summary>
     /// Executes the request and returns paged results with pagination metadata.
     /// </summary>
-    /// <param name="resultsLimit">Optional number of results per page (overrides WithResultsLimit if specified). Must be between <see cref="MinResultsLimit"/> and <see cref="MaxResultsLimit"/>. Omit to use the API default.</param>
+    /// <param name="resultsLimit">Optional number of results per page. Must be between <see cref="MinResultsLimit"/> and <see cref="MaxResultsLimit"/>. Omit to use the API default.</param>
     /// <param name="cursor">Optional cursor for cursor-based pagination.</param>
     /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
     /// <returns>A task that represents the asynchronous operation. The result contains either the paged items or an error.</returns>

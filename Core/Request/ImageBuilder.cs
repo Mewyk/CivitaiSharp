@@ -16,12 +16,12 @@ using CivitaiSharp.Core.Validation;
 public sealed record ImageBuilder : RequestBuilder<ImageBuilder, Image>
 {
     /// <summary>
-    /// The minimum allowed value for <see cref="RequestBuilder{TBuilder, TEntity}.WithResultsLimit"/> (1).
+    /// The minimum allowed value for the <c>resultsLimit</c> parameter in <c>ExecuteAsync</c> (1).
     /// </summary>
     public const int MinimumResultsPerPage = 1;
 
     /// <summary>
-    /// The maximum allowed value for <see cref="RequestBuilder{TBuilder, TEntity}.WithResultsLimit"/> (200).
+    /// The maximum allowed value for the <c>resultsLimit</c> parameter in <c>ExecuteAsync</c> (200).
     /// </summary>
     public const int MaximumResultsPerPage = 200;
 
@@ -153,17 +153,5 @@ public sealed record ImageBuilder : RequestBuilder<ImageBuilder, Image>
     {
         period.ThrowIfUndefined();
         return WithFilter(FilterKeys.Period, period.ToApiString());
-    }
-
-    /// <summary>
-    /// Set the page index for page-based pagination.
-    /// </summary>
-    /// <param name="pageIndex">The 1-based page index. Must be at least 1.</param>
-    /// <returns>A new builder instance with the page index applied.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if pageIndex is less than 1.</exception>
-    public ImageBuilder WithPageIndex(int pageIndex)
-    {
-        ArgumentOutOfRangeException.ThrowIfLessThan(pageIndex, 1);
-        return WithFilter(FilterKeys.Page, pageIndex.ToString(CultureInfo.InvariantCulture));
     }
 }

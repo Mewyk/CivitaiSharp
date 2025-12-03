@@ -12,6 +12,7 @@
     <Project Path="Documentation/Guides/QuickStart/QuickStart.csproj" />
     <Project Path="Documentation/Guides/RequestBuilders/RequestBuilders.csproj" />
     <Project Path="Documentation/Guides/Tags/Tags.csproj" />
+    <Project Path="Documentation/Guides/Tools/Tools.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />

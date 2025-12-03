@@ -40,3 +40,15 @@ items:
   items:
     - name: Introduction
       href: sdk-introduction.md
+
+- name: Tools Library
+  href: tools-introduction.md
+  items:
+    - name: Introduction
+      href: tools-introduction.md
+    - name: File Hashing
+      href: file-hashing.md
+    - name: Downloading Files
+      href: downloading-files.md
+    - name: HTML Parsing
+      href: html-parsing.md

@@ -34,6 +34,15 @@ The SDK provides high-level abstractions for image generation and advanced workf
 - [SDK Introduction](sdk-introduction.md) - Overview of CivitaiSharp.Sdk
 - [AI Resource Identifier (AIR)](air-identifier.md) - Parse and validate AIR identifiers
 
+## Tools Library
+
+The Tools library provides utilities for file hashing, downloading, and HTML parsing.
+
+- [Tools Introduction](tools-introduction.md) - Overview of CivitaiSharp.Tools
+- [File Hashing](file-hashing.md) - Compute SHA256, SHA512, BLAKE3, and CRC32 hashes
+- [Downloading Files](downloading-files.md) - Download images and models with path patterns
+- [HTML Parsing](html-parsing.md) - Convert descriptions to Markdown or plain text
+
 ## Reference
 
 - [API Behavior & Quirks](api-quirks.md) - Known API behaviors and workarounds

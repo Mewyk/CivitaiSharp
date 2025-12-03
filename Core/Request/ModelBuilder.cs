@@ -77,6 +77,34 @@ public sealed record ModelBuilder : RequestBuilder<ModelBuilder, Model>
         return HttpClient.GetAsync<Model>(uri, cancellationToken);
     }
 
+    /// <summary>
+    /// Gets a model version by its unique version identifier.
+    /// </summary>
+    /// <param name="versionId">The model version identifier. Must be a positive value.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The result contains either the model version or an error.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if versionId is less than 1.</exception>
+    public Task<Result<ModelVersion>> GetByVersionIdAsync(long versionId, CancellationToken cancellationToken = default)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(versionId, 1);
+        var uri = HttpClient.Options.GetApiPath($"model-versions/{versionId.ToString(CultureInfo.InvariantCulture)}");
+        return HttpClient.GetAsync<ModelVersion>(uri, cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets a model version by one of its file hashes (SHA256, AutoV2, CRC32, etc.).
+    /// </summary>
+    /// <param name="hash">The file hash to search for. Must not be null or whitespace.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The result contains either the model version or an error.</returns>
+    /// <exception cref="ArgumentException">Thrown if hash is null or whitespace.</exception>
+    public Task<Result<ModelVersion>> GetByVersionHashAsync(string hash, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(hash);
+        var uri = HttpClient.Options.GetApiPath($"model-versions/by-hash/{Uri.EscapeDataString(hash)}");
+        return HttpClient.GetAsync<ModelVersion>(uri, cancellationToken);
+    }
+
     private static class FilterKeys
     {
         public const string Query = "query";

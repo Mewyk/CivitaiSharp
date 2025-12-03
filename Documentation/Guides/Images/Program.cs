@@ -14,8 +14,7 @@ var apiClient = host.Services.GetRequiredService<IApiClient>();
 // Find images generated with a specific model
 var imagesByModel = await apiClient.Images
     .WhereModelId(123456)
-    .WithResultsLimit(10)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 10);
 
 if (imagesByModel is Result<PagedResult<Image>>.Success success)
 {
@@ -30,8 +29,7 @@ if (imagesByModel is Result<PagedResult<Image>>.Success success)
 // Find images generated with a specific model version
 var imagesByVersion = await apiClient.Images
     .WhereModelVersionId(789012)
-    .WithResultsLimit(10)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 10);
 
 if (imagesByVersion is Result<PagedResult<Image>>.Success versionSuccess)
 {
@@ -48,8 +46,7 @@ var imagesByCreator = await apiClient.Images
     .WhereUsername("civitai")
     .OrderBy(ImageSort.MostReactions)
     .WherePeriod(TimePeriod.Week)
-    .WithResultsLimit(10)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 10);
 
 if (imagesByCreator is Result<PagedResult<Image>>.Success creatorSuccess)
 {
@@ -62,27 +59,32 @@ if (imagesByCreator is Result<PagedResult<Image>>.Success creatorSuccess)
 // #endregion by-creator
 
 // #region pagination
-// Paginate through image results using page index
-var page1 = await apiClient.Images
-    .WhereModelId(123456)
-    .WithPageIndex(1)
-    .WithResultsLimit(20)
-    .ExecuteAsync();
+// Paginate through image results using cursor-based pagination
+string? cursor = null;
+var allImages = new List<Image>();
+const int maxImages = 40;
 
-if (page1 is Result<PagedResult<Image>>.Success page1Success)
+do
 {
-    Console.WriteLine($"Page 1: {page1Success.Data.Items.Count} images");
-
-    // Get the next page
-    var page2 = await apiClient.Images
+    var result = await apiClient.Images
         .WhereModelId(123456)
-        .WithPageIndex(2)
-        .WithResultsLimit(20)
-        .ExecuteAsync();
+        .ExecuteAsync(resultsLimit: 20, cursor: cursor);
 
-    if (page2 is Result<PagedResult<Image>>.Success page2Success)
+    if (result is Result<PagedResult<Image>>.Success success)
     {
-        Console.WriteLine($"Page 2: {page2Success.Data.Items.Count} images");
+        allImages.AddRange(success.Data.Items);
+        cursor = success.Data.Metadata?.NextCursor;
+        Console.WriteLine($"Fetched {success.Data.Items.Count} images. Total: {allImages.Count}");
+
+        if (allImages.Count >= maxImages)
+            break;
+    }
+    else
+    {
+        break;
     }
 }
+while (!string.IsNullOrEmpty(cursor));
+
+Console.WriteLine($"Collected {allImages.Count} images total.");
 // #endregion pagination

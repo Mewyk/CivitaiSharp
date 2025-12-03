@@ -14,8 +14,7 @@ When you execute a query, the result includes pagination metadata:
 ```csharp
 var result = await apiClient.Models
     .WhereType(ModelType.Lora)
-    .WithResultsLimit(10)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 10);
 
 if (result is Result<PagedResult<Model>>.Success success)
 {
@@ -47,7 +46,7 @@ The `PaginationMetadata` record contains:
 
 ### Setting Page Size
 
-Use `WithResultsLimit` to control how many items are returned per page:
+Use the `resultsLimit` parameter in `ExecuteAsync` to control how many items are returned per page:
 
 [!code-csharp[Program.cs](Pagination/Program.cs#page-size)]
 
@@ -59,7 +58,7 @@ Use cursor-based pagination to iterate through all pages:
 
 ## Page-Based Pagination
 
-The Creators and Images endpoints support page index-based pagination:
+The Models, Tags, and Creators endpoints support page index-based pagination:
 
 [!code-csharp[Program.cs](Pagination/Program.cs#page-index)]
 

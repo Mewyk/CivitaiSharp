@@ -60,7 +60,7 @@ Use `OrderBy` methods where available:
 
 ### Limiting Results
 
-Use `WithResultsLimit` to control page size:
+Pass `resultsLimit` to `ExecuteAsync` to control page size:
 
 [!code-csharp[Program.cs](RequestBuilders/Program.cs#limiting)]
 
@@ -124,10 +124,10 @@ The `ModelBuilder` provides the most comprehensive set of filters:
 
 | Method | Description |
 |--------|-------------|
-| `WithResultsLimit(int)` | Set results per page (1-100) |
 | `WithPageIndex(int)` | Set page index for pagination |
 | `OrderBy(ModelSort)` | Sort results (HighestRated, MostDownloaded, Newest) |
 | `WherePeriod(TimePeriod)` | Filter by time period |
+| `ExecuteAsync(resultsLimit, cursor)` | Execute query with optional limit (1-100) and cursor |
 
 ## ImageBuilder Reference
 
@@ -140,8 +140,7 @@ The `ModelBuilder` provides the most comprehensive set of filters:
 | `WhereNsfwLevel(ImageNsfwLevel)` | Filter by NSFW level |
 | `OrderBy(ImageSort)` | Sort results (MostReactions, MostComments, MostCollected, Newest, Oldest, Random) |
 | `WherePeriod(TimePeriod)` | Filter by time period |
-| `WithPageIndex(int)` | Set page index for pagination |
-| `WithResultsLimit(int)` | Set results per page (1-200) |
+| `ExecuteAsync(resultsLimit, cursor)` | Execute query with optional limit (1-200) and cursor |
 
 ## Validation
 
@@ -155,7 +154,7 @@ apiClient.Models.WhereName("");
 apiClient.Models.GetByIdAsync(0);
 
 // Throws ArgumentOutOfRangeException - limit must be 1-100
-apiClient.Models.WithResultsLimit(500);
+apiClient.Models.ExecuteAsync(resultsLimit: 500);
 ```
 
 ## Next Steps

@@ -12,8 +12,7 @@ var apiClient = provider.GetRequiredService<IApiClient>();
 
 #region List All Tags
 var allTags = await apiClient.Tags
-    .WithResultsLimit(20)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 20);
 
 if (allTags is Result<PagedResult<Tag>>.Success success)
 {
@@ -27,7 +26,6 @@ if (allTags is Result<PagedResult<Tag>>.Success success)
 #region Search by Name
 var searchResult = await apiClient.Tags
     .WhereName("anime")
-    .WithResultsLimit(50)
     .ExecuteAsync();
 
 if (searchResult is Result<PagedResult<Tag>>.Success searchSuccess)
@@ -42,24 +40,21 @@ if (searchResult is Result<PagedResult<Tag>>.Success searchSuccess)
 
 #region Pagination
 var firstPage = await apiClient.Tags
-    .WithResultsLimit(100)
-    .ExecuteAsync();
+    .WithPageIndex(1)
+    .ExecuteAsync(resultsLimit: 100);
 
 if (firstPage is Result<PagedResult<Tag>>.Success first)
 {
     Console.WriteLine($"Page 1: {first.Data.Items.Count} tags");
     
-    var cursor = first.Data.Metadata?.NextCursor;
-    if (cursor is not null)
+    // Fetch page 2
+    var secondPage = await apiClient.Tags
+        .WithPageIndex(2)
+        .ExecuteAsync(resultsLimit: 100);
+    
+    if (secondPage is Result<PagedResult<Tag>>.Success second)
     {
-        var nextPage = await apiClient.Tags
-            .WithResultsLimit(100)
-            .ExecuteAsync(cursor: cursor);
-        
-        if (nextPage is Result<PagedResult<Tag>>.Success next)
-        {
-            Console.WriteLine($"Page 2: {next.Data.Items.Count} tags");
-        }
+        Console.WriteLine($"Page 2: {second.Data.Items.Count} tags");
     }
 }
 #endregion

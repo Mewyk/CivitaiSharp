@@ -21,8 +21,7 @@ var animeLorasByCreator = await apiClient.Models
     .WhereType(ModelType.Lora)
     .WhereTag("anime")
     .WhereUsername("civitai")
-    .WithResultsLimit(20)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 20);
 // #endregion filtering
 
 // #region sorting
@@ -31,16 +30,14 @@ var topRated = await apiClient.Models
     .WhereType(ModelType.Checkpoint)
     .OrderBy(ModelSort.HighestRated)
     .WherePeriod(TimePeriod.Week)
-    .WithResultsLimit(10)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 10);
 // #endregion sorting
 
 // #region limiting
 // Return only 5 results per page
 var limitedResults = await apiClient.Models
     .WhereName("sdxl")
-    .WithResultsLimit(5)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 5);
 
 if (limitedResults is Result<PagedResult<Model>>.Success success)
 {

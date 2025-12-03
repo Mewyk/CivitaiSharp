@@ -120,8 +120,7 @@ var result = await client.Models
     .WhereType(ModelType.Checkpoint)
     .WhereNsfw(false)
     .OrderBy(ModelSort.MostDownloaded)
-    .WithResultsLimit(10)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 10);
 
 if (result.IsSuccess)
 {
@@ -176,7 +175,7 @@ All settings have sensible defaults, so an empty section is valid.
 | `TimeoutSeconds` | `int` | `30` | HTTP request timeout (1-300 seconds) |
 | `StrictJsonParsing` | `bool` | `false` | Throw on unmapped JSON properties |
 
-> **Authentication Note:** The Core library can query public endpoints (models, images, tags, creators) without an API key. An API key is only required for authenticated features like favorites, hidden models, NSFW content, and higher rate limits. This is different from CivitaiSharp.Sdk which **always requires an API token** for all operations.
+> **Authentication Note:** The Core library can query public endpoints (models, images, tags, creators) without an API key. An API key is only required for authenticated features like favorites, hidden models, and higher rate limits. **NSFW Content**: Setting `WhereNsfw(true)` on models or using certain `ImageNsfwLevel` values (Mature, X) requires authentication. This is different from CivitaiSharp.Sdk which **always requires an API token** for all operations.
 
 </details>
 
@@ -234,8 +233,7 @@ var result = await client.Models
 var result = await client.Models
     .WhereType(ModelType.Checkpoint)
     .OrderBy(ModelSort.MostDownloaded)
-    .WithResultsLimit(25)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 25);
 
 // Filter by tag
 var result = await client.Models
@@ -313,8 +311,7 @@ var result = await client.Images
 var result = await client.Images
     .WhereUsername("Mewyk")
     .WhereNsfwLevel(ImageNsfwLevel.None)
-    .WithResultsLimit(50)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 50);
 
 // Filter by post ID
 var result = await client.Images
@@ -334,8 +331,7 @@ var result = await client.Tags.ExecuteAsync();
 // Search tags by name
 var result = await client.Tags
     .WhereName("portrait")
-    .WithResultsLimit(100)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 100);
 ```
 
 </details>
@@ -350,14 +346,12 @@ var result = await client.Creators.ExecuteAsync();
 // Search creators by name
 var result = await client.Creators
     .WhereName("Mewyk")
-    .WithResultsLimit(20)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 20);
 
-// Page-based pagination (creators use pages, not cursors)
+// Page-based pagination (Models, Tags, and Creators use pages, not cursors)
 var result = await client.Creators
     .WithPageIndex(2)
-    .WithResultsLimit(50)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 50);
 ```
 
 </details>
@@ -366,28 +360,28 @@ var result = await client.Creators
 <summary><strong>Pagination</strong></summary>
 
 ```csharp
-// Cursor-based pagination (Models, Images, Tags)
+// Cursor-based pagination (Images only)
 string? cursor = null;
-var allModels = new List<Model>();
+var allImages = new List<Image>();
 
 do
 {
-    var result = await client.Models
-        .WhereType(ModelType.Checkpoint)
-        .WithResultsLimit(100)
-        .ExecuteAsync(cursor: cursor);
+    result = await client.Images
+        .WhereModelId(12345)
+        .ExecuteAsync(resultsLimit: 100, cursor: cursor);
 
     if (!result.IsSuccess)
         break;
 
-    allModels.AddRange(result.Value.Items);
+    allImages.AddRange(result.Value.Items);
     cursor = result.Value.Metadata?.NextCursor;
     
 } while (cursor is not null);
 
-// Page-based pagination (Creators only)
-var page1 = await client.Creators.WithPageIndex(1).ExecuteAsync();
-var page2 = await client.Creators.WithPageIndex(2).ExecuteAsync();
+// Page-based pagination (Models, Tags, Creators)
+var page1 = await client.Models.WithPageIndex(1).ExecuteAsync();
+var page2 = await client.Tags.WithPageIndex(2).ExecuteAsync();
+var page3 = await client.Creators.WithPageIndex(3).ExecuteAsync();
 ```
 
 </details>
@@ -471,7 +465,7 @@ The `/api/v1/creators` endpoint is known to experience intermittent reliability 
 
 ```csharp
 // Example: Handling Creator endpoint unreliability
-var result = await client.Creators.WithResultsLimit(10).ExecuteAsync();
+var result = await client.Creators.ExecuteAsync(resultsLimit: 10);
 
 if (!result.IsSuccess)
 {

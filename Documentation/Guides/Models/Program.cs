@@ -14,8 +14,7 @@ var apiClient = host.Services.GetRequiredService<IApiClient>();
 // Query LoRA models only
 var loraResult = await apiClient.Models
     .WhereType(ModelType.Lora)
-    .WithResultsLimit(10)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 10);
 
 if (loraResult is Result<PagedResult<Model>>.Success success)
 {
@@ -31,8 +30,7 @@ if (loraResult is Result<PagedResult<Model>>.Success success)
 var animeResult = await apiClient.Models
     .WhereTag("anime")
     .WhereType(ModelType.Lora)
-    .WithResultsLimit(10)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 10);
 
 if (animeResult is Result<PagedResult<Model>>.Success animeSuccess)
 {
@@ -44,8 +42,7 @@ if (animeResult is Result<PagedResult<Model>>.Success animeSuccess)
 // Query models by a specific creator
 var creatorResult = await apiClient.Models
     .WhereUsername("civitai")
-    .WithResultsLimit(10)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 10);
 
 if (creatorResult is Result<PagedResult<Model>>.Success creatorSuccess)
 {
@@ -58,8 +55,7 @@ if (creatorResult is Result<PagedResult<Model>>.Success creatorSuccess)
 var searchResult = await apiClient.Models
     .WhereName("realistic")
     .WhereType(ModelType.Checkpoint)
-    .WithResultsLimit(10)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 10);
 
 if (searchResult is Result<PagedResult<Model>>.Success searchSuccess)
 {
@@ -141,8 +137,7 @@ var commercialFriendly = await apiClient.Models
     .WhereAllowDerivatives(true)
     .WhereAllowDifferentLicenses(true)
     .WhereCommercialUse(CommercialUsePermission.Sell)
-    .WithResultsLimit(10)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 10);
 
 if (commercialFriendly is Result<PagedResult<Model>>.Success permSuccess)
 {

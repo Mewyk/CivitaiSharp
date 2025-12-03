@@ -35,7 +35,7 @@ services.AddCivitaiApi(options =>
 ```
 
 > [!NOTE]
-> The Core library can query public endpoints (models, images, tags, creators) without an API key. An API key is only needed for authenticated features like favorites, hidden models, and higher rate limits.
+> The Core library can query public endpoints (models, images, tags, creators) without an API key. An API key is only needed for authenticated features like favorites, hidden models, higher rate limits, and accessing NSFW content (e.g., `WhereNsfw(true)` or `ImageNsfwLevel.Mature`/`X`). Note: Images use cursor-based pagination while Models, Tags, and Creators use page-based pagination.
 
 ### Basic Usage
 
@@ -47,7 +47,7 @@ public class MyService(IApiClient apiClient)
         var result = await apiClient.Models
             .WhereType(ModelType.Lora)
             .WhereTag("anime")
-            .WithResultsLimit(10)
+            .ExecuteAsync(resultsLimit: 10);
             .ExecuteAsync();
 
         if (result is Result<PagedResult<Model>>.Success success)

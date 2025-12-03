@@ -41,8 +41,7 @@ Tags are referenced in model queries to filter results:
 ```csharp
 var animeModels = await apiClient.Models
     .WhereTag("anime")
-    .WithResultsLimit(50)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 50);
 
 if (animeModels is Result<PagedResult<Model>>.Success success)
 {
@@ -78,8 +77,7 @@ if (model.Tags is { } tags)
 
 ```csharp
 var popularTags = await apiClient.Tags
-    .WithResultsLimit(100)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 100);
 
 if (popularTags is Result<PagedResult<Tag>>.Success success)
 {
@@ -96,8 +94,7 @@ if (popularTags is Result<PagedResult<Tag>>.Success success)
 ```csharp
 var characterTags = await apiClient.Tags
     .WhereName("character")
-    .WithResultsLimit(50)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 50);
 ```
 
 ## Best Practices

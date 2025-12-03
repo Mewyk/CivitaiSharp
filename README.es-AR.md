@@ -123,8 +123,7 @@ var result = await client.Models
     .WhereType(ModelType.Checkpoint)
     .WhereNsfw(false)
     .OrderBy(ModelSort.MostDownloaded)
-    .WithResultsLimit(10)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 10);
 
 if (result.IsSuccess)
 {
@@ -239,8 +238,7 @@ var result = await client.Models
 var result = await client.Models
     .WhereType(ModelType.Checkpoint)
     .OrderBy(ModelSort.MostDownloaded)
-    .WithResultsLimit(25)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 25);
 
 // Filtrar por etiqueta
 var result = await client.Models
@@ -318,8 +316,7 @@ var result = await client.Images
 var result = await client.Images
     .WhereUsername("Mewyk")
     .WhereNsfwLevel(ImageNsfwLevel.None)
-    .WithResultsLimit(50)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 50);
 
 // Filtrar por ID de publicación
 var result = await client.Images
@@ -339,8 +336,7 @@ var result = await client.Tags.ExecuteAsync();
 // Buscar etiquetas por nombre
 var result = await client.Tags
     .WhereName("portrait")
-    .WithResultsLimit(100)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 100);
 ```
 
 </details>
@@ -355,14 +351,12 @@ var result = await client.Creators.ExecuteAsync();
 // Buscar creadores por nombre
 var result = await client.Creators
     .WhereName("Mewyk")
-    .WithResultsLimit(20)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 20);
 
-// Paginación basada en páginas (los creadores usan páginas, no cursores)
+// Paginación basada en páginas (Modelos, Etiquetas y Creadores usan páginas, no cursores)
 var result = await client.Creators
     .WithPageIndex(2)
-    .WithResultsLimit(50)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 50);
 ```
 
 </details>
@@ -371,28 +365,28 @@ var result = await client.Creators
 <summary><strong>Paginación</strong></summary>
 
 ```csharp
-// Paginación basada en cursor (Modelos, Imágenes, Etiquetas)
+// Paginación basada en cursor (Solo Imágenes)
 string? cursor = null;
-var allModels = new List<Model>();
+var allImages = new List<Image>();
 
 do
 {
-    var result = await client.Models
-        .WhereType(ModelType.Checkpoint)
-        .WithResultsLimit(100)
-        .ExecuteAsync(cursor: cursor);
+    result = await client.Images
+        .WhereModelId(12345)
+        .ExecuteAsync(resultsLimit: 100, cursor: cursor);
 
     if (!result.IsSuccess)
         break;
 
-    allModels.AddRange(result.Value.Items);
+    allImages.AddRange(result.Value.Items);
     cursor = result.Value.Metadata?.NextCursor;
     
 } while (cursor is not null);
 
-// Paginación basada en páginas (solo Creadores)
-var page1 = await client.Creators.WithPageIndex(1).ExecuteAsync();
-var page2 = await client.Creators.WithPageIndex(2).ExecuteAsync();
+// Paginación basada en páginas (Modelos, Etiquetas, Creadores)
+var page1 = await client.Models.WithPageIndex(1).ExecuteAsync();
+var page2 = await client.Tags.WithPageIndex(2).ExecuteAsync();
+var page3 = await client.Creators.WithPageIndex(3).ExecuteAsync();
 ```
 
 </details>
@@ -479,7 +473,7 @@ El endpoint `/api/v1/creators` experimenta problemas de fiabilidad intermitentes
 
 ```csharp
 // Ejemplo: Manejando la falta de fiabilidad del endpoint de Creadores
-var result = await client.Creators.WithResultsLimit(10).ExecuteAsync();
+var result = await client.Creators.ExecuteAsync(resultsLimit: 10);
 
 if (!result.IsSuccess)
 {

@@ -223,8 +223,7 @@ var hidden = await apiClient.Models
 var topRated = await apiClient.Models
     .OrderBy(ModelSort.HighestRated)
     .WherePeriod(TimePeriod.Month)
-    .WithResultsLimit(10)
-    .ExecuteAsync();
+    .ExecuteAsync(resultsLimit: 10);
 ```
 
 Available sort options:
@@ -250,6 +249,7 @@ Some filters require authentication via an API key:
 
 - **`WhereFavorites()`** - Returns only the authenticated user's favorited models. Without authentication, returns 0 results.
 - **`WhereHidden()`** - Returns only models the authenticated user has hidden. Without authentication, returns 0 results.
+- **`WhereNsfw(true)`** - Filtering for NSFW-only models requires authentication. Without an API key, this filter will return no results.
 
 Configure your API key in the service registration:
 

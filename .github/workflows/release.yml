@@ -121,6 +121,9 @@ jobs:
 
             # SDK library (Generator API - image generation, jobs, usage)
             dotnet add package CivitaiSharp.Sdk --version ${{ steps.version.outputs.version }}
+
+            # Tools library (file hashing, downloads, HTML parsing)
+            dotnet add package CivitaiSharp.Tools --version ${{ steps.version.outputs.version }}
             ```
 
             ### What's Changed

@@ -70,11 +70,11 @@ do
         .WhereModelId(123456)
         .ExecuteAsync(resultsLimit: 20, cursor: cursor);
 
-    if (result is Result<PagedResult<Image>>.Success success)
+    if (result is Result<PagedResult<Image>>.Success pageSuccess)
     {
-        allImages.AddRange(success.Data.Items);
-        cursor = success.Data.Metadata?.NextCursor;
-        Console.WriteLine($"Fetched {success.Data.Items.Count} images. Total: {allImages.Count}");
+        allImages.AddRange(pageSuccess.Data.Items);
+        cursor = pageSuccess.Data.Metadata?.NextCursor;
+        Console.WriteLine($"Fetched {pageSuccess.Data.Items.Count} images. Total: {allImages.Count}");
 
         if (allImages.Count >= maxImages)
             break;

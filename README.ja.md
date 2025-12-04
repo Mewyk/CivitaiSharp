@@ -186,7 +186,7 @@ CivitaiSharp.Coreはデフォルトで`CivitaiApi`セクションから設定を
 | `TimeoutSeconds` | `int` | `30` | HTTPリクエストのタイムアウト（1-300秒） |
 | `StrictJsonParsing` | `bool` | `false` | マップされていないJSONプロパティで例外をスロー |
 
-> **認証について:** Coreライブラリは、APIキーなしで公開エンドポイント（モデル、画像、タグ、クリエイター）をクエリできます。APIキーが必要なのは、お気に入り、非公開モデル、NSFWコンテンツ、より高いレート制限などの認証機能のみです。これはCivitaiSharp.Sdkとは異なり、**すべての操作でAPIトークンが必須**です。
+> **認証について:** Coreライブラリは、APIキーなしで公開エンドポイント（モデル、画像、タグ、クリエイター）をクエリできます。APIキーが必要なのは、お気に入り、非公開モデル、より高いレート制限などの認証機能のみです。**NSFWコンテンツ**: モデルで`WhereNsfw(true)`を設定するか、特定の`ImageNsfwLevel`値（Mature、X）を使用する場合は認証が必要です。これはCivitaiSharp.Sdkとは異なり、**すべての操作でAPIトークンが必須**です。
 
 </details>
 
@@ -532,12 +532,32 @@ else
 
 ## 6. 機能
 - **モダンな.NET 10** - null許容参照型、record、プライマリコンストラクタで構築
-- **フルエントクエリビルダー** - APIリクエストを構築するための型安全で不変のビルダー
-- **Resultパターン** - 判別共用体による明示的な成功/失敗のハンドリング
-- **組み込みのレジリエンス** - リトライポリシー、サーキットブレーカー、レート制限、タイムアウト
+- **AOT対応** - ソース生成JSONシリアライゼーションによるNative AOTとトリミングの完全サポート
+- **フルエントクエリビルダー** - APIリクエストを構築するための型安全で不変、スレッドセーフなビルダー
+- **Resultパターン** - 期待されるエラーに対する例外なしの明示的な成功/失敗のハンドリング
+- **組み込みのレジリエンス** - リトライポリシー、サーキットブレーカー、レート制限、タイムアウトを備えた標準レジリエンスハンドラー
 - **依存性注入** - `IHttpClientFactory`とMicrosoft DIのファーストクラスサポート
-- **ストリーミングダウンロード** - `ResponseHeadersRead`によるメモリ効率の良いレスポンスハンドリング
-- **明示的なJSONコントラクト** - すべてのモデルプロパティが型安全性のために`[JsonPropertyName]`を使用
+
+### AOTとトリミングのサポート
+
+すべてのCivitaiSharpパッケージはNative AOTコンパイルとILトリミングに完全に対応しています:
+
+- **ソース生成JSON** - リフレクション不要のシリアライゼーションのために`System.Text.Json`ソースジェネレーター（`JsonSerializerContext`）を使用
+- **トリムセーフ** - すべてのパッケージは`<IsAotCompatible>true</IsAotCompatible>`と`<EnableTrimAnalyzer>true</EnableTrimAnalyzer>`を持つ
+- **ランタイムリフレクションなし** - すべての型メタデータはコンパイル時に生成されます
+
+AOTで公開する場合:
+
+```shell
+dotnet publish -c Release -r win-x64 /p:PublishAot=true
+```
+
+トリミングで公開する場合:
+
+```shell
+dotnet publish -c Release -r win-x64 /p:PublishTrimmed=true
+```
+
 
 ---
 

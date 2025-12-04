@@ -526,12 +526,31 @@ else
 
 ## 6. Features
 - **Modern .NET 10** - Built with nullable reference types, records, and primary constructors
-- **Fluent Query Builders** - Type-safe, immutable builders for constructing API requests
-- **Result Pattern** - Explicit success/failure handling with discriminated union
-- **Built-in Resilience** - Retry policies, circuit breakers, rate limiting, and timeouts
+- **AOT-Ready** - Full Native AOT and trimming support with source-generated JSON serialization
+- **Fluent Query Builders** - Type-safe, immutable, thread-safe builders for constructing API requests
+- **Result Pattern** - Explicit success/failure handling without exceptions for expected errors
+- **Built-in Resilience** - Standard resilience handler with retry policies, circuit breakers, rate limiting, and timeouts
 - **Dependency Injection** - First-class support for `IHttpClientFactory` and Microsoft DI
-- **Streaming Downloads** - Memory-efficient response handling with `ResponseHeadersRead`
-- **Explicit JSON Contract** - All model properties use `[JsonPropertyName]` for type safety
+
+### AOT and Trimming Support
+
+All CivitaiSharp packages are fully compatible with Native AOT compilation and IL trimming:
+
+- **Source-Generated JSON** - Uses `System.Text.Json` source generators (`JsonSerializerContext`) for reflection-free serialization
+- **Trim-Safe** - All packages have `<IsAotCompatible>true</IsAotCompatible>` and `<EnableTrimAnalyzer>true</EnableTrimAnalyzer>`
+- **No Runtime Reflection** - All type metadata is generated at compile-time
+
+To publish with AOT:
+
+```shell
+dotnet publish -c Release -r win-x64 /p:PublishAot=true
+```
+
+To publish with trimming:
+
+```shell
+dotnet publish -c Release -r win-x64 /p:PublishTrimmed=true
+```
 
 
 ## 7. Documentation

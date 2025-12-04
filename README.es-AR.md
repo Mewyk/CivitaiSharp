@@ -186,7 +186,7 @@ Todas las configuraciones tienen valores predeterminados sensatos, por lo que un
 | `TimeoutSeconds` | `int` | `30` | Tiempo de espera de solicitud HTTP (1-300 segundos) |
 | `StrictJsonParsing` | `bool` | `false` | Lanzar excepción en propiedades JSON no mapeadas |
 
-> **Nota de Autenticación:** La biblioteca Core puede consultar endpoints públicos (modelos, imágenes, tags, creadores) sin clave API. Una clave API solo es necesaria para funcionalidades autenticadas como favoritos, modelos ocultos, contenido NSFW y límites de tasa más altos. Esto es diferente a CivitaiSharp.Sdk que **siempre requiere un token de API** para todas las operaciones.
+> **Nota de Autenticación:** La biblioteca Core puede consultar endpoints públicos (modelos, imágenes, tags, creadores) sin clave API. Una clave API solo es necesaria para funcionalidades autenticadas como favoritos, modelos ocultos y límites de tasa más altos. **Contenido NSFW**: Establecer `WhereNsfw(true)` en modelos o usar ciertos valores de `ImageNsfwLevel` (Mature, X) requiere autenticación. Esto es diferente a CivitaiSharp.Sdk que **siempre requiere un token de API** para todas las operaciones.
 
 </details>
 
@@ -532,12 +532,32 @@ else
 
 ## 6. Características
 - **.NET 10 Moderno** - Construido con tipos de referencia nullable, records y constructores primarios
-- **Constructores de Consulta Fluidos** - Constructores inmutables y seguros para tipos para construir solicitudes API
-- **Patrón Result** - Manejo explícito de éxito/falla con unión discriminada
-- **Resiliencia Integrada** - Políticas de reintento, circuit breakers, limitación de tasa y tiempos de espera
+- **Listo para AOT** - Soporte completo para Native AOT y trimming con serialización JSON generada en origen
+- **Constructores de Consulta Fluidos** - Constructores tipo-seguros, inmutables y thread-safe para construir solicitudes API
+- **Patrón Result** - Manejo explícito de éxito/falla sin excepciones para errores esperados
+- **Resiliencia Integrada** - Manejador de resiliencia estándar con políticas de reintento, circuit breakers, limitación de tasa y tiempos de espera
 - **Inyección de Dependencias** - Soporte de primera clase para `IHttpClientFactory` y Microsoft DI
-- **Descargas en Streaming** - Manejo de respuestas eficiente en memoria con `ResponseHeadersRead`
-- **Contrato JSON Explícito** - Todas las propiedades del modelo usan `[JsonPropertyName]` para seguridad de tipos
+
+### Soporte para AOT y Trimming
+
+Todos los paquetes de CivitaiSharp son totalmente compatibles con la compilación Native AOT y el trimming de IL:
+
+- **JSON Generado en Origen** - Usa generadores de origen de `System.Text.Json` (`JsonSerializerContext`) para serialización sin reflexión
+- **Trim-Safe** - Todos los paquetes tienen `<IsAotCompatible>true</IsAotCompatible>` y `<EnableTrimAnalyzer>true</EnableTrimAnalyzer>`
+- **Sin Reflexión en Runtime** - Todos los metadatos de tipos se generan en tiempo de compilación
+
+Para publicar con AOT:
+
+```shell
+dotnet publish -c Release -r win-x64 /p:PublishAot=true
+```
+
+Para publicar con trimming:
+
+```shell
+dotnet publish -c Release -r win-x64 /p:PublishTrimmed=true
+```
+
 
 ---
 

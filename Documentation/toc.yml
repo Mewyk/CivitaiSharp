@@ -2,7 +2,8 @@ items:
 - name: Home
   href: index.html
 - name: Guides
-  href: Guides/toc.yml
+  href: Guides/
   topicHref: Guides/index.md
 - name: API Reference
   href: Api/
+  topicHref: Api/index.md

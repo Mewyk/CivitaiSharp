@@ -26,6 +26,9 @@
     }
   ],
   "build": {
+    "xref": [
+      "https://learn.microsoft.com/en-us/dotnet/.xrefmap.json"
+    ],
     "content": [
       {
         "files": [
@@ -104,7 +107,14 @@
       "_appLogoUrl": "https://civitaisharp.mewyk.com",
       "_appFaviconPath": "Resources/Logo/CivitaiSharp.png",
       "_enableSearch": true,
-      "_lang": "en"
+      "_enableNewTab": true,
+      "_disableTocFilter": false,
+      "_gitContribute": {
+        "repo": "https://github.com/Mewyk/CivitaiSharp",
+        "branch": "development"
+      },
+      "_lang": "en",
+      "pdf": false
     }
   }
 }

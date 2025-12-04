@@ -1,6 +1,6 @@
 items:
 - name: Getting Started
-  href: installation.md
+  expanded: true
   items:
     - name: Installation
       href: installation.md
@@ -14,7 +14,7 @@ items:
       href: configuration.md
 
 - name: Core Library
-  href: introduction.md
+  expanded: true
   items:
     - name: Introduction
       href: introduction.md
@@ -32,17 +32,17 @@ items:
       href: error-handling.md
     - name: Pagination
       href: pagination.md
-    - name: API Behavior & Quirks
+    - name: API Behavior and Quirks
       href: api-quirks.md
 
 - name: SDK Library
-  href: sdk-introduction.md
+  expanded: true
   items:
     - name: Introduction
       href: sdk-introduction.md
 
 - name: Tools Library
-  href: tools-introduction.md
+  expanded: true
   items:
     - name: Introduction
       href: tools-introduction.md

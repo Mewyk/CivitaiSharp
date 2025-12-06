@@ -7,7 +7,7 @@ using CivitaiSharp.Sdk.Services;
 /// model availability checking, and usage tracking. For the public API (models, images, tags, creators),
 /// use <see cref="CivitaiSharp.Core.IApiClient"/> instead.
 /// </summary>
-public interface ICivitaiSdkClient
+public interface ISdkClient
 {
     /// <summary>
     /// Provides access to image generation jobs: submit, query, cancel, and retrieve results.

@@ -8,18 +8,18 @@ using CivitaiSharp.Sdk.Services;
 /// Primary client facade for the Civitai Generator SDK. Provides access to image generation,
 /// model availability checking, and usage tracking via the orchestration endpoints.
 /// Obtain an instance through dependency injection using
-/// <see cref="Extensions.ServiceCollectionExtensions.AddCivitaiSdk(Microsoft.Extensions.DependencyInjection.IServiceCollection, System.Action{CivitaiSdkClientOptions})"/>.
+/// <see cref="Extensions.ServiceCollectionExtensions.AddCivitaiSdk(Microsoft.Extensions.DependencyInjection.IServiceCollection, System.Action{SdkClientOptions})"/>.
 /// </summary>
-public sealed class CivitaiSdkClient : ICivitaiSdkClient
+public sealed class SdkClient : ISdkClient
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="CivitaiSdkClient"/> class.
+    /// Initializes a new instance of the <see cref="SdkClient"/> class.
     /// Internal to enforce dependency injection usage.
     /// </summary>
     /// <param name="httpClient">The HTTP client used to make API requests.</param>
     /// <param name="options">The SDK client options.</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="httpClient"/> or <paramref name="options"/> is null.</exception>
-    internal CivitaiSdkClient(SdkHttpClient httpClient, CivitaiSdkClientOptions options)
+    internal SdkClient(SdkHttpClient httpClient, SdkClientOptions options)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
         ArgumentNullException.ThrowIfNull(options);

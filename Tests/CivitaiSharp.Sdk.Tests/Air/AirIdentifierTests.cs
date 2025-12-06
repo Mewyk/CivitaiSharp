@@ -14,52 +14,16 @@ public sealed class AirIdentifierTests : IClassFixture<SdkTestFixture>
         var air = new AirIdentifier(
             AirEcosystem.StableDiffusionXl,
             AirAssetType.Checkpoint,
-            "civitai",
+            AirSource.Civitai,
             4201,
             130072);
 
         // Assert
         Assert.Equal(AirEcosystem.StableDiffusionXl, air.Ecosystem);
         Assert.Equal(AirAssetType.Checkpoint, air.AssetType);
-        Assert.Equal("civitai", air.Source);
+        Assert.Equal(AirSource.Civitai, air.Source);
         Assert.Equal(4201, air.ModelId);
         Assert.Equal(130072, air.VersionId);
-    }
-
-    [Fact]
-    public void WhenCreatingWithNullSourceThenThrowsArgumentNullException()
-    {
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => new AirIdentifier(
-            AirEcosystem.StableDiffusionXl,
-            AirAssetType.Checkpoint,
-            null!,
-            4201,
-            130072));
-    }
-
-    [Fact]
-    public void WhenCreatingWithEmptySourceThenThrowsArgumentException()
-    {
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => new AirIdentifier(
-            AirEcosystem.StableDiffusionXl,
-            AirAssetType.Checkpoint,
-            "",
-            4201,
-            130072));
-    }
-
-    [Fact]
-    public void WhenCreatingWithWhitespaceSourceThenThrowsArgumentException()
-    {
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => new AirIdentifier(
-            AirEcosystem.StableDiffusionXl,
-            AirAssetType.Checkpoint,
-            "   ",
-            4201,
-            130072));
     }
 
     [Fact]
@@ -69,7 +33,7 @@ public sealed class AirIdentifierTests : IClassFixture<SdkTestFixture>
         Assert.Throws<ArgumentOutOfRangeException>(() => new AirIdentifier(
             AirEcosystem.StableDiffusionXl,
             AirAssetType.Checkpoint,
-            "civitai",
+            AirSource.Civitai,
             0,
             130072));
     }
@@ -81,7 +45,7 @@ public sealed class AirIdentifierTests : IClassFixture<SdkTestFixture>
         Assert.Throws<ArgumentOutOfRangeException>(() => new AirIdentifier(
             AirEcosystem.StableDiffusionXl,
             AirAssetType.Checkpoint,
-            "civitai",
+            AirSource.Civitai,
             -1,
             130072));
     }
@@ -93,7 +57,7 @@ public sealed class AirIdentifierTests : IClassFixture<SdkTestFixture>
         Assert.Throws<ArgumentOutOfRangeException>(() => new AirIdentifier(
             AirEcosystem.StableDiffusionXl,
             AirAssetType.Checkpoint,
-            "civitai",
+            AirSource.Civitai,
             4201,
             0));
     }
@@ -105,7 +69,7 @@ public sealed class AirIdentifierTests : IClassFixture<SdkTestFixture>
         Assert.Throws<ArgumentOutOfRangeException>(() => new AirIdentifier(
             AirEcosystem.StableDiffusionXl,
             AirAssetType.Checkpoint,
-            "civitai",
+            AirSource.Civitai,
             4201,
             -1));
     }
@@ -125,7 +89,7 @@ public sealed class AirIdentifierTests : IClassFixture<SdkTestFixture>
             67890);
 
         // Assert
-        Assert.Equal("civitai", air.Source);
+        Assert.Equal(AirSource.Civitai, air.Source);
         Assert.Equal(AirEcosystem.Flux1, air.Ecosystem);
         Assert.Equal(AirAssetType.Lora, air.AssetType);
         Assert.Equal(12345, air.ModelId);
@@ -149,22 +113,26 @@ public sealed class AirIdentifierTests : IClassFixture<SdkTestFixture>
         Assert.True(success);
         Assert.Equal(AirEcosystem.StableDiffusionXl, result.Ecosystem);
         Assert.Equal(AirAssetType.Checkpoint, result.AssetType);
-        Assert.Equal("civitai", result.Source);
+        Assert.Equal(AirSource.Civitai, result.Source);
         Assert.Equal(4201, result.ModelId);
         Assert.Equal(130072, result.VersionId);
     }
 
     [Theory]
-    [InlineData("urn:air:sd1:lora:civitai:100@200", AirEcosystem.StableDiffusion1, AirAssetType.Lora)]
-    [InlineData("urn:air:sd2:vae:civitai:300@400", AirEcosystem.StableDiffusion2, AirAssetType.Vae)]
-    [InlineData("urn:air:flux1:checkpoint:civitai:500@600", AirEcosystem.Flux1, AirAssetType.Checkpoint)]
-    [InlineData("urn:air:pony:embedding:civitai:700@800", AirEcosystem.Pony, AirAssetType.Embedding)]
-    [InlineData("urn:air:sdxl:lycoris:civitai:900@1000", AirEcosystem.StableDiffusionXl, AirAssetType.Lycoris)]
-    [InlineData("urn:air:sdxl:hypernet:civitai:1100@1200", AirEcosystem.StableDiffusionXl, AirAssetType.Hypernetwork)]
+    [InlineData("urn:air:sd1:lora:civitai:100@200", AirEcosystem.StableDiffusion1, AirAssetType.Lora, AirSource.Civitai)]
+    [InlineData("urn:air:sd2:vae:civitai:300@400", AirEcosystem.StableDiffusion2, AirAssetType.Vae, AirSource.Civitai)]
+    [InlineData("urn:air:flux1:checkpoint:civitai:500@600", AirEcosystem.Flux1, AirAssetType.Checkpoint, AirSource.Civitai)]
+    [InlineData("urn:air:pony:embedding:civitai:700@800", AirEcosystem.Pony, AirAssetType.Embedding, AirSource.Civitai)]
+    [InlineData("urn:air:sdxl:lycoris:civitai:900@1000", AirEcosystem.StableDiffusionXl, AirAssetType.Lycoris, AirSource.Civitai)]
+    [InlineData("urn:air:sdxl:hypernet:civitai:1100@1200", AirEcosystem.StableDiffusionXl, AirAssetType.Hypernetwork, AirSource.Civitai)]
+    [InlineData("urn:air:sdxl:checkpoint:huggingface:100@200", AirEcosystem.StableDiffusionXl, AirAssetType.Checkpoint, AirSource.HuggingFace)]
+    [InlineData("urn:air:flux1:lora:openai:300@400", AirEcosystem.Flux1, AirAssetType.Lora, AirSource.OpenAi)]
+    [InlineData("urn:air:sd1:checkpoint:leonardo:500@600", AirEcosystem.StableDiffusion1, AirAssetType.Checkpoint, AirSource.Leonardo)]
     public void WhenParsingVariousValidAirStringsThenParsesCorrectly(
         string airString,
         AirEcosystem expectedEcosystem,
-        AirAssetType expectedAssetType)
+        AirAssetType expectedAssetType,
+        AirSource expectedSource)
     {
         // Act
         var success = AirIdentifier.TryParse(airString, out var result);
@@ -173,6 +141,7 @@ public sealed class AirIdentifierTests : IClassFixture<SdkTestFixture>
         Assert.True(success);
         Assert.Equal(expectedEcosystem, result.Ecosystem);
         Assert.Equal(expectedAssetType, result.AssetType);
+        Assert.Equal(expectedSource, result.Source);
     }
 
     [Fact]
@@ -225,6 +194,8 @@ public sealed class AirIdentifierTests : IClassFixture<SdkTestFixture>
     [InlineData("not-an-air-string")]
     [InlineData("urn:air:invalid:checkpoint:civitai:4201@130072")]
     [InlineData("urn:air:sdxl:invalid:civitai:4201@130072")]
+    [InlineData("urn:air:sdxl:checkpoint:unsupported:4201@130072")] // Invalid source
+    [InlineData("urn:air:sdxl:checkpoint:github:4201@130072")] // Invalid source
     [InlineData("urn:air:sdxl:checkpoint:civitai:abc@130072")]
     [InlineData("urn:air:sdxl:checkpoint:civitai:4201@abc")]
     [InlineData("urn:air:sdxl:checkpoint:civitai:0@130072")]
@@ -386,15 +357,16 @@ public sealed class AirIdentifierTests : IClassFixture<SdkTestFixture>
     }
 
     [Fact]
-    public void WhenComparingWithSourceCaseDifferenceThenReturnsTrue()
+    public void WhenComparingDifferentSourcesThenReturnsFalse()
     {
-        // Arrange - Source comparison should be case-insensitive
-        var air1 = new AirIdentifier(AirEcosystem.StableDiffusionXl, AirAssetType.Checkpoint, "civitai", 4201, 130072);
-        var air2 = new AirIdentifier(AirEcosystem.StableDiffusionXl, AirAssetType.Checkpoint, "CIVITAI", 4201, 130072);
+        // Arrange
+        var air1 = new AirIdentifier(AirEcosystem.StableDiffusionXl, AirAssetType.Checkpoint, AirSource.Civitai, 4201, 130072);
+        var air2 = new AirIdentifier(AirEcosystem.StableDiffusionXl, AirAssetType.Checkpoint, AirSource.HuggingFace, 4201, 130072);
 
         // Act & Assert
-        Assert.True(air1.Equals(air2));
-        Assert.Equal(air1.GetHashCode(), air2.GetHashCode());
+        Assert.False(air1.Equals(air2));
+        Assert.False(air1 == air2);
+        Assert.True(air1 != air2);
     }
 
     [Fact]

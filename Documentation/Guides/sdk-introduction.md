@@ -40,7 +40,7 @@ services.AddCivitaiSdk(options =>
 ### Basic Usage
 
 ```csharp
-public class ImageGenerationService(ICivitaiSdkClient sdkClient)
+public class ImageGenerationService(ISdkClient sdkClient)
 {
     public async Task GenerateImageAsync()
     {

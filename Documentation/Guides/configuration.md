@@ -54,7 +54,7 @@ Options are validated on assignment:
 
 ## CivitaiSharp.Sdk Configuration
 
-The `CivitaiSdkClientOptions` class configures the Generator SDK client.
+The `SdkClientOptions` class configures the Generator SDK client.
 
 > [!IMPORTANT]
 > Unlike CivitaiSharp.Core which can access public endpoints anonymously, the SDK **always requires authentication**. All Generator API operations require a valid API token.

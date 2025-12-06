@@ -9,6 +9,7 @@ CivitaiSharp.Tools provides utility functionality for working with Civitai resou
 
 ## Key Features
 
+- **AIR Builder** - Fluent API for constructing AIR (Artificial Intelligence Resource) identifiers with validation
 - **File Hashing** - Compute SHA256, SHA512, BLAKE3, and CRC32 hashes for file verification
 - **Download Management** - Download images and model files with configurable path patterns and hash verification
 - **HTML Parsing** - Convert Civitai's HTML descriptions to Markdown or plain text
@@ -142,6 +143,7 @@ Configure download behavior via appsettings.json:
 
 ## Guides
 
+- [AIR Builder](air-builder.md) - Build AIR identifiers with a fluent API
 - [File Hashing](file-hashing.md) - Compute and verify file hashes
 - [Downloading Files](downloading-files.md) - Download images and model files
 - [HTML Parsing](html-parsing.md) - Convert descriptions to Markdown or plain text

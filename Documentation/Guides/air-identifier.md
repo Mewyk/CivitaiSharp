@@ -67,20 +67,20 @@ urn:air:model:leonardo:345435
 
 ## Using AIR with CivitaiSharp
 
-The CivitaiSharp.Sdk library provides utilities for working with AIR identifiers.
+The CivitaiSharp.Sdk library provides strongly-typed utilities for working with AIR identifiers.
 
 ### Parsing an AIR
 
 ```csharp
 using CivitaiSharp.Sdk.Air;
 
-var air = AirUrn.Parse("urn:air:sdxl:lora:civitai:328553@368189");
+var air = AirIdentifier.Parse("urn:air:sdxl:lora:civitai:328553@368189");
 
-Console.WriteLine($"Ecosystem: {air.Ecosystem}");  // sdxl
-Console.WriteLine($"Type: {air.Type}");            // lora
-Console.WriteLine($"Source: {air.Source}");        // civitai
-Console.WriteLine($"Id: {air.Id}");                // 328553
-Console.WriteLine($"Version: {air.Version}");      // 368189
+Console.WriteLine($"Ecosystem: {air.Ecosystem}");  // StableDiffusionXl
+Console.WriteLine($"Asset Type: {air.AssetType}"); // Lora
+Console.WriteLine($"Source: {air.Source}");        // Civitai
+Console.WriteLine($"Model ID: {air.ModelId}");     // 328553
+Console.WriteLine($"Version ID: {air.VersionId}"); // 368189
 ```
 
 ### Creating an AIR
@@ -88,17 +88,42 @@ Console.WriteLine($"Version: {air.Version}");      // 368189
 ```csharp
 using CivitaiSharp.Sdk.Air;
 
-var air = new AirUrn
-{
-    Ecosystem = "sdxl",
-    Type = "lora",
-    Source = "civitai",
-    Id = "328553",
-    Version = "368189"
-};
+// Using the constructor
+var air = new AirIdentifier(
+    AirEcosystem.StableDiffusionXl,
+    AirAssetType.Lora,
+    AirSource.Civitai,
+    328553,
+    368189);
 
 Console.WriteLine(air.ToString());
 // Output: urn:air:sdxl:lora:civitai:328553@368189
+
+// Using the factory method (defaults to Civitai source)
+var air2 = AirIdentifier.Create(
+    AirEcosystem.StableDiffusionXl,
+    AirAssetType.Lora,
+    328553,
+    368189);
+```
+
+### Using the Builder Pattern
+
+For more complex scenarios, use the fluent builder:
+
+```csharp
+using CivitaiSharp.Sdk.Air;
+
+var air = new AirBuilder()
+    .WithEcosystem(AirEcosystem.StableDiffusionXl)
+    .WithAssetType(AirAssetType.Lora)
+    .WithSource(AirSource.HuggingFace)
+    .WithModelId(328553)
+    .WithVersionId(368189)
+    .Build();
+
+Console.WriteLine(air.ToString());
+// Output: urn:air:sdxl:lora:huggingface:328553@368189
 ```
 
 ### Validating an AIR
@@ -106,7 +131,7 @@ Console.WriteLine(air.ToString());
 ```csharp
 using CivitaiSharp.Sdk.Air;
 
-if (AirUrn.TryParse("urn:air:sdxl:lora:civitai:328553@368189", out var air))
+if (AirIdentifier.TryParse("urn:air:sdxl:lora:civitai:328553@368189", out var air))
 {
     Console.WriteLine($"Valid AIR: {air}");
 }
@@ -115,6 +140,19 @@ else
     Console.WriteLine("Invalid AIR format");
 }
 ```
+
+### Supported Sources
+
+CivitaiSharp supports four platforms as defined in the official AIR specification:
+
+| Source | Enum Value | Description |
+|--------|------------|-------------|
+| Civitai | `AirSource.Civitai` | Civitai platform resources |
+| Hugging Face | `AirSource.HuggingFace` | Hugging Face model hub |
+| OpenAI | `AirSource.OpenAi` | OpenAI models (DALL-E, GPT) |
+| Leonardo | `AirSource.Leonardo` | Leonardo.Ai platform |
+
+All sources are strongly typed as enums, providing compile-time safety and IDE intellisense.
 
 ## Common Use Cases
 
@@ -125,7 +163,7 @@ AIR provides a standardized way to reference models in your application configur
 ```json
 {
   "models": {
-    "checkpoint": "urn:air:sdxl:model:civitai:101055@128078",
+    "checkpoint": "urn:air:sdxl:checkpoint:civitai:101055@128078",
     "lora": "urn:air:sdxl:lora:civitai:328553@368189"
   }
 }
@@ -137,10 +175,20 @@ Since AIR is a universal identifier, it can be used to reference resources acros
 
 ```csharp
 // Civitai resource
-var civitaiModel = AirUrn.Parse("urn:air:sdxl:model:civitai:101055@128078");
+var civitaiModel = AirIdentifier.Parse("urn:air:sdxl:checkpoint:civitai:101055@128078");
 
 // Hugging Face resource
-var hfModel = AirUrn.Parse("urn:air:model:huggingface:stabilityai/sdxl-vae");
+var hfModel = AirIdentifier.Parse("urn:air:sdxl:checkpoint:huggingface:100@200");
+
+// Switching sources programmatically
+var builder = new AirBuilder()
+    .WithEcosystem(AirEcosystem.StableDiffusionXl)
+    .WithAssetType(AirAssetType.Checkpoint)
+    .WithModelId(101055)
+    .WithVersionId(128078);
+
+var civitai = builder.WithSource(AirSource.Civitai).Build();
+var leonardo = builder.WithSource(AirSource.Leonardo).Build();
 ```
 
 ## Next Steps

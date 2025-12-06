@@ -4,15 +4,16 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CivitaiSharp.Sdk.Air;
 using CivitaiSharp.Sdk.Models.Coverage;
 
 /// <summary>
-/// AOT-compatible JSON converter for <see cref="IReadOnlyDictionary{TKey, TValue}"/> where TValue is <see cref="ProviderAssetAvailability"/>.
+/// AOT-compatible JSON converter for <see cref="IReadOnlyDictionary{TKey, TValue}"/> where TKey is <see cref="AirIdentifier"/> and TValue is <see cref="ProviderAssetAvailability"/>.
 /// </summary>
-internal sealed class ProviderAssetAvailabilityDictionaryConverter : JsonConverter<IReadOnlyDictionary<string, ProviderAssetAvailability>>
+internal sealed class ProviderAssetAvailabilityDictionaryConverter : JsonConverter<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>
 {
     /// <inheritdoc />
-    public override IReadOnlyDictionary<string, ProviderAssetAvailability> Read(
+    public override IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability> Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options)
@@ -22,7 +23,7 @@ internal sealed class ProviderAssetAvailabilityDictionaryConverter : JsonConvert
             throw new JsonException("Expected start of object for dictionary.");
         }
 
-        var dictionary = new Dictionary<string, ProviderAssetAvailability>();
+        var dictionary = new Dictionary<AirIdentifier, ProviderAssetAvailability>();
 
         while (reader.Read())
         {
@@ -36,7 +37,12 @@ internal sealed class ProviderAssetAvailabilityDictionaryConverter : JsonConvert
                 throw new JsonException("Expected property name.");
             }
 
-            var key = reader.GetString()!;
+            var keyString = reader.GetString()!;
+            if (!AirIdentifier.TryParse(keyString, out var key))
+            {
+                throw new JsonException($"Invalid AIR identifier key: '{keyString}'");
+            }
+
             reader.Read();
 
             var availability = JsonSerializer.Deserialize(ref reader, SdkJsonContext.Default.ProviderAssetAvailability);
@@ -52,14 +58,14 @@ internal sealed class ProviderAssetAvailabilityDictionaryConverter : JsonConvert
     /// <inheritdoc />
     public override void Write(
         Utf8JsonWriter writer,
-        IReadOnlyDictionary<string, ProviderAssetAvailability> value,
+        IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability> value,
         JsonSerializerOptions options)
     {
         writer.WriteStartObject();
 
         foreach (var kvp in value)
         {
-            writer.WritePropertyName(kvp.Key);
+            writer.WritePropertyName(kvp.Key.ToString());
             JsonSerializer.Serialize(writer, kvp.Value, SdkJsonContext.Default.ProviderAssetAvailability);
         }
 

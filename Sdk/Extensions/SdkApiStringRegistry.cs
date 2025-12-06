@@ -134,5 +134,14 @@ internal static class SdkApiStringRegistry
             [AirEcosystem.Flux1] = "flux1",
             [AirEcosystem.Pony] = "pony",
         });
+
+        // Register AirSource mappings
+        ApiStringRegistry.Register(new Dictionary<AirSource, string>
+        {
+            [AirSource.Civitai] = "civitai",
+            [AirSource.HuggingFace] = "huggingface",
+            [AirSource.OpenAi] = "openai",
+            [AirSource.Leonardo] = "leonardo",
+        });
     }
 }

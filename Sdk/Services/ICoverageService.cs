@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CivitaiSharp.Core.Response;
+using CivitaiSharp.Sdk.Air;
 using CivitaiSharp.Sdk.Models.Coverage;
 
 /// <summary>
@@ -19,8 +20,8 @@ public interface ICoverageService
     /// <returns>
     /// A task containing a dictionary mapping AIR identifiers to their availability information.
     /// </returns>
-    Task<Result<IReadOnlyDictionary<string, ProviderAssetAvailability>>> GetAsync(
-        IEnumerable<string> models,
+    Task<Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>> GetAsync(
+        IEnumerable<AirIdentifier> models,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -30,6 +31,6 @@ public interface ICoverageService
     /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
     /// <returns>A task containing the availability information for the model.</returns>
     Task<Result<ProviderAssetAvailability>> GetAsync(
-        string model,
+        AirIdentifier model,
         CancellationToken cancellationToken = default);
 }

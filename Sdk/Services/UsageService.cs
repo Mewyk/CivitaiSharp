@@ -13,7 +13,7 @@ using CivitaiSharp.Sdk.Models.Usage;
 internal sealed class UsageService : IUsageService
 {
     private readonly SdkHttpClient _httpClient;
-    private readonly CivitaiSdkClientOptions _options;
+    private readonly SdkClientOptions _options;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UsageService"/> class.
@@ -21,7 +21,7 @@ internal sealed class UsageService : IUsageService
     /// <param name="httpClient">The HTTP client for API requests.</param>
     /// <param name="options">The SDK client options.</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="httpClient"/> or <paramref name="options"/> is null.</exception>
-    internal UsageService(SdkHttpClient httpClient, CivitaiSdkClientOptions options)
+    internal UsageService(SdkHttpClient httpClient, SdkClientOptions options)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
         ArgumentNullException.ThrowIfNull(options);

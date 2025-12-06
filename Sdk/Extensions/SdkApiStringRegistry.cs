@@ -7,7 +7,7 @@ using CivitaiSharp.Sdk.Enums;
 
 /// <summary>
 /// Registers SDK-specific enum mappings with the Core's <see cref="ApiStringRegistry"/>.
-/// Called automatically when <see cref="ServiceCollectionExtensions.AddCivitaiSdk(Microsoft.Extensions.DependencyInjection.IServiceCollection, System.Action{CivitaiSdkClientOptions})"/> is invoked.
+/// Called automatically when <see cref="ServiceCollectionExtensions.AddCivitaiSdk(Microsoft.Extensions.DependencyInjection.IServiceCollection, System.Action{SdkClientOptions})"/> is invoked.
 /// </summary>
 /// <remarks>
 /// <para>

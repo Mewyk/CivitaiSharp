@@ -1,5 +1,6 @@
 namespace CivitaiSharp.Sdk.Models.Jobs;
 
+using System;
 using System.Text.Json.Serialization;
 using CivitaiSharp.Sdk.Enums;
 using CivitaiSharp.Sdk.Json.Converters;
@@ -61,4 +62,28 @@ public sealed class ImageJobControlNet
     /// </summary>
     [JsonPropertyName("endStep")]
     public decimal? EndStep { get; init; }
+
+    /// <summary>
+    /// Validates that exactly one of <see cref="ImageUrl"/> or <see cref="Image"/> is provided.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when neither or both properties are provided.
+    /// </exception>
+    public void Validate()
+    {
+        var hasUrl = !string.IsNullOrWhiteSpace(ImageUrl);
+        var hasImage = !string.IsNullOrWhiteSpace(Image);
+
+        if (!hasUrl && !hasImage)
+        {
+            throw new InvalidOperationException(
+                "Either ImageUrl or Image must be provided for ControlNet configuration.");
+        }
+
+        if (hasUrl && hasImage)
+        {
+            throw new InvalidOperationException(
+                "Only one of ImageUrl or Image can be provided for ControlNet configuration, not both.");
+        }
+    }
 }

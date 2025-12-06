@@ -16,7 +16,7 @@ using CivitaiSharp.Sdk.Models.Results;
 internal sealed class JobsService : IJobsService
 {
     private readonly SdkHttpClient _httpClient;
-    private readonly CivitaiSdkClientOptions _options;
+    private readonly SdkClientOptions _options;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="JobsService"/> class.
@@ -24,7 +24,7 @@ internal sealed class JobsService : IJobsService
     /// <param name="httpClient">The HTTP client for API requests.</param>
     /// <param name="options">The SDK client options.</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="httpClient"/> or <paramref name="options"/> is null.</exception>
-    internal JobsService(SdkHttpClient httpClient, CivitaiSdkClientOptions options)
+    internal JobsService(SdkHttpClient httpClient, SdkClientOptions options)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
         ArgumentNullException.ThrowIfNull(options);
@@ -41,6 +41,15 @@ internal sealed class JobsService : IJobsService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
+
+        // Validate ControlNet configurations if present
+        if (request.ControlNets is not null)
+        {
+            foreach (var controlNet in request.ControlNets)
+            {
+                controlNet.Validate();
+            }
+        }
 
         var uri = BuildJobsUri(wait, detailed);
         return _httpClient.PostAsync<TextToImageJobRequest, JobStatusCollection>(uri, request, cancellationToken);
@@ -60,6 +69,18 @@ internal sealed class JobsService : IJobsService
         if (jobsList.Count == 0)
         {
             throw new ArgumentException("At least one job request is required.", nameof(requests));
+        }
+
+        // Validate all ControlNet configurations if present
+        foreach (var request in jobsList)
+        {
+            if (request.ControlNets is not null)
+            {
+                foreach (var controlNet in request.ControlNets)
+                {
+                    controlNet.Validate();
+                }
+            }
         }
 
         var uri = BuildJobsUri(wait, detailed);

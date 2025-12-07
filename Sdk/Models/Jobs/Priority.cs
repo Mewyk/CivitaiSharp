@@ -5,15 +5,13 @@ using System.Text.Json.Serialization;
 /// <summary>
 /// Priority configuration for job scheduling.
 /// </summary>
-[method: JsonConstructor]
-public readonly struct Priority(decimal modifier)
+/// <param name="Modifier">
+/// The priority modifier value. Higher values increase priority. Maps to JSON property "modifier".
+/// Range: 0.1-10.0, default: 1.0.
+/// </param>
+public sealed record Priority(
+    [property: JsonPropertyName("modifier")] decimal Modifier)
 {
-    /// <summary>
-    /// Gets the priority modifier. Higher values increase priority.
-    /// </summary>
-    [JsonPropertyName("modifier")]
-    public decimal Modifier { get; init; } = modifier;
-
     /// <summary>
     /// The default priority modifier value.
     /// </summary>

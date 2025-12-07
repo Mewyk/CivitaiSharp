@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 /// <summary>
 /// Request model for batch job submission.
 /// </summary>
-internal sealed class BatchJobRequest
+public sealed class BatchJobRequest
 {
     /// <summary>
     /// Gets or sets the jobs to submit in this batch.

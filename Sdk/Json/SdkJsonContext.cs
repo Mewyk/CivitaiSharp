@@ -39,7 +39,6 @@ using CivitaiSharp.Sdk.Models.Usage;
 [JsonSerializable(typeof(ImageJobNetworkParams))]
 [JsonSerializable(typeof(ImageJobControlNet))]
 [JsonSerializable(typeof(Priority))]
-[JsonSerializable(typeof(Priority?))]
 // Job response types
 [JsonSerializable(typeof(JobStatus))]
 [JsonSerializable(typeof(JobStatusCollection))]

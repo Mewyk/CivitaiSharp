@@ -36,12 +36,8 @@ public sealed class SdkClientOptions
     private int _timeoutSeconds = DefaultTimeoutSeconds;
 
     /// <summary>
-    /// Gets or sets the API token for authentication.
-    /// This is required for all SDK operations.
+    /// API token for authentication (required). Obtain from https://civitai.com/user/account
     /// </summary>
-    /// <remarks>
-    /// Obtain your API token from https://civitai.com/user/account
-    /// </remarks>
     /// <exception cref="ArgumentNullException">Thrown when value is null.</exception>
     /// <exception cref="ArgumentException">Thrown when value is empty or whitespace.</exception>
     public required string ApiToken
@@ -55,7 +51,7 @@ public sealed class SdkClientOptions
     }
 
     /// <summary>
-    /// Gets or sets the base URL for the Civitai Orchestration API.
+    /// Base URL for the Civitai Orchestration API.
     /// </summary>
     /// <exception cref="ArgumentNullException">Thrown when value is null.</exception>
     /// <exception cref="ArgumentException">Thrown when value is empty, whitespace, or not a valid absolute URI.</exception>
@@ -75,7 +71,7 @@ public sealed class SdkClientOptions
     }
 
     /// <summary>
-    /// Gets or sets the API version path segment (e.g., "v1").
+    /// API version path segment (e.g., "v1").
     /// </summary>
     /// <exception cref="ArgumentNullException">Thrown when value is null.</exception>
     /// <exception cref="ArgumentException">Thrown when value is empty or whitespace.</exception>

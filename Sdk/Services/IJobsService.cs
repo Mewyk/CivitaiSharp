@@ -15,13 +15,9 @@ using CivitaiSharp.Sdk.Request;
 public interface IJobsService
 {
     /// <summary>
-    /// Creates a new fluent builder for text-to-image generation jobs.
+    /// Creates a fluent builder for text-to-image generation jobs with compile-time validation.
     /// </summary>
-    /// <returns>A new <see cref="TextToImageJobBuilder"/> instance for configuring and submitting jobs.</returns>
-    /// <remarks>
-    /// This is the recommended way to create and submit jobs. The builder provides a fluent API
-    /// with compile-time guidance and validation.
-    /// </remarks>
+    /// <returns>A new <see cref="TextToImageJobBuilder"/> instance.</returns>
     /// <example>
     /// <code>
     /// var result = await client.Jobs

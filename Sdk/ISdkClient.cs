@@ -10,17 +10,17 @@ using CivitaiSharp.Sdk.Services;
 public interface ISdkClient
 {
     /// <summary>
-    /// Provides access to image generation jobs: submit, query, cancel, and retrieve results.
+    /// Image generation jobs: submit, query, cancel, and retrieve results.
     /// </summary>
     IJobsService Jobs { get; }
 
     /// <summary>
-    /// Provides model and resource availability checks to verify assets are ready before submitting jobs.
+    /// Model and resource availability checks before submitting jobs.
     /// </summary>
     ICoverageService Coverage { get; }
 
     /// <summary>
-    /// Provides API consumption tracking: credit usage, job counts, and consumption history.
+    /// API consumption tracking: credits, job counts, and history.
     /// </summary>
     IUsageService Usage { get; }
 }

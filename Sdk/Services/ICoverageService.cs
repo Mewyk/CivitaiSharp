@@ -17,9 +17,7 @@ public interface ICoverageService
     /// </summary>
     /// <param name="models">The AIR identifiers of the models to check.</param>
     /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
-    /// <returns>
-    /// A task containing a dictionary mapping AIR identifiers to their availability information.
-    /// </returns>
+    /// <returns>Dictionary mapping AIR identifiers to their availability information.</returns>
     Task<Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>> GetAsync(
         IEnumerable<AirIdentifier> models,
         CancellationToken cancellationToken = default);
@@ -29,7 +27,7 @@ public interface ICoverageService
     /// </summary>
     /// <param name="model">The AIR identifier of the model to check.</param>
     /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
-    /// <returns>A task containing the availability information for the model.</returns>
+    /// <returns>Availability information for the model.</returns>
     Task<Result<ProviderAssetAvailability>> GetAsync(
         AirIdentifier model,
         CancellationToken cancellationToken = default);

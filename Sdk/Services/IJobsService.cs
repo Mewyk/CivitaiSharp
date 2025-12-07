@@ -7,12 +7,34 @@ using System.Threading.Tasks;
 using CivitaiSharp.Core.Response;
 using CivitaiSharp.Sdk.Models.Jobs;
 using CivitaiSharp.Sdk.Models.Results;
+using CivitaiSharp.Sdk.Request;
 
 /// <summary>
 /// Service for submitting, tracking, and managing image generation jobs.
 /// </summary>
 public interface IJobsService
 {
+    /// <summary>
+    /// Creates a new fluent builder for text-to-image generation jobs.
+    /// </summary>
+    /// <returns>A new <see cref="TextToImageJobBuilder"/> instance for configuring and submitting jobs.</returns>
+    /// <remarks>
+    /// This is the recommended way to create and submit jobs. The builder provides a fluent API
+    /// with compile-time guidance and validation.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var result = await client.Jobs
+    ///     .CreateTextToImage()
+    ///     .WithModel(AirIdentifier.Parse("urn:air:sdxl:checkpoint:civitai:4201@130072"))
+    ///     .WithPrompt("A beautiful sunset over mountains")
+    ///     .WithSize(1024, 1024)
+    ///     .WithSteps(30)
+    ///     .SubmitAsync();
+    /// </code>
+    /// </example>
+    TextToImageJobBuilder CreateTextToImage();
+
     /// <summary>
     /// Submits a single text-to-image generation job.
     /// </summary>

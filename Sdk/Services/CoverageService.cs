@@ -13,26 +13,15 @@ using CivitaiSharp.Sdk.Models.Coverage;
 /// <summary>
 /// Implementation of the Coverage service for checking model availability.
 /// </summary>
-internal sealed class CoverageService : ICoverageService
+/// <remarks>
+/// This service is registered as a singleton and holds references to the HTTP client and options.
+/// It is created via dependency injection and should not be instantiated directly.
+/// </remarks>
+/// <param name="httpClient">The HTTP client for API requests.</param>
+/// <param name="options">The SDK client options.</param>
+/// <exception cref="ArgumentNullException">Thrown when <paramref name="httpClient"/> or <paramref name="options"/> is null.</exception>
+internal sealed class CoverageService(SdkHttpClient httpClient, SdkClientOptions options) : ICoverageService
 {
-    private readonly SdkHttpClient _httpClient;
-    private readonly SdkClientOptions _options;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CoverageService"/> class.
-    /// </summary>
-    /// <param name="httpClient">The HTTP client for API requests.</param>
-    /// <param name="options">The SDK client options.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="httpClient"/> or <paramref name="options"/> is null.</exception>
-    internal CoverageService(SdkHttpClient httpClient, SdkClientOptions options)
-    {
-        ArgumentNullException.ThrowIfNull(httpClient);
-        ArgumentNullException.ThrowIfNull(options);
-
-        _httpClient = httpClient;
-        _options = options;
-    }
-
     /// <inheritdoc />
     public Task<Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>> GetAsync(
         IEnumerable<AirIdentifier> models,
@@ -48,7 +37,7 @@ internal sealed class CoverageService : ICoverageService
         }
 
         var uri = BuildCoverageUri(modelList);
-        return _httpClient.GetAsync<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>(uri, cancellationToken);
+        return httpClient.GetAsync<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>(uri, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -74,7 +63,7 @@ internal sealed class CoverageService : ICoverageService
 
     private string BuildCoverageUri(IReadOnlyList<AirIdentifier> models)
     {
-        var path = _options.GetApiPath("coverage");
+        var path = options.GetApiPath("coverage");
         var query = new QueryStringBuilder();
 
         foreach (var model in models)

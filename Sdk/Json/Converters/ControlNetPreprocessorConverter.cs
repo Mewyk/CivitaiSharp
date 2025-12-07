@@ -82,6 +82,7 @@ internal sealed class ControlNetPreprocessorConverter : JsonConverter<ControlNet
 
 /// <summary>
 /// AOT-compatible JSON converter for nullable <see cref="ControlNetPreprocessor"/>.
+/// Handles null values by writing JSON null and reading null tokens appropriately.
 /// </summary>
 internal sealed class NullableControlNetPreprocessorConverter : JsonConverter<ControlNetPreprocessor?>
 {

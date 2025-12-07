@@ -5,10 +5,12 @@ using System.Text.Json.Serialization;
 /// <summary>
 /// Priority configuration for job scheduling.
 /// </summary>
-/// <remarks>
-/// This type is a struct for better memory efficiency as it contains only a single decimal value.
-/// </remarks>
-public readonly struct Priority
+/// <param name="Modifier">
+/// The priority modifier value. Higher values increase priority. Maps to JSON property "modifier".
+/// Range: 0.1-10.0, default: 1.0.
+/// </param>
+public sealed record Priority(
+    [property: JsonPropertyName("modifier")] decimal Modifier)
 {
     /// <summary>
     /// The default priority modifier value.
@@ -16,21 +18,14 @@ public readonly struct Priority
     public const decimal DefaultModifier = 1.0m;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Priority"/> struct with the default modifier.
+    /// The minimum allowed priority modifier value.
     /// </summary>
-    public Priority() => Modifier = DefaultModifier;
+    public const decimal MinModifier = 0.1m;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Priority"/> struct with the specified modifier.
+    /// The maximum allowed priority modifier value.
     /// </summary>
-    /// <param name="modifier">The priority modifier value.</param>
-    public Priority(decimal modifier) => Modifier = modifier;
-
-    /// <summary>
-    /// Gets the priority modifier. Higher values increase priority.
-    /// </summary>
-    [JsonPropertyName("modifier")]
-    public decimal Modifier { get; init; }
+    public const decimal MaxModifier = 10.0m;
 
     /// <summary>
     /// Gets the default priority configuration.

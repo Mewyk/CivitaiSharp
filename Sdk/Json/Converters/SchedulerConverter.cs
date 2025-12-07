@@ -76,6 +76,7 @@ internal sealed class SchedulerConverter : JsonConverter<Scheduler>
 
 /// <summary>
 /// AOT-compatible JSON converter for nullable <see cref="Scheduler"/>.
+/// Handles null values by writing JSON null and reading null tokens appropriately.
 /// </summary>
 internal sealed class NullableSchedulerConverter : JsonConverter<Scheduler?>
 {

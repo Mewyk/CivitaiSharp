@@ -48,7 +48,6 @@ public class MyService(IApiClient apiClient)
             .WhereType(ModelType.Lora)
             .WhereTag("anime")
             .ExecuteAsync(resultsLimit: 10);
-            .ExecuteAsync();
 
         if (result is Result<PagedResult<Model>>.Success success)
         {

@@ -15,18 +15,13 @@ public readonly partial struct AirIdentifier : IEquatable<AirIdentifier>, IParsa
     /// <summary>
     /// The default source for Civitai assets.
     /// </summary>
-    public const string CivitaiSource = "civitai";
+    public const AirSource DefaultSource = AirSource.Civitai;
 
     /// <summary>
     /// Compiled regex pattern for parsing AIR identifiers.
     /// </summary>
     [GeneratedRegex(@"^urn:air:([a-z0-9]+):([a-z]+):([a-z]+):(\d+)@(\d+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
     private static partial Regex AirPattern();
-
-    /// <summary>
-    /// Cached lowercase source for hash code computation to avoid allocation.
-    /// </summary>
-    private readonly string _sourceLower;
 
     /// <summary>
     /// Gets the model ecosystem (e.g., sd1, sdxl, flux1).
@@ -39,9 +34,9 @@ public readonly partial struct AirIdentifier : IEquatable<AirIdentifier>, IParsa
     public AirAssetType AssetType { get; }
 
     /// <summary>
-    /// Gets the source of the asset. Currently always "civitai".
+    /// Gets the source platform of the asset.
     /// </summary>
-    public string Source { get; }
+    public AirSource Source { get; }
 
     /// <summary>
     /// Gets the model ID on Civitai.
@@ -58,26 +53,23 @@ public readonly partial struct AirIdentifier : IEquatable<AirIdentifier>, IParsa
     /// </summary>
     /// <param name="ecosystem">The model ecosystem.</param>
     /// <param name="assetType">The asset type.</param>
-    /// <param name="source">The source (typically "civitai").</param>
+    /// <param name="source">The source platform.</param>
     /// <param name="modelId">The model ID.</param>
     /// <param name="versionId">The version ID.</param>
-    /// <exception cref="ArgumentException">Thrown when source is null or whitespace.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when modelId or versionId is less than 1.</exception>
     public AirIdentifier(
         AirEcosystem ecosystem,
         AirAssetType assetType,
-        string source,
+        AirSource source,
         long modelId,
         long versionId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(source);
         ArgumentOutOfRangeException.ThrowIfLessThan(modelId, 1);
         ArgumentOutOfRangeException.ThrowIfLessThan(versionId, 1);
 
         Ecosystem = ecosystem;
         AssetType = assetType;
         Source = source;
-        _sourceLower = source.ToLowerInvariant();
         ModelId = modelId;
         VersionId = versionId;
     }
@@ -95,7 +87,7 @@ public readonly partial struct AirIdentifier : IEquatable<AirIdentifier>, IParsa
         AirAssetType assetType,
         long modelId,
         long versionId) =>
-        new(ecosystem, assetType, CivitaiSource, modelId, versionId);
+        new(ecosystem, assetType, DefaultSource, modelId, versionId);
 
     /// <summary>
     /// Attempts to parse a string as an AIR identifier.
@@ -120,7 +112,7 @@ public readonly partial struct AirIdentifier : IEquatable<AirIdentifier>, IParsa
 
         var ecosystemStr = match.Groups[1].Value;
         var typeStr = match.Groups[2].Value;
-        var source = match.Groups[3].Value.ToLowerInvariant();
+        var sourceStr = match.Groups[3].Value;
         var modelIdStr = match.Groups[4].Value;
         var versionIdStr = match.Groups[5].Value;
 
@@ -130,6 +122,11 @@ public readonly partial struct AirIdentifier : IEquatable<AirIdentifier>, IParsa
         }
 
         if (!EnumExtensions.TryParseFromApiString<AirAssetType>(typeStr, out var assetType))
+        {
+            return false;
+        }
+
+        if (!EnumExtensions.TryParseFromApiString<AirSource>(sourceStr, out var source))
         {
             return false;
         }
@@ -153,7 +150,8 @@ public readonly partial struct AirIdentifier : IEquatable<AirIdentifier>, IParsa
     /// </summary>
     /// <param name="value">The string to parse.</param>
     /// <returns>The parsed <see cref="AirIdentifier"/>.</returns>
-    /// <exception cref="ArgumentException">Thrown when value is null or whitespace.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when value is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when value is empty or whitespace.</exception>
     /// <exception cref="FormatException">Thrown when value is not a valid AIR identifier.</exception>
     public static AirIdentifier Parse(string value)
     {
@@ -183,13 +181,13 @@ public readonly partial struct AirIdentifier : IEquatable<AirIdentifier>, IParsa
     /// </summary>
     /// <returns>The AIR identifier string in the format <c>urn:air:{ecosystem}:{type}:{source}:{modelId}@{versionId}</c>.</returns>
     public override string ToString() =>
-        $"urn:air:{Ecosystem.ToApiString()}:{AssetType.ToApiString()}:{_sourceLower}:{ModelId}@{VersionId}";
+        $"urn:air:{Ecosystem.ToApiString()}:{AssetType.ToApiString()}:{Source.ToApiString()}:{ModelId}@{VersionId}";
 
     /// <inheritdoc />
     public bool Equals(AirIdentifier other) =>
         Ecosystem == other.Ecosystem &&
         AssetType == other.AssetType &&
-        string.Equals(_sourceLower, other._sourceLower, StringComparison.Ordinal) &&
+        Source == other.Source &&
         ModelId == other.ModelId &&
         VersionId == other.VersionId;
 
@@ -197,7 +195,7 @@ public readonly partial struct AirIdentifier : IEquatable<AirIdentifier>, IParsa
     public override bool Equals(object? obj) => obj is AirIdentifier other && Equals(other);
 
     /// <inheritdoc />
-    public override int GetHashCode() => HashCode.Combine(Ecosystem, AssetType, _sourceLower, ModelId, VersionId);
+    public override int GetHashCode() => HashCode.Combine(Ecosystem, AssetType, Source, ModelId, VersionId);
 
     /// <summary>
     /// Determines whether two AIR identifiers are equal.

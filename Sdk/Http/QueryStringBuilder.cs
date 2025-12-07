@@ -8,6 +8,16 @@ using System.Text;
 /// Builder for constructing URL query strings with proper encoding.
 /// This class is mutable and not thread-safe.
 /// </summary>
+/// <example>
+/// <code>
+/// var query = new QueryStringBuilder()
+///     .Append("token", "abc123")
+///     .AppendIf("wait", true)
+///     .Append("startDate", DateTime.Now)
+///     .BuildUri("/api/v1/jobs");
+/// // Result: "/api/v1/jobs?token=abc123&amp;wait=true&amp;startDate=2025-12-06T19:00:00.0000000Z"
+/// </code>
+/// </example>
 internal sealed class QueryStringBuilder
 {
     private readonly StringBuilder _builder = new();

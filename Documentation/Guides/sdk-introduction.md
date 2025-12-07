@@ -40,25 +40,19 @@ services.AddCivitaiSdk(options =>
 ### Basic Usage
 
 ```csharp
-public class ImageGenerationService(ICivitaiSdkClient sdkClient)
+public class ImageGenerationService(ISdkClient sdkClient)
 {
     public async Task GenerateImageAsync()
     {
-        var request = new TextToImageJobRequest
-        {
-            Model = "urn:air:sd1:checkpoint:civitai:4201@130072",
-            Params = new ImageJobParams
-            {
-                Prompt = "a beautiful sunset over mountains",
-                NegativePrompt = "blurry, low quality",
-                Width = 512,
-                Height = 512,
-                Steps = 20,
-                CfgScale = 7.0
-            }
-        };
-
-        var result = await sdkClient.Jobs.SubmitAsync(request);
+        var result = await sdkClient.Jobs
+            .CreateTextToImage()
+            .WithModel(AirIdentifier.Parse("urn:air:sdxl:checkpoint:civitai:4201@130072"))
+            .WithPrompt("a beautiful sunset over mountains")
+            .WithNegativePrompt("blurry, low quality")
+            .WithSize(1024, 1024)
+            .WithSteps(30)
+            .WithCfgScale(7.5m)
+            .SubmitAsync();
 
         if (result is Result<JobStatusCollection>.Success success)
         {
@@ -74,15 +68,16 @@ public class ImageGenerationService(ICivitaiSdkClient sdkClient)
 
 Submit and manage image generation jobs:
 
-- `SubmitAsync` - Submit a text-to-image generation job
-- `SubmitBatchAsync` - Submit multiple jobs as a batch
-- `GetByIdAsync` - Get job status by ID
-- `GetByTokenAsync` - Get job status by token
-- `QueryAsync` - Query multiple jobs with filters
-- `CancelByIdAsync` - Cancel a job by ID
-- `CancelByTokenAsync` - Cancel jobs by batch token
-- `TaintByIdAsync` - Mark a job as tainted by ID
-- `TaintByTokenAsync` - Mark jobs as tainted by batch token
+- `CreateTextToImage()` - Create a fluent builder for text-to-image jobs (recommended)
+- `SubmitAsync()` - Submit a text-to-image generation job
+- `SubmitBatchAsync()` - Submit multiple jobs as a batch
+- `GetByIdAsync()` - Get job status by ID
+- `GetByTokenAsync()` - Get job status by token
+- `QueryAsync()` - Query multiple jobs with filters
+- `CancelByIdAsync()` - Cancel a job by ID
+- `CancelByTokenAsync()` - Cancel jobs by batch token
+- `TaintByIdAsync()` - Mark a job as tainted by ID
+- `TaintByTokenAsync()` - Mark jobs as tainted by batch token
 
 ### Coverage Service
 

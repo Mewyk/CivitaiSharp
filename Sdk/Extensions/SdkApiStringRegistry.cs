@@ -7,7 +7,7 @@ using CivitaiSharp.Sdk.Enums;
 
 /// <summary>
 /// Registers SDK-specific enum mappings with the Core's <see cref="ApiStringRegistry"/>.
-/// Called automatically when <see cref="ServiceCollectionExtensions.AddCivitaiSdk(Microsoft.Extensions.DependencyInjection.IServiceCollection, System.Action{CivitaiSdkClientOptions})"/> is invoked.
+/// Called automatically when <see cref="ServiceCollectionExtensions.AddCivitaiSdk(Microsoft.Extensions.DependencyInjection.IServiceCollection, System.Action{SdkClientOptions})"/> is invoked.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -133,6 +133,15 @@ internal static class SdkApiStringRegistry
             [AirEcosystem.StableDiffusionXl] = "sdxl",
             [AirEcosystem.Flux1] = "flux1",
             [AirEcosystem.Pony] = "pony",
+        });
+
+        // Register AirSource mappings
+        ApiStringRegistry.Register(new Dictionary<AirSource, string>
+        {
+            [AirSource.Civitai] = "civitai",
+            [AirSource.HuggingFace] = "huggingface",
+            [AirSource.OpenAi] = "openai",
+            [AirSource.Leonardo] = "leonardo",
         });
     }
 }

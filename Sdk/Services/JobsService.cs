@@ -9,29 +9,23 @@ using CivitaiSharp.Core.Response;
 using CivitaiSharp.Sdk.Http;
 using CivitaiSharp.Sdk.Models.Jobs;
 using CivitaiSharp.Sdk.Models.Results;
+using CivitaiSharp.Sdk.Request;
 
 /// <summary>
 /// Implementation of the Jobs service for managing image generation jobs.
 /// </summary>
-internal sealed class JobsService : IJobsService
+/// <remarks>
+/// This service is registered as a singleton and holds references to the HTTP client and options.
+/// It is created via dependency injection and should not be instantiated directly.
+/// </remarks>
+/// <param name="httpClient">The HTTP client for API requests.</param>
+/// <param name="options">The SDK client options.</param>
+/// <exception cref="ArgumentNullException">Thrown when <paramref name="httpClient"/> or <paramref name="options"/> is null.</exception>
+internal sealed class JobsService(SdkHttpClient httpClient, SdkClientOptions options) : IJobsService
 {
-    private readonly SdkHttpClient _httpClient;
-    private readonly CivitaiSdkClientOptions _options;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="JobsService"/> class.
-    /// </summary>
-    /// <param name="httpClient">The HTTP client for API requests.</param>
-    /// <param name="options">The SDK client options.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="httpClient"/> or <paramref name="options"/> is null.</exception>
-    internal JobsService(SdkHttpClient httpClient, CivitaiSdkClientOptions options)
-    {
-        ArgumentNullException.ThrowIfNull(httpClient);
-        ArgumentNullException.ThrowIfNull(options);
-
-        _httpClient = httpClient;
-        _options = options;
-    }
+    /// <inheritdoc />
+    public TextToImageJobBuilder CreateTextToImage()
+        => TextToImageJobBuilder.Create(this);
 
     /// <inheritdoc />
     public Task<Result<JobStatusCollection>> SubmitAsync(
@@ -42,8 +36,17 @@ internal sealed class JobsService : IJobsService
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        // Validate ControlNet configurations if present
+        if (request.ControlNets is not null)
+        {
+            foreach (var controlNet in request.ControlNets)
+            {
+                controlNet.Validate();
+            }
+        }
+
         var uri = BuildJobsUri(wait, detailed);
-        return _httpClient.PostAsync<TextToImageJobRequest, JobStatusCollection>(uri, request, cancellationToken);
+        return httpClient.PostAsync<TextToImageJobRequest, JobStatusCollection>(uri, request, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -62,9 +65,21 @@ internal sealed class JobsService : IJobsService
             throw new ArgumentException("At least one job request is required.", nameof(requests));
         }
 
+        // Validate all ControlNet configurations if present
+        foreach (var request in jobsList)
+        {
+            if (request.ControlNets is not null)
+            {
+                foreach (var controlNet in request.ControlNets)
+                {
+                    controlNet.Validate();
+                }
+            }
+        }
+
         var uri = BuildJobsUri(wait, detailed);
         var batchRequest = new BatchJobRequest { Jobs = jobsList };
-        return _httpClient.PostAsync<BatchJobRequest, JobStatusCollection>(uri, batchRequest, cancellationToken);
+        return httpClient.PostAsync<BatchJobRequest, JobStatusCollection>(uri, batchRequest, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -76,7 +91,7 @@ internal sealed class JobsService : IJobsService
         ArgumentOutOfRangeException.ThrowIfEqual(jobId, Guid.Empty, nameof(jobId));
 
         var uri = BuildUri($"jobs/{jobId}", detailed: detailed);
-        return _httpClient.GetAsync<JobStatus>(uri, cancellationToken);
+        return httpClient.GetAsync<JobStatus>(uri, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -89,7 +104,7 @@ internal sealed class JobsService : IJobsService
         ArgumentException.ThrowIfNullOrWhiteSpace(token);
 
         var uri = BuildUri("jobs", token: token, wait: wait, detailed: detailed);
-        return _httpClient.GetAsync<JobStatusCollection>(uri, cancellationToken);
+        return httpClient.GetAsync<JobStatusCollection>(uri, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -101,7 +116,7 @@ internal sealed class JobsService : IJobsService
         ArgumentNullException.ThrowIfNull(request);
 
         var uri = BuildUri("jobs/query", detailed: detailed);
-        return _httpClient.PostAsync<QueryJobsRequest, JobStatusCollection>(uri, request, cancellationToken);
+        return httpClient.PostAsync<QueryJobsRequest, JobStatusCollection>(uri, request, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -113,7 +128,7 @@ internal sealed class JobsService : IJobsService
         ArgumentOutOfRangeException.ThrowIfEqual(jobId, Guid.Empty, nameof(jobId));
 
         var uri = BuildUri($"jobs/{jobId}", force: force);
-        return _httpClient.DeleteAsync<Unit>(uri, cancellationToken);
+        return httpClient.DeleteAsync<Unit>(uri, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -125,7 +140,7 @@ internal sealed class JobsService : IJobsService
         ArgumentException.ThrowIfNullOrWhiteSpace(token);
 
         var uri = BuildUri("jobs", token: token, force: force);
-        return _httpClient.DeleteAsync<Unit>(uri, cancellationToken);
+        return httpClient.DeleteAsync<Unit>(uri, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -135,8 +150,8 @@ internal sealed class JobsService : IJobsService
     {
         ArgumentOutOfRangeException.ThrowIfEqual(jobId, Guid.Empty, nameof(jobId));
 
-        var uri = _options.GetApiPath($"jobs/{jobId}/taint");
-        return _httpClient.PutAsync<Unit>(uri, cancellationToken);
+        var uri = options.GetApiPath($"jobs/{jobId}/taint");
+        return httpClient.PutAsync<Unit>(uri, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -147,7 +162,7 @@ internal sealed class JobsService : IJobsService
         ArgumentException.ThrowIfNullOrWhiteSpace(token);
 
         var uri = BuildUri("jobs/taint", token: token);
-        return _httpClient.PutAsync<Unit>(uri, cancellationToken);
+        return httpClient.PutAsync<Unit>(uri, cancellationToken);
     }
 
     private string BuildJobsUri(bool wait, bool detailed)
@@ -155,7 +170,7 @@ internal sealed class JobsService : IJobsService
         var query = new QueryStringBuilder()
             .AppendIf("wait", wait)
             .AppendIf("detailed", detailed);
-        return query.BuildUri(_options.GetApiPath("jobs"));
+        return query.BuildUri(options.GetApiPath("jobs"));
     }
 
     private string BuildUri(
@@ -170,6 +185,6 @@ internal sealed class JobsService : IJobsService
             .AppendIf("wait", wait)
             .AppendIf("detailed", detailed)
             .Append("force", force);
-        return query.BuildUri(_options.GetApiPath(relativePath));
+        return query.BuildUri(options.GetApiPath(relativePath));
     }
 }

@@ -147,7 +147,7 @@ if (image.Stats is { } stats)
 
 ## Pagination
 
-Use page-based pagination for images:
+Images use cursor-based pagination:
 
 [!code-csharp[Program.cs](Images/Program.cs#L62-L85)]
 

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CivitaiSharp.Sdk.Air;
 
 /// <summary>
 /// Request model for text-to-image generation jobs.
@@ -26,7 +27,7 @@ public sealed class TextToImageJobRequest
     /// </summary>
     /// <example>urn:air:sdxl:checkpoint:civitai:4201@130072</example>
     [JsonPropertyName("model")]
-    public required string Model { get; init; }
+    public required AirIdentifier Model { get; init; }
 
     /// <summary>
     /// Gets or sets the generation parameters. Required.
@@ -39,7 +40,7 @@ public sealed class TextToImageJobRequest
     /// Key is the AIR identifier, value is the network configuration.
     /// </summary>
     [JsonPropertyName("additionalNetworks")]
-    public IReadOnlyDictionary<string, ImageJobNetworkParams>? AdditionalNetworks { get; init; }
+    public IReadOnlyDictionary<AirIdentifier, ImageJobNetworkParams>? AdditionalNetworks { get; init; }
 
     /// <summary>
     /// Gets or sets ControlNet configurations for guided generation.

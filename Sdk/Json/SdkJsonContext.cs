@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CivitaiSharp.Sdk.Air;
 using CivitaiSharp.Sdk.Json.Converters;
 using CivitaiSharp.Sdk.Models.Coverage;
 using CivitaiSharp.Sdk.Models.Jobs;
@@ -21,6 +22,7 @@ using CivitaiSharp.Sdk.Models.Usage;
     AllowTrailingCommas = true,
     ReadCommentHandling = JsonCommentHandling.Skip,
     Converters = [
+        typeof(AirIdentifierConverter),
         typeof(SchedulerConverter),
         typeof(NullableSchedulerConverter),
         typeof(NetworkTypeConverter),
@@ -37,7 +39,6 @@ using CivitaiSharp.Sdk.Models.Usage;
 [JsonSerializable(typeof(ImageJobNetworkParams))]
 [JsonSerializable(typeof(ImageJobControlNet))]
 [JsonSerializable(typeof(Priority))]
-[JsonSerializable(typeof(Priority?))]
 // Job response types
 [JsonSerializable(typeof(JobStatus))]
 [JsonSerializable(typeof(JobStatusCollection))]
@@ -48,6 +49,8 @@ using CivitaiSharp.Sdk.Models.Usage;
 [JsonSerializable(typeof(Dictionary<string, ProviderAssetAvailability>))]
 // Usage types
 [JsonSerializable(typeof(ConsumptionDetails))]
+// AIR types
+[JsonSerializable(typeof(AirIdentifier))]
 // Collection types
 [JsonSerializable(typeof(IReadOnlyList<JobStatus>))]
 [JsonSerializable(typeof(List<JobStatus>))]
@@ -55,8 +58,8 @@ using CivitaiSharp.Sdk.Models.Usage;
 [JsonSerializable(typeof(List<TextToImageJobRequest>))]
 [JsonSerializable(typeof(IReadOnlyList<ImageJobControlNet>))]
 [JsonSerializable(typeof(List<ImageJobControlNet>))]
-[JsonSerializable(typeof(IReadOnlyDictionary<string, ImageJobNetworkParams>))]
-[JsonSerializable(typeof(Dictionary<string, ImageJobNetworkParams>))]
+[JsonSerializable(typeof(IReadOnlyDictionary<AirIdentifier, ImageJobNetworkParams>))]
+[JsonSerializable(typeof(Dictionary<AirIdentifier, ImageJobNetworkParams>))]
 [JsonSerializable(typeof(IReadOnlyDictionary<string, JsonElement>))]
 [JsonSerializable(typeof(Dictionary<string, JsonElement>))]
 // Primitive types for properties

@@ -14,10 +14,10 @@ public interface IUsageService
     /// <summary>
     /// Gets account consumption statistics for the specified period.
     /// </summary>
-    /// <param name="startDate">Optional start date for the reporting period (ISO 8601 format).</param>
-    /// <param name="endDate">Optional end date for the reporting period (ISO 8601 format).</param>
+    /// <param name="startDate">Start date for reporting period (ISO 8601 format).</param>
+    /// <param name="endDate">End date for reporting period (ISO 8601 format).</param>
     /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
-    /// <returns>A task containing the consumption details.</returns>
+    /// <returns>Consumption details.</returns>
     Task<Result<ConsumptionDetails>> GetConsumptionAsync(
         DateTime? startDate = null,
         DateTime? endDate = null,

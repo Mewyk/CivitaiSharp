@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
     /// Registers the Civitai SDK client and related services with the specified configuration action.
     /// </summary>
     /// <param name="services">The service collection to register services into.</param>
-    /// <param name="configure">Action to configure <see cref="CivitaiSdkClientOptions"/>.</param>
+    /// <param name="configure">Action to configure <see cref="SdkClientOptions"/>.</param>
     /// <returns>The service collection for chaining.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="services"/> or <paramref name="configure"/> is null.</exception>
     /// <example>
@@ -37,7 +37,7 @@ public static class ServiceCollectionExtensions
     /// </example>
     public static IServiceCollection AddCivitaiSdk(
         this IServiceCollection services,
-        Action<CivitaiSdkClientOptions> configure)
+        Action<SdkClientOptions> configure)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configure);
@@ -54,8 +54,8 @@ public static class ServiceCollectionExtensions
     /// <param name="configuration">The configuration source containing SDK settings.</param>
     /// <param name="sectionName">Optional section name to read from configuration. Defaults to "CivitaiSdk".</param>
     /// <returns>The service collection for chaining.</returns>
-    /// <exception cref="ArgumentNullException">Thrown if <paramref name="services"/> or <paramref name="configuration"/> is null.</exception>
-    /// <exception cref="ArgumentException">Thrown if <paramref name="sectionName"/> is null or whitespace.</exception>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="services"/>, <paramref name="configuration"/>, or <paramref name="sectionName"/> is null.</exception>
+    /// <exception cref="ArgumentException">Thrown if <paramref name="sectionName"/> is empty or whitespace.</exception>
     /// <example>
     /// <code>
     /// // appsettings.json:
@@ -77,7 +77,7 @@ public static class ServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentException.ThrowIfNullOrWhiteSpace(sectionName);
 
-        services.Configure<CivitaiSdkClientOptions>(configuration.GetSection(sectionName));
+        services.Configure<SdkClientOptions>(configuration.GetSection(sectionName));
         RegisterSdkServices(services);
         return services;
     }
@@ -87,7 +87,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Registering <see cref="SdkHttpClient"/> and <see cref="ICivitaiSdkClient"/> as singletons is correct
+    /// Registering <see cref="SdkHttpClient"/> and <see cref="ISdkClient"/> as singletons is correct
     /// for this library. The HTTP client factory pattern (<see cref="IHttpClientFactory"/>) is used,
     /// which properly manages <see cref="HttpMessageHandler"/> lifetimes and avoids socket exhaustion.
     /// </para>
@@ -103,7 +103,7 @@ public static class ServiceCollectionExtensions
 
         services.AddHttpClient(nameof(SdkHttpClient), (serviceProvider, client) =>
         {
-            var options = serviceProvider.GetRequiredService<IOptions<CivitaiSdkClientOptions>>().Value;
+            var options = serviceProvider.GetRequiredService<IOptions<SdkClientOptions>>().Value;
             ConfigureHttpClient(client, options);
         })
         .AddStandardResilienceHandler();
@@ -116,18 +116,18 @@ public static class ServiceCollectionExtensions
             return new SdkHttpClient(httpClient, logger);
         });
 
-        services.AddSingleton<ICivitaiSdkClient>(serviceProvider =>
+        services.AddSingleton<ISdkClient>(serviceProvider =>
         {
             var httpClient = serviceProvider.GetRequiredService<SdkHttpClient>();
-            var options = serviceProvider.GetRequiredService<IOptions<CivitaiSdkClientOptions>>().Value;
-            return new CivitaiSdkClient(httpClient, options);
+            var options = serviceProvider.GetRequiredService<IOptions<SdkClientOptions>>().Value;
+            return new SdkClient(httpClient, options);
         });
     }
 
     /// <summary>
     /// Configures the HTTP client base address, headers, and authentication.
     /// </summary>
-    private static void ConfigureHttpClient(HttpClient client, CivitaiSdkClientOptions options)
+    private static void ConfigureHttpClient(HttpClient client, SdkClientOptions options)
     {
         options.Validate();
 

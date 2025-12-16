@@ -262,8 +262,6 @@ public class BatchProcessor
             
             identifiers.Add(airId);
             
-            // Reset for next iteration
-            builder.Reset();
         }
         
         return identifiers;

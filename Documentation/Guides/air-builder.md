@@ -89,13 +89,13 @@ Available asset types:
 
 ### WithSource
 
-Sets the source platform (optional, defaults to "civitai"):
+Sets the source platform (optional, defaults to `AirSource.Civitai`):
 
 ```csharp
 // Explicitly set source (usually not needed)
-builder.WithSource("civitai");
+builder.WithSource(AirSource.Civitai);
 
-// Source defaults to "civitai" if not set
+// Source defaults to AirSource.Civitai if not set
 ```
 
 ### WithModelId

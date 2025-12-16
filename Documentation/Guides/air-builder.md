@@ -24,10 +24,10 @@ urn:air:sdxl:lora:civitai:328553@368189
 
 ### Installation
 
-The `AirBuilder` is part of CivitaiSharp.Tools:
+The `AirBuilder` is part of the `CivitaiSharp.Sdk` package.
 
 ```bash
-dotnet add package CivitaiSharp.Tools --prerelease
+dotnet add package CivitaiSharp.Sdk --prerelease
 ```
 
 ### Basic Usage
@@ -93,8 +93,6 @@ Sets the source platform (optional, defaults to `AirSource.Civitai`):
 ```csharp
 // Explicitly set source (usually not needed)
 builder.WithSource(AirSource.Civitai);
-
-// Source defaults to AirSource.Civitai if not set
 ```
 
 ### WithModelId
@@ -117,23 +115,29 @@ builder.WithVersionId(368189);
 // Must be greater than 0
 ```
 
-### Reset
+### Reset / Reuse
 
-Clears all properties to start building a new identifier:
+The `AirBuilder` is immutable and thread-safe: each `With*` method returns a new builder instance. There is no instance `Reset()` method. To "reset" or reuse a base configuration, either create a new `AirBuilder()` or keep a reusable base instance and call the fluent methods which return new instances.
 
 ```csharp
-var builder = new AirBuilder()
+// Start from a base builder and derive per-item builders (recommended)
+var baseBuilder = new AirBuilder()
     .WithEcosystem(AirEcosystem.Flux1)
-    .WithAssetType(AirAssetType.Lora)
-    .WithModelId(123)
-    .WithVersionId(456);
+    .WithAssetType(AirAssetType.Lora);
 
-// Reset to reuse the builder
-builder.Reset()
+// For a new identifier, derive from the base and set IDs
+var air1 = baseBuilder
+    .WithModelId(123)
+    .WithVersionId(456)
+    .Build();
+
+// To "reset", simply start from a fresh builder or reuse baseBuilder
+var air2 = new AirBuilder()
     .WithEcosystem(AirEcosystem.StableDiffusionXl)
     .WithAssetType(AirAssetType.Checkpoint)
     .WithModelId(789)
-    .WithVersionId(101);
+    .WithVersionId(101)
+    .Build();
 ```
 
 ### Build
@@ -237,7 +241,6 @@ public class ModelService(IApiClient apiClient)
 ### Batch Building
 
 ```csharp
-using CivitaiSharp.Tools.Air;
 using CivitaiSharp.Sdk.Air;
 
 public class BatchProcessor
@@ -276,7 +279,6 @@ public class BatchProcessor
 ### Builder with Error Handling
 
 ```csharp
-using CivitaiSharp.Tools.Air;
 using CivitaiSharp.Sdk.Air;
 
 public AirIdentifier? TryBuildAirId(
@@ -315,26 +317,19 @@ public AirIdentifier? TryBuildAirId(
 Reuse builder instances when creating multiple identifiers:
 
 ```csharp
-// Good - reuses builder
-var builder = new AirBuilder();
+// Good - derive per-item builders from a reusable base configuration
+var baseBuilder = new AirBuilder()
+    .WithEcosystem(AirEcosystem.StableDiffusionXl);
+
 foreach (var data in modelData)
 {
-    var airId = builder
-        .WithEcosystem(data.Ecosystem)
+    var airId = baseBuilder
         .WithAssetType(data.AssetType)
         .WithModelId(data.ModelId)
         .WithVersionId(data.VersionId)
         .Build();
-    
-    ProcessAirId(airId);
-    builder.Reset();
-}
 
-// Avoid - creates new builder each time
-foreach (var data in modelData)
-{
-    var builder = new AirBuilder();
-    var airId = builder.WithEcosystem(data.Ecosystem)...Build();
+    ProcessAirId(airId);
 }
 ```
 

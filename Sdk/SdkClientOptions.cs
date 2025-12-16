@@ -7,7 +7,7 @@ using System;
 /// Unlike the public API used by <c>CivitaiSharp.Core</c>, the Generator API requires authentication
 /// for all requests, so the <see cref="ApiToken"/> property must be set before the client can be used.
 /// </summary>
-public sealed class CivitaiSdkClientOptions
+public sealed class SdkClientOptions
 {
     /// <summary>
     /// Default base URL for the Civitai Orchestration API.
@@ -36,13 +36,10 @@ public sealed class CivitaiSdkClientOptions
     private int _timeoutSeconds = DefaultTimeoutSeconds;
 
     /// <summary>
-    /// Gets or sets the API token for authentication.
-    /// This is required for all SDK operations.
+    /// API token for authentication (required). Obtain from https://civitai.com/user/account
     /// </summary>
-    /// <remarks>
-    /// Obtain your API token from https://civitai.com/user/account
-    /// </remarks>
-    /// <exception cref="ArgumentException">Thrown when value is null or whitespace.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when value is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when value is empty or whitespace.</exception>
     public required string ApiToken
     {
         get => _apiToken;
@@ -54,9 +51,10 @@ public sealed class CivitaiSdkClientOptions
     }
 
     /// <summary>
-    /// Gets or sets the base URL for the Civitai Orchestration API.
+    /// Base URL for the Civitai Orchestration API.
     /// </summary>
-    /// <exception cref="ArgumentException">Thrown when value is null, whitespace, or not a valid absolute URI.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when value is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when value is empty, whitespace, or not a valid absolute URI.</exception>
     public string BaseUrl
     {
         get => _baseUrl;
@@ -73,9 +71,10 @@ public sealed class CivitaiSdkClientOptions
     }
 
     /// <summary>
-    /// Gets or sets the API version path segment (e.g., "v1").
+    /// API version path segment (e.g., "v1").
     /// </summary>
-    /// <exception cref="ArgumentException">Thrown when value is null or whitespace.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when value is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when value is empty or whitespace.</exception>
     public string ApiVersion
     {
         get => _apiVersion;
@@ -129,7 +128,8 @@ public sealed class CivitaiSdkClientOptions
     /// </summary>
     /// <param name="relativePath">The relative endpoint path (e.g., "jobs", "coverage").</param>
     /// <returns>The full API path including version prefix and consumer path.</returns>
-    /// <exception cref="ArgumentException">Thrown if relativePath is null or whitespace.</exception>
+    /// <exception cref="ArgumentNullException">Thrown if relativePath is null.</exception>
+    /// <exception cref="ArgumentException">Thrown if relativePath is empty or whitespace.</exception>
     public string GetApiPath(string relativePath)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(relativePath);

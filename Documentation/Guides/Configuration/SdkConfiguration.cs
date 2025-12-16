@@ -24,7 +24,7 @@ public static class SdkConfiguration
 
         var host = builder.Build();
 
-        var sdkClient = host.Services.GetRequiredService<ICivitaiSdkClient>();
+        var sdkClient = host.Services.GetRequiredService<ISdkClient>();
         Console.WriteLine("SDK configuration example completed.");
     }
 }

@@ -189,7 +189,7 @@ var airId = builder.Build(); // Throws InvalidOperationException
 
 ```csharp
 using CivitaiSharp.Core;
-using CivitaiSharp.Tools.Air;
+using CivitaiSharp.Sdk.Air;
 
 public class ModelService(IApiClient apiClient)
 {

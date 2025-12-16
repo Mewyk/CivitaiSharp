@@ -33,7 +33,6 @@ dotnet add package CivitaiSharp.Tools --prerelease
 ### Basic Usage
 
 ```csharp
-using CivitaiSharp.Tools.Air;
 using CivitaiSharp.Sdk.Air;
 
 // Build an AIR identifier using the fluent API

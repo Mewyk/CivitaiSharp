@@ -165,8 +165,6 @@ builder.WithModelId(0); // Throws ArgumentOutOfRangeException
 // VersionId must be > 0
 builder.WithVersionId(-1); // Throws ArgumentOutOfRangeException
 
-// Source cannot be null or whitespace
-builder.WithSource(""); // Throws ArgumentNullException
 ```
 
 ### Build Validation

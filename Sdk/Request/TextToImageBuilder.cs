@@ -195,7 +195,7 @@ public sealed record TextToImageBuilder
     public TextToImageBuilder WithAdditionalNetwork(AirIdentifier network, ImageJobNetworkParams networkParams)
     {
         ArgumentNullException.ThrowIfNull(networkParams);
-        var networks = _additionalNetworks ?? ImmutableDictionary<AirIdentifier, ImageJobNetworkParams>.Empty;
+        var networks = _additionalNetworks ?? [];
         return new(_httpClient, _options, _model, _paramsBuilder, networks.SetItem(network, networkParams), _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
     }
 
@@ -232,7 +232,7 @@ public sealed record TextToImageBuilder
     public TextToImageBuilder WithControlNet(ImageJobControlNet controlNet)
     {
         ArgumentNullException.ThrowIfNull(controlNet);
-        var controlNets = _controlNets ?? ImmutableList<ImageJobControlNet>.Empty;
+        var controlNets = _controlNets ?? [];
         return new(_httpClient, _options, _model, _paramsBuilder, _additionalNetworks, controlNets.Add(controlNet), _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
     }
 
@@ -284,7 +284,7 @@ public sealed record TextToImageBuilder
     public TextToImageBuilder WithProperty(string key, JsonElement value)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
-        var properties = _properties ?? ImmutableDictionary<string, JsonElement>.Empty;
+        var properties = _properties ?? [];
         return new(_httpClient, _options, _model, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, properties.SetItem(key, value), _callbackUrl, _retries, _timeout, _clipSkip);
     }
 

@@ -85,7 +85,7 @@ public sealed record JobQueryBuilder
     public JobQueryBuilder WhereProperty(string key, JsonElement value)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
-        var filters = _propertyFilters ?? ImmutableDictionary<string, JsonElement>.Empty;
+        var filters = _propertyFilters ?? [];
         return new(_httpClient, _options, _wait, _detailed, filters.SetItem(key, value));
     }
 
@@ -106,7 +106,7 @@ public sealed record JobQueryBuilder
             return this;
         }
 
-        var filters = _propertyFilters ?? ImmutableDictionary<string, JsonElement>.Empty;
+        var filters = _propertyFilters ?? [];
         foreach (var kvp in properties)
         {
             filters = filters.SetItem(kvp.Key, kvp.Value);

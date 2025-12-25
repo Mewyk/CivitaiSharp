@@ -1,6 +1,7 @@
 namespace CivitaiSharp.Sdk.Extensions;
 
 using System.Collections.Generic;
+using System.Threading;
 using CivitaiSharp.Core.Extensions;
 using CivitaiSharp.Sdk.Air;
 using CivitaiSharp.Sdk.Enums;
@@ -18,7 +19,7 @@ using CivitaiSharp.Sdk.Enums;
 internal static class SdkApiStringRegistry
 {
     private static bool _initialized;
-    private static readonly object InitializationLock = new();
+    private static readonly Lock InitializationLock = new();
 
     /// <summary>
     /// Ensures the SDK enum mappings are registered with the Core registry.

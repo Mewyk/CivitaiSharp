@@ -5,8 +5,8 @@ using CivitaiSharp.Sdk.Http;
 using CivitaiSharp.Sdk.Services;
 
 /// <summary>
-/// Primary client facade for the Civitai Generator SDK. Provides access to image generation,
-/// model availability checking, and usage tracking via the orchestration endpoints.
+/// Primary client facade for the Civitai Generator SDK. All properties return cached, immutable,
+/// thread-safe instances that can be safely shared across threads.
 /// Obtain an instance through dependency injection using
 /// <see cref="Extensions.ServiceCollectionExtensions.AddCivitaiSdk(Microsoft.Extensions.DependencyInjection.IServiceCollection, System.Action{SdkClientOptions})"/>.
 /// </summary>
@@ -24,13 +24,13 @@ public sealed class SdkClient : ISdkClient
         ArgumentNullException.ThrowIfNull(httpClient);
         ArgumentNullException.ThrowIfNull(options);
 
-        Jobs = new JobsService(httpClient, options);
+        Jobs = new JobsBuilder(httpClient, options);
         Coverage = new CoverageService(httpClient, options);
         Usage = new UsageService(httpClient, options);
     }
 
     /// <inheritdoc />
-    public IJobsService Jobs { get; }
+    public JobsBuilder Jobs { get; }
 
     /// <inheritdoc />
     public ICoverageService Coverage { get; }

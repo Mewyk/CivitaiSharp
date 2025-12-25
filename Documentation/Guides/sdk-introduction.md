@@ -52,7 +52,7 @@ public class ImageGenerationService(ISdkClient sdkClient)
             .WithSize(1024, 1024)
             .WithSteps(30)
             .WithCfgScale(7.5m)
-            .SubmitAsync();
+            .ExecuteAsync();
 
         if (result is Result<JobStatusCollection>.Success success)
         {
@@ -64,20 +64,47 @@ public class ImageGenerationService(ISdkClient sdkClient)
 
 ## Services
 
-### Jobs Service
+### Jobs Operations
 
-Submit and manage image generation jobs:
+Create and manage image generation jobs using fluent builders:
 
-- `CreateTextToImage()` - Create a fluent builder for text-to-image jobs (recommended)
-- `SubmitAsync()` - Submit a text-to-image generation job
-- `SubmitBatchAsync()` - Submit multiple jobs as a batch
-- `GetByIdAsync()` - Get job status by ID
-- `GetByTokenAsync()` - Get job status by token
-- `QueryAsync()` - Query multiple jobs with filters
-- `CancelByIdAsync()` - Cancel a job by ID
-- `CancelByTokenAsync()` - Cancel jobs by batch token
-- `TaintByIdAsync()` - Mark a job as tainted by ID
-- `TaintByTokenAsync()` - Mark jobs as tainted by batch token
+**Creating Jobs:**
+- `CreateTextToImage()` - Returns a `TextToImageBuilder` for configuring and submitting jobs
+
+**Querying Jobs:**
+- `Query` - Returns a cached `JobQueryBuilder` for fluent job queries
+  - `WithDetailed()` - Include original job specifications in response
+  - `WithWait()` - Block until jobs complete (up to ~10 minutes)
+  - `WhereProperty(key, value)` - Filter by custom properties
+  - `GetByIdAsync(Guid id)` - Get job status by ID
+  - `GetByTokenAsync(string token)` - Get job status by token
+  - `ExecuteAsync()` - Query jobs by custom properties
+
+**Job Management:**
+- `Query.CancelAsync(Guid id)` - Cancel a specific job by ID
+- `Query.CancelAsync(string token)` - Cancel all jobs in a batch by token
+- `Query.TaintAsync(Guid id)` - Mark a job as tainted by ID
+- `Query.TaintAsync(string token)` - Mark all jobs in a batch as tainted by token
+
+**Example - Querying Jobs:**
+```csharp
+// Query by ID with detailed information
+var result = await sdkClient.Jobs.Query
+    .WithDetailed()
+    .GetByIdAsync(jobId);
+
+// Query by token and wait for completion (blocks up to ~10 minutes)
+var result = await sdkClient.Jobs.Query
+    .WithWait()
+    .WithDetailed()
+    .GetByTokenAsync(token);
+
+// Query by custom properties
+var result = await sdkClient.Jobs.Query
+    .WhereProperty("userId", JsonSerializer.SerializeToElement("12345"))
+    .WhereProperty("environment", JsonSerializer.SerializeToElement("production"))
+    .ExecuteAsync();
+```
 
 ### Coverage Service
 
@@ -93,5 +120,9 @@ Monitor API consumption:
 
 ## Next Steps
 
+- [Jobs Service](sdk-jobs.md) - Comprehensive guide to creating and querying jobs
+- [Coverage Service](sdk-coverage.md) - Check model and resource availability
+- [Usage Service](sdk-usage.md) - Monitor API consumption and credits
 - [Configuration](configuration.md) - Configure SDK client options
 - [Quick Start](quick-start.md) - Step-by-step guide to your first image generation
+- [AIR Identifiers](air-identifier.md) - Learn about model resource identifiers

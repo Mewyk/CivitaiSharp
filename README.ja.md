@@ -496,6 +496,159 @@ var plainText = modelVersion.GetDescriptionAsPlainText();
 </details>
 
 <details>
+<summary><strong>SDK - 画像生成（Jobs）</strong></summary>
+
+```csharp
+using CivitaiSharp.Sdk;
+using CivitaiSharp.Sdk.Extensions;
+using CivitaiSharp.Sdk.Air;
+using Microsoft.Extensions.DependencyInjection;
+
+var services = new ServiceCollection();
+services.AddCivitaiSdk(options =>
+{
+    options.ApiToken = "your-api-token"; // SDKには必須
+});
+
+await using var provider = services.BuildServiceProvider();
+var sdkClient = provider.GetRequiredService<ISdkClient>();
+
+// テキストから画像へのジョブを作成
+var model = AirIdentifier.Parse("urn:air:sdxl:checkpoint:civitai:4201@130072");
+
+var result = await sdkClient.Jobs
+    .CreateTextToImage()
+    .WithModel(model)
+    .WithPrompt("山々の上の美しい夕焼け、非常に詳細")
+    .WithNegativePrompt("ぼやけた、低品質")
+    .WithSize(1024, 1024)
+    .WithSteps(30)
+    .WithCfgScale(7.5m)
+    .WithSeed(12345)
+    .ExecuteAsync();
+
+if (result is Result<JobStatusCollection>.Success success)
+{
+    var token = success.Data.Token;
+    Console.WriteLine($"ジョブ送信済み: {token}");
+    
+    // ジョブステータスを照会
+    var statusResult = await sdkClient.Jobs.Query
+        .WithDetailed()
+        .GetByTokenAsync(token);
+    
+    if (statusResult is Result<JobStatusCollection>.Success statusSuccess)
+    {
+        foreach (var job in statusSuccess.Data.Jobs)
+        {
+            Console.WriteLine($"ジョブ {job.JobId}: {job.Status}");
+        }
+    }
+}
+
+// ジョブ完了を待機（最大約10分間ブロック）
+var completedResult = await sdkClient.Jobs.Query
+    .WithWait()
+    .WithDetailed()
+    .GetByTokenAsync(token);
+
+// カスタムプロパティでジョブを照会
+var queryResult = await sdkClient.Jobs.Query
+    .WhereProperty("userId", JsonSerializer.SerializeToElement("12345"))
+    .WhereProperty("environment", JsonSerializer.SerializeToElement("production"))
+    .ExecuteAsync();
+```
+
+</details>
+
+<details>
+<summary><strong>SDK - カバレッジサービス</strong></summary>
+
+```csharp
+using CivitaiSharp.Sdk;
+using CivitaiSharp.Sdk.Air;
+
+// ジョブを送信する前にモデルが利用可能かチェック
+var model = AirIdentifier.Parse("urn:air:sdxl:checkpoint:civitai:4201@130072");
+var lora = AirIdentifier.Parse("urn:air:sdxl:lora:civitai:328553@368189");
+
+// 単一モデルをチェック
+var coverageResult = await sdkClient.Coverage.GetAsync(model);
+
+if (coverageResult is Result<ProviderAssetAvailability>.Success coverage)
+{
+    if (coverage.Data.Available)
+    {
+        Console.WriteLine("モデルは利用可能です！");
+        foreach (var (provider, status) in coverage.Data.Providers)
+        {
+            Console.WriteLine($"  {provider}: キュー位置 {status.QueuePosition}");
+        }
+    }
+    else
+    {
+        Console.WriteLine("どのプロバイダーでもモデルは利用できません");
+    }
+}
+
+// 複数のリソースを一度にチェック
+var resources = new[] { model, lora };
+var batchResult = await sdkClient.Coverage.GetAsync(resources);
+
+if (batchResult is Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>.Success batch)
+{
+    foreach (var (resource, availability) in batch.Data)
+    {
+        Console.WriteLine($"{resource}: {availability.Available}");
+    }
+}
+```
+
+</details>
+
+<details>
+<summary><strong>SDK - 使用状況サービス</strong></summary>
+
+```csharp
+using CivitaiSharp.Sdk;
+
+// 現在のアカウント使用状況を取得
+var usageResult = await sdkClient.Usage.GetConsumptionAsync();
+
+if (usageResult is Result<ConsumptionDetails>.Success usage)
+{
+    Console.WriteLine($"総ジョブ数: {usage.Data.TotalJobs}");
+    Console.WriteLine($"総クレジット数: {usage.Data.TotalCredits:F2}");
+    Console.WriteLine($"期間: {usage.Data.StartDate} から {usage.Data.EndDate}");
+}
+
+// 特定の日付範囲の使用状況を取得
+var startDate = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+var endDate = new DateTime(2025, 1, 31, 23, 59, 59, DateTimeKind.Utc);
+
+var monthlyResult = await sdkClient.Usage.GetConsumptionAsync(startDate, endDate);
+
+if (monthlyResult is Result<ConsumptionDetails>.Success monthly)
+{
+    Console.WriteLine($"2025年1月:");
+    Console.WriteLine($"  ジョブ: {monthly.Data.TotalJobs}");
+    Console.WriteLine($"  クレジット: {monthly.Data.TotalCredits:F2}");
+    
+    if (monthly.Data.JobsByType is not null)
+    {
+        Console.WriteLine("  タイプ別内訳:");
+        foreach (var (jobType, count) in monthly.Data.JobsByType)
+        {
+            var credits = monthly.Data.CreditsByType?.GetValueOrDefault(jobType, 0) ?? 0;
+            Console.WriteLine($"    {jobType}: {count} ジョブ、{credits:F2} クレジット");
+        }
+    }
+}
+```
+
+</details>
+
+<details>
 <summary><strong>エラーハンドリング</strong></summary>
 
 ```csharp

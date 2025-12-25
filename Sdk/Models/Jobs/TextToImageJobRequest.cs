@@ -20,7 +20,7 @@ public sealed class TextToImageJobRequest
     /// Gets the job type discriminator. Always <see cref="JobType"/>.
     /// </summary>
     [JsonPropertyName("$type")]
-    public string Type => JobType;
+    public static string Type => JobType;
 
     /// <summary>
     /// Gets or sets the base model AIR identifier. Required.

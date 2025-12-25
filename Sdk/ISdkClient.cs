@@ -1,5 +1,6 @@
 namespace CivitaiSharp.Sdk;
 
+using CivitaiSharp.Sdk.Request;
 using CivitaiSharp.Sdk.Services;
 
 /// <summary>
@@ -10,9 +11,9 @@ using CivitaiSharp.Sdk.Services;
 public interface ISdkClient
 {
     /// <summary>
-    /// Image generation jobs: submit, query, cancel, and retrieve results.
+    /// Image generation job operations: create, query, cancel, and monitor jobs.
     /// </summary>
-    IJobsService Jobs { get; }
+    JobsBuilder Jobs { get; }
 
     /// <summary>
     /// Model and resource availability checks before submitting jobs.

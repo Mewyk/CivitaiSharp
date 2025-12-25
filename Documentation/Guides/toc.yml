@@ -40,6 +40,12 @@ items:
   items:
     - name: Introduction
       href: sdk-introduction.md
+    - name: Jobs Service
+      href: sdk-jobs.md
+    - name: Coverage Service
+      href: sdk-coverage.md
+    - name: Usage Service
+      href: sdk-usage.md
 
 - name: Tools Library
   expanded: true

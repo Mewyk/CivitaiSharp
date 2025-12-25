@@ -416,6 +416,150 @@ var markdown = model.GetDescriptionAsMarkdown();
 var plainText = modelVersion.GetDescriptionAsPlainText();
 ```
 
+**SDK - Image Generation (Jobs)**
+
+```csharp
+using CivitaiSharp.Sdk;
+using CivitaiSharp.Sdk.Extensions;
+using CivitaiSharp.Sdk.Air;
+using Microsoft.Extensions.DependencyInjection;
+
+var services = new ServiceCollection();
+services.AddCivitaiSdk(options =>
+{
+    options.ApiToken = "your-api-token"; // Required for SDK
+});
+
+await using var provider = services.BuildServiceProvider();
+var sdkClient = provider.GetRequiredService<ISdkClient>();
+
+// Create a text-to-image job
+var model = AirIdentifier.Parse("urn:air:sdxl:checkpoint:civitai:4201@130072");
+
+var result = await sdkClient.Jobs
+    .CreateTextToImage()
+    .WithModel(model)
+    .WithPrompt("a beautiful sunset over mountains, highly detailed")
+    .WithNegativePrompt("blurry, low quality")
+    .WithSize(1024, 1024)
+    .WithSteps(30)
+    .WithCfgScale(7.5m)
+    .WithSeed(12345)
+    .ExecuteAsync();
+
+if (result is Result<JobStatusCollection>.Success success)
+{
+    var token = success.Data.Token;
+    Console.WriteLine($"Job submitted: {token}");
+
+    // Query job status
+    var statusResult = await sdkClient.Jobs.Query
+        .WithDetailed()
+        .GetByTokenAsync(token);
+
+    if (statusResult is Result<JobStatusCollection>.Success statusSuccess)
+    {
+        foreach (var job in statusSuccess.Data.Jobs)
+        {
+            Console.WriteLine($"Job {job.JobId}: {job.Status}");
+        }
+    }
+}
+
+// Wait for job completion (blocks up to ~10 minutes)
+var completedResult = await sdkClient.Jobs.Query
+    .WithWait()
+    .WithDetailed()
+    .GetByTokenAsync(token);
+
+// Query jobs by custom properties
+var queryResult = await sdkClient.Jobs.Query
+    .WhereProperty("userId", JsonSerializer.SerializeToElement("12345"))
+    .WhereProperty("environment", JsonSerializer.SerializeToElement("production"))
+    .ExecuteAsync();
+```
+
+**SDK - Coverage Service**
+
+```csharp
+using CivitaiSharp.Sdk;
+using CivitaiSharp.Sdk.Air;
+
+// Check if a model is available before submitting a job
+var model = AirIdentifier.Parse("urn:air:sdxl:checkpoint:civitai:4201@130072");
+var lora = AirIdentifier.Parse("urn:air:sdxl:lora:civitai:328553@368189");
+
+// Check single model
+var coverageResult = await sdkClient.Coverage.GetAsync(model);
+
+if (coverageResult is Result<ProviderAssetAvailability>.Success coverage)
+{
+    if (coverage.Data.Available)
+    {
+        Console.WriteLine("Model is available!");
+        foreach (var (provider, status) in coverage.Data.Providers)
+        {
+            Console.WriteLine($"  {provider}: Queue position {status.QueuePosition}");
+        }
+    }
+    else
+    {
+        Console.WriteLine("Model not available on any provider");
+    }
+}
+
+// Check multiple resources at once
+var resources = new[] { model, lora };
+var batchResult = await sdkClient.Coverage.GetAsync(resources);
+
+if (batchResult is Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>.Success batch)
+{
+    foreach (var (resource, availability) in batch.Data)
+    {
+        Console.WriteLine($"{resource}: {availability.Available}");
+    }
+}
+```
+
+**SDK - Usage Service**
+
+```csharp
+using CivitaiSharp.Sdk;
+
+// Get current account usage
+var usageResult = await sdkClient.Usage.GetConsumptionAsync();
+
+if (usageResult is Result<ConsumptionDetails>.Success usage)
+{
+    Console.WriteLine($"Total Jobs: {usage.Data.TotalJobs}");
+    Console.WriteLine($"Total Credits: {usage.Data.TotalCredits:F2}");
+    Console.WriteLine($"Period: {usage.Data.StartDate} to {usage.Data.EndDate}");
+}
+
+// Get usage for specific date range
+var startDate = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+var endDate = new DateTime(2025, 1, 31, 23, 59, 59, DateTimeKind.Utc);
+
+var monthlyResult = await sdkClient.Usage.GetConsumptionAsync(startDate, endDate);
+
+if (monthlyResult is Result<ConsumptionDetails>.Success monthly)
+{
+    Console.WriteLine($"January 2025:");
+    Console.WriteLine($"  Jobs: {monthly.Data.TotalJobs}");
+    Console.WriteLine($"  Credits: {monthly.Data.TotalCredits:F2}");
+
+    if (monthly.Data.JobsByType is not null)
+    {
+        Console.WriteLine("  Breakdown by type:");
+        foreach (var (jobType, count) in monthly.Data.JobsByType)
+        {
+            var credits = monthly.Data.CreditsByType?.GetValueOrDefault(jobType, 0) ?? 0;
+            Console.WriteLine($"    {jobType}: {count} jobs, {credits:F2} credits");
+        }
+    }
+}
+```
+
 **Error Handling**
 
 ```csharp

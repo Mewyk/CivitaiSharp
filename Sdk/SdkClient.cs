@@ -2,6 +2,7 @@ namespace CivitaiSharp.Sdk;
 
 using System;
 using CivitaiSharp.Sdk.Http;
+using CivitaiSharp.Sdk.Request;
 using CivitaiSharp.Sdk.Services;
 
 /// <summary>

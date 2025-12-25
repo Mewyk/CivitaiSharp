@@ -1,5 +1,6 @@
 namespace CivitaiSharp.Sdk;
 
+using CivitaiSharp.Sdk.Request;
 using CivitaiSharp.Sdk.Services;
 
 /// <summary>

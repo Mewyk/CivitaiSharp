@@ -1,8 +1,8 @@
-namespace CivitaiSharp.Sdk;
+namespace CivitaiSharp.Sdk.Request;
 
 using System;
+using CivitaiSharp.Sdk;
 using CivitaiSharp.Sdk.Http;
-using CivitaiSharp.Sdk.Request;
 
 /// <summary>
 /// Entry point for job creation and querying operations.

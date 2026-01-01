@@ -548,7 +548,7 @@ Accessed through `sdkClient.Jobs.CreateImage()`:
 | `WithPriority(Priority)` | Set job priority configuration |
 | `WithCallbackUrl(string)` | Set webhook URL for completion notification |
 | `WithRetries(int)` | Set automatic retry count on failure (default: 0) |
-| `WithTimeout(string)` | Set job timeout in HH:mm:ss format (default: "00:10:00") |
+| `WithTimeout(TimeSpan)` | Set job timeout (default: 10 minutes) |
 
 #### Custom Properties
 
@@ -585,7 +585,7 @@ Because the builder is immutable, it's thread-safe and can be shared:
 
 ```csharp
 // Safe to share across threads
-private readonly ImageGenerationBuilder _baseJobConfiguration;
+private readonly ImageGenerationBuilder _baseJob;
 
 public MyService(ISdkClient client)
 {

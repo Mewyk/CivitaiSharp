@@ -46,12 +46,12 @@ public class ImageGenerationService(ISdkClient sdkClient)
     {
         var result = await sdkClient.Jobs
             .CreateTextToImage()
-            .WithModel(AirIdentifier.Parse("urn:air:sdxl:checkpoint:civitai:4201@130072"))
-            .WithPrompt("a beautiful sunset over mountains")
+            .WithAir(new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072))
+            .WithPositivePrompt("a beautiful sunset over mountains")
             .WithNegativePrompt("blurry, low quality")
-            .WithSize(1024, 1024)
+            .WithDimensions(1024, 1024)
             .WithSteps(30)
-            .WithCfgScale(7.5m)
+            .WithConfigurationScale(7.5m)
             .ExecuteAsync();
 
         if (result is Result<JobStatusCollection>.Success success)

@@ -19,9 +19,9 @@ The Coverage service provides methods to:
 ### Check Single Model Availability
 
 ```csharp
-var model = AirIdentifier.Parse("urn:air:sdxl:checkpoint:civitai:4201@130072");
+var checkpointModel = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
 
-var result = await sdkClient.Coverage.GetAsync(model);
+var result = await sdkClient.Coverage.GetAsync(checkpointModel);
 
 if (result is Result<ProviderAssetAvailability>.Success success)
 {
@@ -38,20 +38,19 @@ if (result is Result<ProviderAssetAvailability>.Success success)
 ### Check Multiple Models
 
 ```csharp
-var models = new[]
-{
-    AirIdentifier.Parse("urn:air:sdxl:checkpoint:civitai:4201@130072"),
-    AirIdentifier.Parse("urn:air:sdxl:lora:civitai:328553@368189"),
-    AirIdentifier.Parse("urn:air:sd1:vae:civitai:22354@123456")
-};
+var checkpointModel = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
+var loraModel = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 328553, 368189);
+var vaeModel = new AirIdentifier("sd1", AirAssetType.Vae, "civitai", 22354, 123456);
 
-var result = await sdkClient.Coverage.GetAsync(models);
+var modelsToCheck = new[] { checkpointModel, loraModel, vaeModel };
+
+var result = await sdkClient.Coverage.GetAsync(modelsToCheck);
 
 if (result is Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>.Success success)
 {
-    foreach (var (model, availability) in success.Data)
+    foreach (var (modelIdentifier, availability) in success.Data)
     {
-        Console.WriteLine($"{model}: {availability.Available}");
+        Console.WriteLine($"{modelIdentifier}: {availability.Available}");
     }
 }
 ```
@@ -82,11 +81,11 @@ Provider-specific information:
 
 ```csharp
 public async Task<Result<JobStatusCollection>> GenerateWithValidationAsync(
-    AirIdentifier model,
-    string prompt)
+    AirIdentifier checkpointModel,
+    string promptText)
 {
     // Check availability first
-    var coverageResult = await sdkClient.Coverage.GetAsync(model);
+    var coverageResult = await sdkClient.Coverage.GetAsync(checkpointModel);
     
     if (coverageResult is not Result<ProviderAssetAvailability>.Success coverageSuccess)
     {
@@ -104,9 +103,9 @@ public async Task<Result<JobStatusCollection>> GenerateWithValidationAsync(
     // Model is available, proceed with job submission
     return await sdkClient.Jobs
         .CreateTextToImage()
-        .WithModel(model)
-        .WithPrompt(prompt)
-        .WithSize(1024, 1024)
+        .WithAir(checkpointModel)
+        .WithPositivePrompt(promptText)
+        .WithDimensions(1024, 1024)
         .ExecuteAsync();
 }
 ```
@@ -115,11 +114,11 @@ public async Task<Result<JobStatusCollection>> GenerateWithValidationAsync(
 
 ```csharp
 public async Task<bool> ValidateJobResourcesAsync(
-    AirIdentifier baseModel,
-    IEnumerable<AirIdentifier> loras)
+    AirIdentifier baseCheckpoint,
+    IEnumerable<AirIdentifier> loraModels)
 {
     // Combine all resources
-    var allResources = loras.Prepend(baseModel).ToArray();
+    var allResources = loraModels.Prepend(baseCheckpoint).ToArray();
     
     // Check coverage
     var result = await sdkClient.Coverage.GetAsync(allResources);
@@ -280,8 +279,8 @@ public async Task<Result<JobStatusCollection>> GenerateAsync(
     
     return await sdkClient.Jobs
         .CreateTextToImage()
-        .WithModel(model)
-        .WithPrompt(prompt)
+        .WithAir(model)
+        .WithPositivePrompt(prompt)
         .ExecuteAsync();
 }
 ```

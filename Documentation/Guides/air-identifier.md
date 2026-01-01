@@ -175,19 +175,29 @@ Since AIR is a universal identifier, it can be used to reference resources acros
 
 ```csharp
 // Civitai resource
-var civitaiModel = AirIdentifier.Parse("urn:air:sdxl:checkpoint:civitai:101055@128078");
+var civitaiCheckpoint = new AirIdentifier(
+    AirEcosystem.StableDiffusionXl,
+    AirAssetType.Checkpoint,
+    AirSource.Civitai,
+    101055,
+    128078);
 
 // Hugging Face resource
-var hfModel = AirIdentifier.Parse("urn:air:sdxl:checkpoint:huggingface:100@200");
+var huggingFaceCheckpoint = new AirIdentifier(
+    AirEcosystem.StableDiffusionXl,
+    AirAssetType.Checkpoint,
+    AirSource.HuggingFace,
+    100,
+    200);
 
 // Switching sources programmatically
-var builder = new AirBuilder()
+var airBuilder = new AirBuilder()
     .WithEcosystem(AirEcosystem.StableDiffusionXl)
     .WithAssetType(AirAssetType.Checkpoint)
     .WithModelId(101055)
     .WithVersionId(128078);
 
-var civitai = builder.WithSource(AirSource.Civitai).Build();
+var civitaiAir = airBuilder.WithSource(AirSource.Civitai).Build();
 var leonardo = builder.WithSource(AirSource.Leonardo).Build();
 ```
 

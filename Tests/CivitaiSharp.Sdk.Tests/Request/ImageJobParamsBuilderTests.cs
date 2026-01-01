@@ -15,21 +15,21 @@ public sealed class ImageJobParamsBuilderTests
     }
 
     [Fact]
-    public void WithPrompt_SetsPromptValue()
+    public void WithPositivePrompt_SetsPositivePromptValue()
     {
         var builder = ImageJobParamsBuilder.Create()
-            .WithPrompt("test prompt");
+            .WithPositivePrompt("test prompt");
 
         var result = builder.Build();
 
-        Assert.Equal("test prompt", result.Prompt);
+        Assert.Equal("test prompt", result.PositivePrompt);
     }
 
     [Fact]
     public void WithNegativePrompt_SetsNegativePromptValue()
     {
         var builder = ImageJobParamsBuilder.Create()
-            .WithPrompt("positive")
+            .WithPositivePrompt("positive")
             .WithNegativePrompt("negative");
 
         var result = builder.Build();
@@ -41,7 +41,7 @@ public sealed class ImageJobParamsBuilderTests
     public void WithScheduler_SetsSchedulerValue()
     {
         var builder = ImageJobParamsBuilder.Create()
-            .WithPrompt("test")
+            .WithPositivePrompt("test")
             .WithScheduler(Scheduler.EulerAncestral);
 
         var result = builder.Build();
@@ -53,7 +53,7 @@ public sealed class ImageJobParamsBuilderTests
     public void WithSteps_SetsStepsValue()
     {
         var builder = ImageJobParamsBuilder.Create()
-            .WithPrompt("test")
+            .WithPositivePrompt("test")
             .WithSteps(30);
 
         var result = builder.Build();
@@ -62,22 +62,22 @@ public sealed class ImageJobParamsBuilderTests
     }
 
     [Fact]
-    public void WithCfgScale_SetsCfgScaleValue()
+    public void WithConfigurationScale_SetsConfigurationScaleValue()
     {
         var builder = ImageJobParamsBuilder.Create()
-            .WithPrompt("test")
-            .WithCfgScale(7.5m);
+            .WithPositivePrompt("test")
+            .WithConfigurationScale(7.5m);
 
         var result = builder.Build();
 
-        Assert.Equal(7.5m, result.CfgScale);
+        Assert.Equal(7.5m, result.ConfigurationScale);
     }
 
     [Fact]
     public void WithSize_SetsBothWidthAndHeight()
     {
         var builder = ImageJobParamsBuilder.Create()
-            .WithPrompt("test")
+            .WithPositivePrompt("test")
             .WithSize(1024, 768);
 
         var result = builder.Build();
@@ -90,7 +90,7 @@ public sealed class ImageJobParamsBuilderTests
     public void WithWidth_SetsWidthOnly()
     {
         var builder = ImageJobParamsBuilder.Create()
-            .WithPrompt("test")
+            .WithPositivePrompt("test")
             .WithWidth(512);
 
         var result = builder.Build();
@@ -103,7 +103,7 @@ public sealed class ImageJobParamsBuilderTests
     public void WithHeight_SetsHeightOnly()
     {
         var builder = ImageJobParamsBuilder.Create()
-            .WithPrompt("test")
+            .WithPositivePrompt("test")
             .WithHeight(768);
 
         var result = builder.Build();
@@ -116,7 +116,7 @@ public sealed class ImageJobParamsBuilderTests
     public void WithSeed_SetsSeedValue()
     {
         var builder = ImageJobParamsBuilder.Create()
-            .WithPrompt("test")
+            .WithPositivePrompt("test")
             .WithSeed(123456789L);
 
         var result = builder.Build();
@@ -128,7 +128,7 @@ public sealed class ImageJobParamsBuilderTests
     public void WithClipSkip_SetsClipSkipValue()
     {
         var builder = ImageJobParamsBuilder.Create()
-            .WithPrompt("test")
+            .WithPositivePrompt("test")
             .WithClipSkip(2);
 
         var result = builder.Build();
@@ -140,7 +140,7 @@ public sealed class ImageJobParamsBuilderTests
     public void WithSourceImage_SetsImageUrl()
     {
         var builder = ImageJobParamsBuilder.Create()
-            .WithPrompt("test")
+            .WithPositivePrompt("test")
             .WithSourceImage("https://example.com/image.png");
 
         var result = builder.Build();
@@ -152,7 +152,7 @@ public sealed class ImageJobParamsBuilderTests
     public void WithStrength_SetsStrengthValue()
     {
         var builder = ImageJobParamsBuilder.Create()
-            .WithPrompt("test")
+            .WithPositivePrompt("test")
             .WithStrength(0.7m);
 
         var result = builder.Build();
@@ -166,14 +166,14 @@ public sealed class ImageJobParamsBuilderTests
         var builder = ImageJobParamsBuilder.Create();
 
         var exception = Assert.Throws<InvalidOperationException>(() => builder.Build());
-        Assert.Contains("Prompt is required", exception.Message);
+        Assert.Contains("Positive prompt is required", exception.Message);
     }
 
     [Fact]
     public void BuilderIsImmutable_ReturnsNewInstanceOnEachMethod()
     {
         var builder1 = ImageJobParamsBuilder.Create();
-        var builder2 = builder1.WithPrompt("test");
+        var builder2 = builder1.WithPositivePrompt("test");
         var builder3 = builder2.WithSteps(30);
 
         Assert.NotSame(builder1, builder2);
@@ -184,21 +184,21 @@ public sealed class ImageJobParamsBuilderTests
     public void CompleteFluentAPI_BuildsCorrectParams()
     {
         var result = ImageJobParamsBuilder.Create()
-            .WithPrompt("A beautiful sunset")
+            .WithPositivePrompt("A beautiful sunset")
             .WithNegativePrompt("blurry, low quality")
             .WithScheduler(Scheduler.DpmPlusPlus2M)
             .WithSteps(25)
-            .WithCfgScale(7.0m)
+            .WithConfigurationScale(7.0m)
             .WithSize(1024, 1024)
             .WithSeed(42)
             .WithClipSkip(2)
             .Build();
 
-        Assert.Equal("A beautiful sunset", result.Prompt);
+        Assert.Equal("A beautiful sunset", result.PositivePrompt);
         Assert.Equal("blurry, low quality", result.NegativePrompt);
         Assert.Equal(Scheduler.DpmPlusPlus2M, result.Scheduler);
         Assert.Equal(25, result.Steps);
-        Assert.Equal(7.0m, result.CfgScale);
+        Assert.Equal(7.0m, result.ConfigurationScale);
         Assert.Equal(1024, result.Width);
         Assert.Equal(1024, result.Height);
         Assert.Equal(42, result.Seed);

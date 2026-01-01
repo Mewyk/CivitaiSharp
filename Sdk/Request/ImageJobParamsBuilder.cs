@@ -11,11 +11,11 @@ using CivitaiSharp.Sdk.Models.Jobs;
 /// with the updated configuration, making it thread-safe and cacheable.
 /// </remarks>
 public sealed record ImageJobParamsBuilder(
-    string? Prompt = null,
+    string? PositivePrompt = null,
     string? NegativePrompt = null,
     Scheduler? Scheduler = null,
     int? Steps = null,
-    decimal? CfgScale = null,
+    decimal? ConfigurationScale = null,
     int? Width = null,
     int? Height = null,
     long? Seed = null,
@@ -32,10 +32,10 @@ public sealed record ImageJobParamsBuilder(
     /// <summary>
     /// Sets the positive prompt for image generation.
     /// </summary>
-    /// <param name="prompt">The prompt text describing what to generate. Required.</param>
-    /// <returns>A new builder instance with the updated prompt.</returns>
-    public ImageJobParamsBuilder WithPrompt(string prompt)
-        => this with { Prompt = prompt };
+    /// <param name="positivePrompt">The prompt text describing what to generate. Required.</param>
+    /// <returns>A new builder instance with the updated positive prompt.</returns>
+    public ImageJobParamsBuilder WithPositivePrompt(string positivePrompt)
+        => this with { PositivePrompt = positivePrompt };
 
     /// <summary>
     /// Sets the negative prompt describing what to avoid in the generated image.
@@ -64,13 +64,13 @@ public sealed record ImageJobParamsBuilder(
     /// <summary>
     /// Sets the classifier-free guidance scale.
     /// </summary>
-    /// <param name="cfgScale">The CFG scale. Range: 1-30, default: 7.0.</param>
-    /// <returns>A new builder instance with the updated CFG scale.</returns>
+    /// <param name="configurationScale">The configuration scale. Range: 1-30, default: 7.0.</param>
+    /// <returns>A new builder instance with the updated configuration scale.</returns>
     /// <remarks>
     /// Higher values make the image more closely match the prompt but may reduce quality.
     /// </remarks>
-    public ImageJobParamsBuilder WithCfgScale(decimal cfgScale)
-        => this with { CfgScale = cfgScale };
+    public ImageJobParamsBuilder WithConfigurationScale(decimal configurationScale)
+        => this with { ConfigurationScale = configurationScale };
 
     /// <summary>
     /// Sets the image dimensions.
@@ -142,18 +142,18 @@ public sealed record ImageJobParamsBuilder(
     /// <exception cref="InvalidOperationException">Thrown when required properties are missing.</exception>
     public ImageJobParams Build()
     {
-        if (string.IsNullOrWhiteSpace(Prompt))
+        if (string.IsNullOrWhiteSpace(PositivePrompt))
         {
-            throw new InvalidOperationException("Prompt is required. Use WithPrompt() to set it.");
+            throw new InvalidOperationException("Positive prompt is required. Use WithPositivePrompt() to set it.");
         }
 
         return new ImageJobParams
         {
-            Prompt = Prompt,
+            PositivePrompt = PositivePrompt,
             NegativePrompt = NegativePrompt,
             Scheduler = Scheduler,
             Steps = Steps,
-            CfgScale = CfgScale,
+            ConfigurationScale = ConfigurationScale,
             Width = Width,
             Height = Height,
             Seed = Seed,

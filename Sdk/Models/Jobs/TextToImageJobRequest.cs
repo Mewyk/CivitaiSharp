@@ -23,11 +23,16 @@ public sealed class TextToImageJobRequest
     public static string Type => JobType;
 
     /// <summary>
-    /// Gets or sets the base model AIR identifier. Required.
+    /// Gets or sets the base AIR identifier. Required.
     /// </summary>
+    /// <remarks>
+    /// Note: The Civitai API uses "model" as the JSON property name, but this C# property
+    /// is named "Air" to accurately reflect that it represents an AIR (Asset Identifier Resource)
+    /// identifier, not a Model object. This distinction improves code clarity and type safety.
+    /// </remarks>
     /// <example>urn:air:sdxl:checkpoint:civitai:4201@130072</example>
     [JsonPropertyName("model")]
-    public required AirIdentifier Model { get; init; }
+    public required AirIdentifier Air { get; init; }
 
     /// <summary>
     /// Gets or sets the generation parameters. Required.

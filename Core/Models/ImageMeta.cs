@@ -40,8 +40,12 @@ public sealed record ImageMeta
     public int? Steps { get; init; }
 
     /// <summary>The positive prompt text used to guide image generation.</summary>
+    /// <remarks>
+    /// The JSON property name is "prompt" from generation tools, but this C# property
+    /// is named "PositivePrompt" for consistency with <see cref="NegativePrompt"/>.
+    /// </remarks>
     [JsonPropertyName("prompt")]
-    public string? Prompt { get; init; }
+    public string? PositivePrompt { get; init; }
 
     /// <summary>The negative prompt text describing what to avoid in the generated image.</summary>
     [JsonPropertyName("negativePrompt")]
@@ -52,8 +56,12 @@ public sealed record ImageMeta
     public string? Sampler { get; init; }
 
     /// <summary>The classifier-free guidance scale controlling prompt influence.</summary>
+    /// <remarks>
+    /// The JSON property name is "cfgScale" from generation tools, but this C# property
+    /// uses the full name "ConfigurationScale" for clarity.
+    /// </remarks>
     [JsonPropertyName("cfgScale")]
-    public decimal? CfgScale { get; init; }
+    public decimal? ConfigurationScale { get; init; }
 
     /// <summary>The number of tokens to skip in the CLIP model.</summary>
     [JsonPropertyName("clipSkip")]

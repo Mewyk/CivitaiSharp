@@ -21,7 +21,7 @@ public sealed record TextToImageBuilder
 {
     private readonly SdkHttpClient _httpClient;
     private readonly SdkClientOptions _options;
-    private readonly AirIdentifier? _model;
+    private readonly AirIdentifier? _air;
     private readonly ImageJobParamsBuilder? _paramsBuilder;
     private readonly ImmutableDictionary<AirIdentifier, ImageJobNetworkParams>? _additionalNetworks;
     private readonly ImmutableList<ImageJobControlNet>? _controlNets;
@@ -46,7 +46,7 @@ public sealed record TextToImageBuilder
         : this(
             httpClient ?? throw new ArgumentNullException(nameof(httpClient)),
             options ?? throw new ArgumentNullException(nameof(options)),
-            model: null,
+            air: null,
             paramsBuilder: null,
             additionalNetworks: null,
             controlNets: null,
@@ -63,7 +63,7 @@ public sealed record TextToImageBuilder
     private TextToImageBuilder(
         SdkHttpClient httpClient,
         SdkClientOptions options,
-        AirIdentifier? model,
+        AirIdentifier? air,
         ImageJobParamsBuilder? paramsBuilder,
         ImmutableDictionary<AirIdentifier, ImageJobNetworkParams>? additionalNetworks,
         ImmutableList<ImageJobControlNet>? controlNets,
@@ -77,7 +77,7 @@ public sealed record TextToImageBuilder
     {
         _httpClient = httpClient;
         _options = options;
-        _model = model;
+        _air = air;
         _paramsBuilder = paramsBuilder;
         _additionalNetworks = additionalNetworks;
         _controlNets = controlNets;
@@ -91,23 +91,23 @@ public sealed record TextToImageBuilder
     }
 
     /// <summary>
-    /// Sets the base model to use for generation.
+    /// Sets the base AIR identifier to use for generation.
     /// </summary>
-    /// <param name="model">The AIR identifier for the model. Required.</param>
-    /// <returns>A new builder instance with the updated model.</returns>
+    /// <param name="air">The AIR identifier. Required.</param>
+    /// <returns>A new builder instance with the updated AIR identifier.</returns>
     /// <example>urn:air:sdxl:checkpoint:civitai:4201@130072</example>
-    public TextToImageBuilder WithModel(AirIdentifier model)
-        => new(_httpClient, _options, model, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
+    public TextToImageBuilder WithAir(AirIdentifier air)
+        => new(_httpClient, _options, air, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
 
     /// <summary>
     /// Sets the positive prompt for image generation.
     /// </summary>
-    /// <param name="prompt">The prompt text describing what to generate. Required.</param>
-    /// <returns>A new builder instance with the updated prompt.</returns>
-    public TextToImageBuilder WithPrompt(string prompt)
+    /// <param name="positivePrompt">The prompt text describing what to generate. Required.</param>
+    /// <returns>A new builder instance with the updated positive prompt.</returns>
+    public TextToImageBuilder WithPositivePrompt(string positivePrompt)
     {
         var builder = _paramsBuilder ?? ImageJobParamsBuilder.Create();
-        return new(_httpClient, _options, _model, builder.WithPrompt(prompt), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
+        return new(_httpClient, _options, _air, builder.WithPositivePrompt(positivePrompt), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
     }
 
     /// <summary>
@@ -118,7 +118,7 @@ public sealed record TextToImageBuilder
     public TextToImageBuilder WithNegativePrompt(string negativePrompt)
     {
         var builder = _paramsBuilder ?? ImageJobParamsBuilder.Create();
-        return new(_httpClient, _options, _model, builder.WithNegativePrompt(negativePrompt), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
+        return new(_httpClient, _options, _air, builder.WithNegativePrompt(negativePrompt), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
     }
 
     /// <summary>
@@ -130,7 +130,7 @@ public sealed record TextToImageBuilder
     public TextToImageBuilder WithSize(int width, int height)
     {
         var builder = _paramsBuilder ?? ImageJobParamsBuilder.Create();
-        return new(_httpClient, _options, _model, builder.WithSize(width, height), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
+        return new(_httpClient, _options, _air, builder.WithSize(width, height), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
     }
 
     /// <summary>
@@ -141,18 +141,18 @@ public sealed record TextToImageBuilder
     public TextToImageBuilder WithSteps(int steps)
     {
         var builder = _paramsBuilder ?? ImageJobParamsBuilder.Create();
-        return new(_httpClient, _options, _model, builder.WithSteps(steps), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
+        return new(_httpClient, _options, _air, builder.WithSteps(steps), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
     }
 
     /// <summary>
     /// Sets the classifier-free guidance scale.
     /// </summary>
-    /// <param name="cfgScale">The CFG scale. Range: 1-30, default: 7.0.</param>
-    /// <returns>A new builder instance with the updated CFG scale.</returns>
-    public TextToImageBuilder WithCfgScale(decimal cfgScale)
+    /// <param name="configurationScale">The configuration scale. Range: 1-30, default: 7.0.</param>
+    /// <returns>A new builder instance with the updated configuration scale.</returns>
+    public TextToImageBuilder WithConfigurationScale(decimal configurationScale)
     {
         var builder = _paramsBuilder ?? ImageJobParamsBuilder.Create();
-        return new(_httpClient, _options, _model, builder.WithCfgScale(cfgScale), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
+        return new(_httpClient, _options, _air, builder.WithConfigurationScale(configurationScale), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
     }
 
     /// <summary>
@@ -163,7 +163,7 @@ public sealed record TextToImageBuilder
     public TextToImageBuilder WithSeed(long seed)
     {
         var builder = _paramsBuilder ?? ImageJobParamsBuilder.Create();
-        return new(_httpClient, _options, _model, builder.WithSeed(seed), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
+        return new(_httpClient, _options, _air, builder.WithSeed(seed), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
     }
 
     /// <summary>
@@ -172,7 +172,7 @@ public sealed record TextToImageBuilder
     /// <param name="paramsBuilder">The configured parameters builder.</param>
     /// <returns>A new builder instance with the updated parameters.</returns>
     public TextToImageBuilder WithParams(ImageJobParamsBuilder paramsBuilder)
-        => new(_httpClient, _options, _model, paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
+        => new(_httpClient, _options, _air, paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
 
     /// <summary>
     /// Configures generation parameters using a configuration action.
@@ -183,7 +183,7 @@ public sealed record TextToImageBuilder
     {
         ArgumentNullException.ThrowIfNull(configure);
         var builder = _paramsBuilder ?? ImageJobParamsBuilder.Create();
-        return new(_httpClient, _options, _model, configure(builder), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
+        return new(_httpClient, _options, _air, configure(builder), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
     }
 
     /// <summary>
@@ -196,7 +196,7 @@ public sealed record TextToImageBuilder
     {
         ArgumentNullException.ThrowIfNull(networkParams);
         var networks = _additionalNetworks ?? [];
-        return new(_httpClient, _options, _model, _paramsBuilder, networks.SetItem(network, networkParams), _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
+        return new(_httpClient, _options, _air, _paramsBuilder, networks.SetItem(network, networkParams), _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
     }
 
     /// <summary>
@@ -233,7 +233,7 @@ public sealed record TextToImageBuilder
     {
         ArgumentNullException.ThrowIfNull(controlNet);
         var controlNets = _controlNets ?? [];
-        return new(_httpClient, _options, _model, _paramsBuilder, _additionalNetworks, controlNets.Add(controlNet), _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
+        return new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, controlNets.Add(controlNet), _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
     }
 
     /// <summary>
@@ -265,7 +265,7 @@ public sealed record TextToImageBuilder
     /// <param name="quantity">The quantity. Range: 1-10, default: 1.</param>
     /// <returns>A new builder instance with the updated quantity.</returns>
     public TextToImageBuilder WithQuantity(int quantity)
-        => new(_httpClient, _options, _model, _paramsBuilder, _additionalNetworks, _controlNets, quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
+        => new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, _controlNets, quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
 
     /// <summary>
     /// Sets the priority configuration for job scheduling.
@@ -273,7 +273,7 @@ public sealed record TextToImageBuilder
     /// <param name="priority">The priority configuration.</param>
     /// <returns>A new builder instance with the updated priority.</returns>
     public TextToImageBuilder WithPriority(Priority priority)
-        => new(_httpClient, _options, _model, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
+        => new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
 
     /// <summary>
     /// Adds a custom property for job tracking and querying.
@@ -285,7 +285,7 @@ public sealed record TextToImageBuilder
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
         var properties = _properties ?? [];
-        return new(_httpClient, _options, _model, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, properties.SetItem(key, value), _callbackUrl, _retries, _timeout, _clipSkip);
+        return new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, properties.SetItem(key, value), _callbackUrl, _retries, _timeout, _clipSkip);
     }
 
     /// <summary>
@@ -294,7 +294,7 @@ public sealed record TextToImageBuilder
     /// <param name="callbackUrl">The webhook URL.</param>
     /// <returns>A new builder instance with the updated callback URL.</returns>
     public TextToImageBuilder WithCallbackUrl(string callbackUrl)
-        => new(_httpClient, _options, _model, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, _properties, callbackUrl, _retries, _timeout, _clipSkip);
+        => new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, _properties, callbackUrl, _retries, _timeout, _clipSkip);
 
     /// <summary>
     /// Sets the number of automatic retries on failure.
@@ -302,7 +302,7 @@ public sealed record TextToImageBuilder
     /// <param name="retries">The number of retry attempts. Default: 0.</param>
     /// <returns>A new builder instance with the updated retry attempts.</returns>
     public TextToImageBuilder WithRetries(int retries)
-        => new(_httpClient, _options, _model, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, retries, _timeout, _clipSkip);
+        => new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, retries, _timeout, _clipSkip);
 
     /// <summary>
     /// Sets the job timeout.
@@ -310,7 +310,7 @@ public sealed record TextToImageBuilder
     /// <param name="timeout">The timeout duration. Format: "HH:mm:ss". Default: "00:10:00".</param>
     /// <returns>A new builder instance with the updated timeout.</returns>
     public TextToImageBuilder WithTimeout(string timeout)
-        => new(_httpClient, _options, _model, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, timeout, _clipSkip);
+        => new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, timeout, _clipSkip);
 
     /// <summary>
     /// Sets the job timeout.
@@ -318,7 +318,7 @@ public sealed record TextToImageBuilder
     /// <param name="timeout">The timeout duration. Default: 10 minutes.</param>
     /// <returns>A new builder instance with the updated timeout.</returns>
     public TextToImageBuilder WithTimeout(TimeSpan timeout)
-        => new(_httpClient, _options, _model, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, timeout.ToString(@"hh\:mm\:ss"), _clipSkip);
+        => new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, timeout.ToString(@"hh\:mm\:ss"), _clipSkip);
 
     /// <summary>
     /// Sets the number of CLIP layers to skip.
@@ -330,7 +330,7 @@ public sealed record TextToImageBuilder
     /// This can also be set via <see cref="ImageJobParamsBuilder.WithClipSkip"/>.
     /// </remarks>
     public TextToImageBuilder WithClipSkip(int clipSkip)
-        => new(_httpClient, _options, _model, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, clipSkip);
+        => new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, clipSkip);
 
     /// <summary>
     /// Executes the job submission to the Civitai Generator API.
@@ -340,19 +340,19 @@ public sealed record TextToImageBuilder
     /// <exception cref="InvalidOperationException">Thrown when required properties are missing.</exception>
     public Task<Result<JobStatusCollection>> ExecuteAsync(CancellationToken cancellationToken = default)
     {
-        if (_model == null)
+        if (_air == null)
         {
-            throw new InvalidOperationException("Model is required. Use WithModel() to set it.");
+            throw new InvalidOperationException("AIR identifier is required. Use WithAir() to set it.");
         }
 
         if (_paramsBuilder == null)
         {
-            throw new InvalidOperationException("Parameters are required. Use WithPrompt() or WithParams() to set them.");
+            throw new InvalidOperationException("Parameters are required. Use WithPositivePrompt() or WithParams() to set them.");
         }
 
         var request = new TextToImageJobRequest
         {
-            Model = _model.Value,
+            Air = _air.Value,
             Params = _paramsBuilder.Build(),
             AdditionalNetworks = _additionalNetworks?.Count > 0 ? _additionalNetworks : null,
             ControlNets = _controlNets?.Count > 0 ? _controlNets : null,
@@ -397,19 +397,19 @@ public sealed record TextToImageBuilder
 
         foreach (var builder in allBuilders)
         {
-            if (builder._model == null)
+            if (builder._air == null)
             {
-                throw new InvalidOperationException("All jobs must have a model set. Use WithModel() on all builders.");
+                throw new InvalidOperationException("All jobs must have an AIR identifier set. Use WithAir() on all builders.");
             }
 
             if (builder._paramsBuilder == null)
             {
-                throw new InvalidOperationException("All jobs must have parameters set. Use WithPrompt() or WithParams() on all builders.");
+                throw new InvalidOperationException("All jobs must have parameters set. Use WithPositivePrompt() or WithParams() on all builders.");
             }
 
             var request = new TextToImageJobRequest
             {
-                Model = builder._model.Value,
+                Air = builder._air.Value,
                 Params = builder._paramsBuilder.Build(),
                 AdditionalNetworks = builder._additionalNetworks?.Count > 0 ? builder._additionalNetworks : null,
                 ControlNets = builder._controlNets?.Count > 0 ? builder._controlNets : null,

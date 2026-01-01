@@ -24,51 +24,51 @@ internal sealed class CoverageService(SdkHttpClient httpClient, SdkClientOptions
 {
     /// <inheritdoc />
     public Task<Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>> GetAsync(
-        IEnumerable<AirIdentifier> models,
+        IEnumerable<AirIdentifier> airIdentifiers,
         CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(models);
+        ArgumentNullException.ThrowIfNull(airIdentifiers);
 
         // Avoid double enumeration by checking if already a list
-        var modelList = models as IReadOnlyList<AirIdentifier> ?? models.ToList();
-        if (modelList.Count == 0)
+        var airList = airIdentifiers as IReadOnlyList<AirIdentifier> ?? [.. airIdentifiers];
+        if (airList.Count == 0)
         {
-            throw new ArgumentException("At least one model is required.", nameof(models));
+            throw new ArgumentException("At least one AIR identifier is required.", nameof(airIdentifiers));
         }
 
-        var uri = BuildCoverageUri(modelList);
+        var uri = BuildCoverageUri(airList);
         return httpClient.GetAsync<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>(uri, cancellationToken);
     }
 
     /// <inheritdoc />
     public async Task<Result<ProviderAssetAvailability>> GetAsync(
-        AirIdentifier model,
+        AirIdentifier air,
         CancellationToken cancellationToken = default)
     {
-        var result = await GetAsync([model], cancellationToken).ConfigureAwait(false);
+        var result = await GetAsync([air], cancellationToken).ConfigureAwait(false);
 
         return result.Match<Result<ProviderAssetAvailability>>(
             onSuccess: data =>
             {
-                if (data.TryGetValue(model, out var availability))
+                if (data.TryGetValue(air, out var availability))
                 {
                     return new Result<ProviderAssetAvailability>.Success(availability);
                 }
 
                 return new Result<ProviderAssetAvailability>.Failure(
-                    Error.Create(ErrorCode.NotFound, $"Model '{model}' not found in coverage response."));
+                    Error.Create(ErrorCode.NotFound, $"AIR identifier '{air}' not found in coverage response."));
             },
             onFailure: error => new Result<ProviderAssetAvailability>.Failure(error));
     }
 
-    private string BuildCoverageUri(IReadOnlyList<AirIdentifier> models)
+    private string BuildCoverageUri(IReadOnlyList<AirIdentifier> airList)
     {
         var path = options.GetApiPath("coverage");
         var query = new QueryStringBuilder();
 
-        foreach (var model in models)
+        foreach (var air in airList)
         {
-            query.Append("model", model.ToString());
+            query.Append("model", air.ToString());
         }
 
         return query.BuildUri(path);

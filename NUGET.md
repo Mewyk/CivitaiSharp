@@ -434,16 +434,16 @@ await using var provider = services.BuildServiceProvider();
 var sdkClient = provider.GetRequiredService<ISdkClient>();
 
 // Create a text-to-image job
-var model = AirIdentifier.Parse("urn:air:sdxl:checkpoint:civitai:4201@130072");
+var model = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
 
 var result = await sdkClient.Jobs
     .CreateTextToImage()
-    .WithModel(model)
-    .WithPrompt("a beautiful sunset over mountains, highly detailed")
+    .WithAir(model)
+    .WithPositivePrompt("a beautiful sunset over mountains, highly detailed")
     .WithNegativePrompt("blurry, low quality")
-    .WithSize(1024, 1024)
+    .WithDimensions(1024, 1024)
     .WithSteps(30)
-    .WithCfgScale(7.5m)
+    .WithConfigurationScale(7.5m)
     .WithSeed(12345)
     .ExecuteAsync();
 
@@ -479,6 +479,131 @@ var queryResult = await sdkClient.Jobs.Query
     .ExecuteAsync();
 ```
 
+#### Complete Job Configuration Example
+
+Use all available parameters for fine-tuned control:
+
+```csharp
+var baseCheckpoint = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
+
+var comprehensiveJob = await sdkClient.Jobs
+    .CreateTextToImage()
+    .WithAir(baseCheckpoint)
+    .WithPositivePrompt("masterpiece, best quality, professional photo of a cyberpunk cityscape at night, neon lights, rain-slicked streets, highly detailed architecture")
+    .WithNegativePrompt("blurry, low quality, bad anatomy, watermark, signature, jpeg artifacts, worst quality")
+    .WithDimensions(1024, 1536)
+    .WithSteps(35)
+    .WithConfigurationScale(8.0m)
+    .WithSampler(Scheduler.DpmPlusPlus2MKarras)
+    .WithSeed(987654321)
+    .WithClipSkip(2)
+    .WithQuantity(4) // Generate 4 variations
+    .WithPriority(false) // Normal priority
+    .WithCallbackUrl("https://myapp.com/webhook/image-complete")
+    .WithRetries(3)
+    .WithTimeout(600) // 10 minutes
+    .ExecuteAsync();
+
+if (comprehensiveJob is Result<JobStatusCollection>.Success jobSuccess)
+{
+    Console.WriteLine($"Submitted {jobSuccess.Data.Jobs.Count} jobs with token: {jobSuccess.Data.Token}");
+}
+```
+
+#### Multi-LoRA Example
+
+Combine multiple LoRAs with different strengths for enhanced control:
+
+```csharp
+var baseCheckpoint = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
+var characterLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 328553, 368189);
+var styleLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 234567, 456789);
+var lightingLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 345678, 567890);
+
+var multiLoRAJob = await sdkClient.Jobs
+    .CreateTextToImage()
+    .WithAir(baseCheckpoint)
+    .WithPositivePrompt("anime character portrait, cinematic lighting, detailed face")
+    .WithNegativePrompt("blurry, low quality, bad hands")
+    .WithDimensions(1024, 1024)
+    .WithSteps(30)
+    .WithConfigurationScale(7.5m)
+    // Character LoRA with high strength
+    .WithAdditionalNetwork(characterLoRA, network => network
+        .WithStrength(0.9m)
+        .WithTriggerWord("anime_style"))
+    // Style LoRA with medium strength
+    .WithAdditionalNetwork(styleLoRA, network => network
+        .WithStrength(0.6m)
+        .WithTriggerWord("cinematic"))
+    // Lighting LoRA with subtle strength
+    .WithAdditionalNetwork(lightingLoRA, network => network
+        .WithStrength(0.4m))
+    .ExecuteAsync();
+
+if (multiLoRAJob is Result<JobStatusCollection>.Success loraSuccess)
+{
+    Console.WriteLine($"Multi-LoRA job submitted: {loraSuccess.Data.Token}");
+}
+```
+
+#### ControlNet with LoRA Example
+
+Combine ControlNet for pose guidance with LoRAs for style:
+
+```csharp
+var baseCheckpoint = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
+var styleLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 234567, 456789);
+var detailLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 345678, 567890);
+var controlNetModel = new AirIdentifier("sdxl", AirAssetType.ControlNet, "civitai", 456789, 678901);
+
+var controlNetJob = await sdkClient.Jobs
+    .CreateTextToImage()
+    .WithAir(baseCheckpoint)
+    .WithPositivePrompt("professional photo of a person in business attire, studio lighting, sharp focus")
+    .WithNegativePrompt("blurry, low quality, bad anatomy, deformed")
+    .WithDimensions(768, 1024)
+    .WithSteps(35)
+    .WithConfigurationScale(7.0m)
+    // ControlNet for pose guidance
+    .WithControlNet(controlNet => controlNet
+        .WithModel(controlNetModel)
+        .WithImage("https://example.com/reference-pose.png")
+        .WithWeight(1.0m)
+        .WithStartingControlStep(0.0m)
+        .WithEndingControlStep(0.8m))
+    // Style LoRA
+    .WithAdditionalNetwork(styleLoRA, network => network
+        .WithStrength(0.7m)
+        .WithTriggerWord("professional_photo"))
+    // Detail enhancement LoRA
+    .WithAdditionalNetwork(detailLoRA, network => network
+        .WithStrength(0.5m))
+    .ExecuteAsync();
+
+if (controlNetJob is Result<JobStatusCollection>.Success controlNetSuccess)
+{
+    Console.WriteLine($"ControlNet+LoRA job submitted: {controlNetSuccess.Data.Token}");
+
+    // Wait for completion
+    var completedJob = await sdkClient.Jobs.Query
+        .WithWait()
+        .WithDetailed()
+        .GetByTokenAsync(controlNetSuccess.Data.Token);
+
+    if (completedJob is Result<JobStatusCollection>.Success completed)
+    {
+        foreach (var job in completed.Data.Jobs)
+        {
+            if (job.Result?.BlobUrl is string blobUrl)
+            {
+                Console.WriteLine($"Generated image: {blobUrl}");
+            }
+        }
+    }
+}
+```
+
 **SDK - Coverage Service**
 
 ```csharp
@@ -486,8 +611,8 @@ using CivitaiSharp.Sdk;
 using CivitaiSharp.Sdk.Air;
 
 // Check if a model is available before submitting a job
-var model = AirIdentifier.Parse("urn:air:sdxl:checkpoint:civitai:4201@130072");
-var lora = AirIdentifier.Parse("urn:air:sdxl:lora:civitai:328553@368189");
+var model = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
+var lora = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 328553, 368189);
 
 // Check single model
 var coverageResult = await sdkClient.Coverage.GetAsync(model);

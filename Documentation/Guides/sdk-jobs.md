@@ -671,10 +671,21 @@ await sdkClient.Jobs
 
 ### Handle Async Operations Properly
 
-Jobs are asynchronous - use appropriate polling strategies:
+**Why polling is necessary:** Image generation jobs typically take 30 seconds to several minutes to complete, depending on model complexity, queue position, and service load. The API processes requests asynchronously, so you must either poll for results or use webhook callbacks (see [Webhook Callbacks Guide](sdk-webhooks.md) for an alternative approach).
+
+**Choosing a polling strategy:**
+
+CivitaiSharp provides two approaches for checking job status:
+
+#### Option 1: Manual Polling with Task.Delay
+
+Use manual polling when you need:
+- Custom retry logic or exponential backoff
+- Specific polling intervals based on your requirements
+- Integration with existing async workflows or state machines
+- Fine-grained control over cancellation and timeout behavior
 
 ```csharp
-// Good - properly async with polling
 var submitResult = await sdkClient.Jobs
     .CreateImage()
     .WithAir(model)
@@ -685,15 +696,79 @@ if (submitResult is Result<JobStatusCollection>.Success success)
 {
     var token = success.Data.Token;
     
-    // Option 1: Poll with delay
-    await Task.Delay(5000);
-    var status = await sdkClient.Jobs.Query.GetByTokenAsync(token);
+    // Poll every 5 seconds until complete
+    while (true)
+    {
+        await Task.Delay(5000); // Wait 5 seconds between checks
+        
+        var statusResult = await sdkClient.Jobs.Query.GetByTokenAsync(token);
+        
+        if (statusResult is Result<JobStatus>.Success statusSuccess)
+        {
+            var status = statusSuccess.Data;
+            
+            // Check if job is complete (scheduled = false)
+            if (!status.Scheduled)
+            {
+                if (status.Result?.BlobUrl is string imageUrl)
+                {
+                    Console.WriteLine($"Job complete! Image URL: {imageUrl}");
+                }
+                break;
+            }
+            
+            Console.WriteLine($"Job still processing. Position in queue: {status.Position}");
+        }
+    }
+}
+```
+
+**Best practices for manual polling:**
+- Poll every 5-10 seconds to balance responsiveness and API load
+- Consider exponential backoff for longer-running jobs (5s → 10s → 20s)
+- Implement a maximum retry limit to avoid infinite loops
+- Use `CancellationToken` to support graceful cancellation
+
+#### Option 2: Automatic Waiting with WithWait()
+
+Use the `WithWait()` parameter when you want:
+- Simplified code without manual polling loops
+- The API to handle polling automatically (up to ~10 minutes)
+- Convenience for scripts, CLIs, or simple applications
+- Blocking behavior where the call waits until the job completes
+
+```csharp
+var submitResult = await sdkClient.Jobs
+    .CreateImage()
+    .WithAir(model)
+    .WithPositivePrompt(prompt)
+    .ExecuteAsync();
+
+if (submitResult is Result<JobStatusCollection>.Success success)
+{
+    var token = success.Data.Token;
     
-    // Option 2: Use wait parameter (blocks up to ~10 min)
-    var completed = await sdkClient.Jobs.Query
+    // Single call that waits for completion (up to ~10 minutes)
+    var completedResult = await sdkClient.Jobs.Query
         .WithWait()
         .GetByTokenAsync(token);
+    
+    if (completedResult is Result<JobStatus>.Success completedSuccess)
+    {
+        var status = completedSuccess.Data;
+        
+        if (status.Result?.BlobUrl is string imageUrl)
+        {
+            Console.WriteLine($"Job complete! Image URL: {imageUrl}");
+        }
+    }
 }
+```
+
+**Trade-offs:**
+- **WithWait()** blocks the calling thread but is simpler to implement
+- **Manual polling** requires more code but offers flexibility and control
+- **Webhooks** (recommended for production) eliminate polling entirely - see [Webhook Callbacks Guide](sdk-webhooks.md)
 ```
 
 ## Error Handling

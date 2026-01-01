@@ -48,6 +48,8 @@ items:
       href: sdk-introduction.md
     - name: Jobs Service
       href: sdk-jobs.md
+    - name: Webhook Callbacks
+      href: sdk-webhooks.md
     - name: Coverage Service
       href: sdk-coverage.md
     - name: Usage Service

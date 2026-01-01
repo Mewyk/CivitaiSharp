@@ -40,7 +40,7 @@ CivitaiSharp uses this format by default as it's the most reliable.
 However, **other parameters return 400 Bad Request** with comma-separated values:
 
 ```
-?baseModels=SD 1.5,SDXL 1.0  ❌ 400 Bad Request
+?baseModels=SD 1.5,SDXL 1.0  -- 400 Bad Request
 ```
 
 **Recommendation:** Always use the repeated parameter format, which CivitaiSharp does automatically.
@@ -62,9 +62,9 @@ Some filters require authentication via an API key configured in `ApiClientOptio
 
 | Filter Method | Requires Auth | Behavior Without Auth |
 |---------------|---------------|----------------------|
-| `WhereFavorites()` | ✅ Yes | Returns 0 results |
-| `WhereHidden()` | ✅ Yes | Returns 0 results |
-| All other filters | ❌ No | Works normally |
+| `WhereFavorites()` | Yes | Returns 0 results |
+| `WhereHidden()` | Yes | Returns 0 results |
+| All other filters | No | Works normally |
 
 ### Configuring Authentication
 
@@ -87,12 +87,12 @@ Without authentication:
 The `WhereCommercialUse()` filter exhibits unusual behavior:
 
 ```csharp
-// ❌ Single value typically returns 0 results
+// Single value typically returns 0 results
 var result = await apiClient.Models
     .WhereCommercialUse(CommercialUsePermission.None)
     .ExecuteAsync();
 
-// ✅ Multiple values work correctly
+// Multiple values work correctly
 var result = await apiClient.Models
     .WhereCommercialUse(
         CommercialUsePermission.Image, 
@@ -125,10 +125,10 @@ During testing, these boolean filters showed inconsistent behavior:
 
 These boolean filters work correctly:
 
-- `WhereNsfw(bool)` - ✅ Works for both true and false
-- `WherePrimaryFileOnly()` - ✅ Works (always true)
-- `WhereAllowDifferentLicenses(bool)` - ✅ Works for both true and false
-- `WhereSupportsGeneration(bool)` - ✅ Works for both true and false
+- `WhereNsfw(bool)` - Works for both true and false
+- `WherePrimaryFileOnly()` - Works (always true)
+- `WhereAllowDifferentLicenses(bool)` - Works for both true and false
+- `WhereSupportsGeneration(bool)` - Works for both true and false
 
 ## Endpoint Reliability
 
@@ -143,10 +143,10 @@ The `/api/v1/creators` endpoint has shown reliability issues:
 
 **Example Test Results:**
 ```
-✅ Models endpoint: 100% success rate
-✅ Images endpoint: 100% success rate
-✅ Tags endpoint: 100% success rate
-❌ Creators endpoint: ~50% success rate (timeouts/500 errors)
+[PASS] Models endpoint: 100% success rate
+[PASS] Images endpoint: 100% success rate
+[PASS] Tags endpoint: 100% success rate
+[FAIL] Creators endpoint: ~50% success rate (timeouts/500 errors)
 ```
 
 **Mitigation:**
@@ -178,12 +178,12 @@ var result = await apiClient.Models
 
 | Enum Value | API String | Encoding Required |
 |------------|------------|-------------------|
-| `ModelSort.HighestRated` | "Highest Rated" | ✅ Yes |
-| `ModelSort.MostDownloaded` | "Most Downloaded" | ✅ Yes |
-| `ModelSort.Newest` | "Newest" | ❌ No (single word) |
-| `ImageSort.MostReactions` | "Most Reactions" | ✅ Yes |
-| `ImageSort.MostComments` | "Most Comments" | ✅ Yes |
-| `ImageSort.MostCollected` | "Most Collected" | ✅ Yes |
+| `ModelSort.HighestRated` | "Highest Rated" | Yes |
+| `ModelSort.MostDownloaded` | "Most Downloaded" | Yes |
+| `ModelSort.Newest` | "Newest" | No (single word) |
+| `ImageSort.MostReactions` | "Most Reactions" | Yes |
+| `ImageSort.MostComments` | "Most Comments" | Yes |
+| `ImageSort.MostCollected` | "Most Collected" | Yes |
 
 CivitaiSharp automatically handles all URL encoding.
 

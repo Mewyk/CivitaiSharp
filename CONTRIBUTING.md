@@ -154,13 +154,13 @@ public sealed record Model(
 Use classes with init-only properties:
 
 ```csharp
-public sealed class TextToImageJobRequest
+public sealed class ImageGenerationJobRequest
 {
     [JsonPropertyName("model")]
-    public required string Model { get; init; }
+    public required AirIdentifier Air { get; init; }
 
     [JsonPropertyName("params")]
-    public ImageJobParams? Params { get; init; }
+    public required ImageJobParams Params { get; init; }
 }
 ```
 

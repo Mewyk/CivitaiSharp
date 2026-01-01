@@ -48,7 +48,7 @@ internal static class SdkJsonTypeResolver
         object? typeInfo = typeof(T) switch
         {
             // Job request types
-            _ when typeof(T) == typeof(TextToImageJobRequest) => SdkJsonContext.Default.TextToImageJobRequest,
+            _ when typeof(T) == typeof(ImageGenerationJobRequest) => SdkJsonContext.Default.ImageGenerationJobRequest,
             _ when typeof(T) == typeof(BatchJobRequest) => SdkJsonContext.Default.BatchJobRequest,
             _ when typeof(T) == typeof(QueryJobsRequest) => SdkJsonContext.Default.QueryJobsRequest,
 

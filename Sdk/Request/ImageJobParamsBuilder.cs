@@ -11,17 +11,15 @@ using CivitaiSharp.Sdk.Models.Jobs;
 /// with the updated configuration, making it thread-safe and cacheable.
 /// </remarks>
 public sealed record ImageJobParamsBuilder(
-    string? Prompt = null,
+    string? PositivePrompt = null,
     string? NegativePrompt = null,
     Scheduler? Scheduler = null,
     int? Steps = null,
-    decimal? CfgScale = null,
+    decimal? ConfigurationScale = null,
     int? Width = null,
     int? Height = null,
     long? Seed = null,
-    int? ClipSkip = null,
-    string? Image = null,
-    decimal? Strength = null)
+    int? ClipSkip = null)
 {
     /// <summary>
     /// Creates a new <see cref="ImageJobParamsBuilder"/> instance.
@@ -32,10 +30,10 @@ public sealed record ImageJobParamsBuilder(
     /// <summary>
     /// Sets the positive prompt for image generation.
     /// </summary>
-    /// <param name="prompt">The prompt text describing what to generate. Required.</param>
-    /// <returns>A new builder instance with the updated prompt.</returns>
-    public ImageJobParamsBuilder WithPrompt(string prompt)
-        => this with { Prompt = prompt };
+    /// <param name="positivePrompt">The prompt text describing what to generate. Required.</param>
+    /// <returns>A new builder instance with the updated positive prompt.</returns>
+    public ImageJobParamsBuilder WithPositivePrompt(string positivePrompt)
+        => this with { PositivePrompt = positivePrompt };
 
     /// <summary>
     /// Sets the negative prompt describing what to avoid in the generated image.
@@ -64,13 +62,13 @@ public sealed record ImageJobParamsBuilder(
     /// <summary>
     /// Sets the classifier-free guidance scale.
     /// </summary>
-    /// <param name="cfgScale">The CFG scale. Range: 1-30, default: 7.0.</param>
-    /// <returns>A new builder instance with the updated CFG scale.</returns>
+    /// <param name="configurationScale">The configuration scale. Range: 1-30, default: 7.0.</param>
+    /// <returns>A new builder instance with the updated configuration scale.</returns>
     /// <remarks>
     /// Higher values make the image more closely match the prompt but may reduce quality.
     /// </remarks>
-    public ImageJobParamsBuilder WithCfgScale(decimal cfgScale)
-        => this with { CfgScale = cfgScale };
+    public ImageJobParamsBuilder WithConfigurationScale(decimal configurationScale)
+        => this with { ConfigurationScale = configurationScale };
 
     /// <summary>
     /// Sets the image dimensions.
@@ -78,7 +76,7 @@ public sealed record ImageJobParamsBuilder(
     /// <param name="width">The width in pixels. Must be a multiple of 8. Range: 64-2048.</param>
     /// <param name="height">The height in pixels. Must be a multiple of 8. Range: 64-2048.</param>
     /// <returns>A new builder instance with the updated dimensions.</returns>
-    public ImageJobParamsBuilder WithSize(int width, int height)
+    public ImageJobParamsBuilder WithDimensions(int width, int height)
         => this with { Width = width, Height = height };
 
     /// <summary>
@@ -117,49 +115,28 @@ public sealed record ImageJobParamsBuilder(
         => this with { ClipSkip = clipSkip };
 
     /// <summary>
-    /// Sets the source image URL for image-to-image generation.
-    /// </summary>
-    /// <param name="imageUrl">The source image URL.</param>
-    /// <returns>A new builder instance with the updated source image.</returns>
-    public ImageJobParamsBuilder WithSourceImage(string imageUrl)
-        => this with { Image = imageUrl };
-
-    /// <summary>
-    /// Sets the denoising strength for image-to-image generation.
-    /// </summary>
-    /// <param name="strength">The strength value. Range: 0.0-1.0.</param>
-    /// <returns>A new builder instance with the updated strength.</returns>
-    /// <remarks>
-    /// Lower values preserve more of the source image; higher values allow more change.
-    /// </remarks>
-    public ImageJobParamsBuilder WithStrength(decimal strength)
-        => this with { Strength = strength };
-
-    /// <summary>
     /// Builds the <see cref="ImageJobParams"/> instance.
     /// </summary>
     /// <returns>The configured <see cref="ImageJobParams"/>.</returns>
     /// <exception cref="InvalidOperationException">Thrown when required properties are missing.</exception>
     public ImageJobParams Build()
     {
-        if (string.IsNullOrWhiteSpace(Prompt))
+        if (string.IsNullOrWhiteSpace(PositivePrompt))
         {
-            throw new InvalidOperationException("Prompt is required. Use WithPrompt() to set it.");
+            throw new InvalidOperationException("Positive prompt is required. Use WithPositivePrompt() to set it.");
         }
 
         return new ImageJobParams
         {
-            Prompt = Prompt,
+            PositivePrompt = PositivePrompt,
             NegativePrompt = NegativePrompt,
             Scheduler = Scheduler,
             Steps = Steps,
-            CfgScale = CfgScale,
+            ConfigurationScale = ConfigurationScale,
             Width = Width,
             Height = Height,
             Seed = Seed,
-            ClipSkip = ClipSkip,
-            Image = Image,
-            Strength = Strength
+            ClipSkip = ClipSkip
         };
     }
 }

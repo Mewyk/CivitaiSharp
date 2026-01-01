@@ -7,12 +7,16 @@ using System.Text.Json.Serialization;
 using CivitaiSharp.Sdk.Air;
 
 /// <summary>
-/// Request model for text-to-image generation jobs.
+/// Request model for image generation jobs. Supports both text-to-image and image-to-image modes.
 /// </summary>
-public sealed class TextToImageJobRequest
+/// <remarks>
+/// The job type is always "textToImage" for the Civitai API, regardless of whether source image is provided.
+/// When <see cref="SourceImageUrl"/> is provided, the generation operates in image-to-image mode.
+/// </remarks>
+public sealed class ImageGenerationJobRequest
 {
     /// <summary>
-    /// The job type discriminator value for text-to-image jobs.
+    /// The job type discriminator value for image generation jobs.
     /// </summary>
     public const string JobType = "textToImage";
 
@@ -23,17 +27,44 @@ public sealed class TextToImageJobRequest
     public static string Type => JobType;
 
     /// <summary>
-    /// Gets or sets the base model AIR identifier. Required.
+    /// Gets or sets the base AIR identifier. Required.
     /// </summary>
+    /// <remarks>
+    /// Note: The Civitai API uses "model" as the JSON property name, but this C# property
+    /// is named "Air" to accurately reflect that it represents an AIR (Asset Identifier Resource)
+    /// identifier, not a Model object. This distinction improves code clarity and type safety.
+    /// </remarks>
     /// <example>urn:air:sdxl:checkpoint:civitai:4201@130072</example>
     [JsonPropertyName("model")]
-    public required AirIdentifier Model { get; init; }
+    public required AirIdentifier Air { get; init; }
 
     /// <summary>
     /// Gets or sets the generation parameters. Required.
     /// </summary>
     [JsonPropertyName("params")]
     public required ImageJobParams Params { get; init; }
+
+    /// <summary>
+    /// Gets or sets the source image URL for image-to-image generation.
+    /// </summary>
+    /// <remarks>
+    /// When provided, enables image-to-image mode where the source image is transformed
+    /// according to the prompt and other parameters. Use <see cref="DenoisingStrength"/>
+    /// to control how much the source image is transformed.
+    /// </remarks>
+    [JsonPropertyName("image")]
+    public string? SourceImageUrl { get; init; }
+
+    /// <summary>
+    /// Gets or sets the denoising strength for image-to-image generation. Range: 0.0-1.0.
+    /// </summary>
+    /// <remarks>
+    /// Only applicable when <see cref="SourceImageUrl"/> is provided.
+    /// Lower values (e.g., 0.3) preserve more of the source image.
+    /// Higher values (e.g., 0.8) allow more transformation.
+    /// </remarks>
+    [JsonPropertyName("strength")]
+    public decimal? DenoisingStrength { get; init; }
 
     /// <summary>
     /// Gets or sets additional networks (LoRAs, embeddings, etc.) to apply.

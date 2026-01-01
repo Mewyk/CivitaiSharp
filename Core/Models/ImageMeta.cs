@@ -40,8 +40,12 @@ public sealed record ImageMeta
     public int? Steps { get; init; }
 
     /// <summary>The positive prompt text used to guide image generation.</summary>
+    /// <remarks>
+    /// The JSON property name is "prompt" from generation tools, but this C# property
+    /// is named "PositivePrompt" for consistency with <see cref="NegativePrompt"/>.
+    /// </remarks>
     [JsonPropertyName("prompt")]
-    public string? Prompt { get; init; }
+    public string? PositivePrompt { get; init; }
 
     /// <summary>The negative prompt text describing what to avoid in the generated image.</summary>
     [JsonPropertyName("negativePrompt")]
@@ -52,8 +56,12 @@ public sealed record ImageMeta
     public string? Sampler { get; init; }
 
     /// <summary>The classifier-free guidance scale controlling prompt influence.</summary>
+    /// <remarks>
+    /// The JSON property name is "cfgScale" from generation tools, but this C# property
+    /// uses the full name "ConfigurationScale" for clarity.
+    /// </remarks>
     [JsonPropertyName("cfgScale")]
-    public decimal? CfgScale { get; init; }
+    public decimal? ConfigurationScale { get; init; }
 
     /// <summary>The number of tokens to skip in the CLIP model.</summary>
     [JsonPropertyName("clipSkip")]
@@ -75,9 +83,15 @@ public sealed record ImageMeta
     [JsonPropertyName("scheduler")]
     public string? Scheduler { get; init; }
 
-    /// <summary>The name of the base model used for generation.</summary>
+    /// <summary>
+    /// The name of the base model used for generation.
+    /// </summary>
+    /// <remarks>
+    /// The API property is named "Model", but this C# property is named "ModelName" for clarity,
+    /// as "Model" could be confused with model types or AIR identifiers elsewhere in the codebase.
+    /// </remarks>
     [JsonPropertyName("Model")]
-    public string? Model { get; init; }
+    public string? ModelName { get; init; }
 
     /// <summary>The hash identifier of the model used.</summary>
     [JsonPropertyName("Model hash")]
@@ -115,25 +129,43 @@ public sealed record ImageMeta
     [JsonPropertyName("Denoising strength")]
     public string? DenoisingStrength { get; init; }
 
-    /// <summary>The generation workflow type (e.g., "txt2img", "img2img").</summary>
+    /// <summary>
+    /// The generation workflow type (e.g., "txt2img", "img2img").
+    /// </summary>
+    /// <remarks>
+    /// The API property is named "workflow", but this C# property is named "GenerationType" for clarity,
+    /// as it describes the type of generation performed rather than a complete workflow definition.
+    /// </remarks>
     [JsonPropertyName("workflow")]
-    public string? Workflow { get; init; }
+    public string? GenerationType { get; init; }
 
     /// <summary>The date when the image was created (ISO format).</summary>
     [JsonPropertyName("Created Date")]
     public string? CreatedDate { get; init; }
 
-    /// <summary>The random number generator type used.</summary>
+    /// <summary>
+    /// The random number generator type used.
+    /// </summary>
+    /// <remarks>
+    /// The API property is named "RNG", but this C# property is named "RngType" to follow
+    /// standard naming conventions and improve clarity.
+    /// </remarks>
     [JsonPropertyName("RNG")]
-    public string? Rng { get; init; }
+    public string? RngType { get; init; }
 
     /// <summary>The noise schedule type (e.g., "Karras").</summary>
     [JsonPropertyName("Schedule type")]
     public string? ScheduleType { get; init; }
 
-    /// <summary>Raw ComfyUI workflow JSON for complex multi-step generations.</summary>
+    /// <summary>
+    /// Raw ComfyUI workflow JSON for complex multi-step generations.
+    /// </summary>
+    /// <remarks>
+    /// The API property is named "comfy", but this C# property is named "ComfyUiWorkflow"
+    /// for better readability and to clearly indicate it contains a ComfyUI workflow definition.
+    /// </remarks>
     [JsonPropertyName("comfy")]
-    public string? Comfy { get; init; }
+    public string? ComfyUiWorkflow { get; init; }
 
     /// <summary>Indicates whether the image has not-safe-for-work content.</summary>
     [JsonPropertyName("nsfw")]

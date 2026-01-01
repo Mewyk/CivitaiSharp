@@ -12,8 +12,14 @@ public sealed class ImageJobParams
     /// <summary>
     /// Gets or sets the positive prompt for image generation. Required.
     /// </summary>
+    /// <remarks>
+    /// Note: The Civitai API uses "prompt" as the JSON property name, but this C# property
+    /// is named "PositivePrompt" for clarity and consistency with <see cref="NegativePrompt"/>.
+    /// The API's asymmetric naming ("prompt" vs "negativePrompt") is a design flaw that
+    /// this library corrects for better API usability.
+    /// </remarks>
     [JsonPropertyName("prompt")]
-    public required string Prompt { get; init; }
+    public required string PositivePrompt { get; init; }
 
     /// <summary>
     /// Gets or sets the negative prompt describing what to avoid in the generated image.
@@ -39,10 +45,16 @@ public sealed class ImageJobParams
     /// Gets or sets the classifier-free guidance scale. Range: 1-30, default: 7.0.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Higher values make the image more closely match the prompt but may reduce quality.
+    /// </para>
+    /// <para>
+    /// Note: The Civitai API uses "cfgScale" as the JSON property name, but this C# property
+    /// uses the full name "ConfigurationScale" for clarity and to follow proper naming conventions.
+    /// </para>
     /// </remarks>
     [JsonPropertyName("cfgScale")]
-    public decimal? CfgScale { get; init; }
+    public decimal? ConfigurationScale { get; init; }
 
     /// <summary>
     /// Gets or sets the image width in pixels. Must be a multiple of 8. Range: 64-2048.
@@ -70,19 +82,4 @@ public sealed class ImageJobParams
     /// </remarks>
     [JsonPropertyName("clipSkip")]
     public int? ClipSkip { get; init; }
-
-    /// <summary>
-    /// Gets or sets the source image URL for image-to-image generation.
-    /// </summary>
-    [JsonPropertyName("image")]
-    public string? Image { get; init; }
-
-    /// <summary>
-    /// Gets or sets the denoising strength for image-to-image generation. Range: 0.0-1.0.
-    /// </summary>
-    /// <remarks>
-    /// Lower values preserve more of the source image; higher values allow more change.
-    /// </remarks>
-    [JsonPropertyName("strength")]
-    public decimal? Strength { get; init; }
 }

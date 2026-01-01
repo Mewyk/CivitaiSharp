@@ -269,12 +269,12 @@ Based on API testing, be aware of these behaviors:
 The `WhereCommercialUse()` filter requires **at least two permission values** to return results. Single values typically return 0 results:
 
 ```csharp
-// ❌ May return 0 results
+// May return 0 results
 var result = await apiClient.Models
     .WhereCommercialUse(CommercialUsePermission.None)
     .ExecuteAsync();
 
-// ✅ Works correctly
+// Works correctly
 var result = await apiClient.Models
     .WhereCommercialUse(CommercialUsePermission.Image, CommercialUsePermission.Sell)
     .ExecuteAsync();

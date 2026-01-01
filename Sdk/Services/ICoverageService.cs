@@ -13,22 +13,22 @@ using CivitaiSharp.Sdk.Models.Coverage;
 public interface ICoverageService
 {
     /// <summary>
-    /// Checks the availability of one or more models.
+    /// Checks the availability of one or more AIR identifiers.
     /// </summary>
-    /// <param name="models">The AIR identifiers of the models to check.</param>
+    /// <param name="airIdentifiers">The AIR identifiers to check.</param>
     /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
     /// <returns>Dictionary mapping AIR identifiers to their availability information.</returns>
     Task<Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>> GetAsync(
-        IEnumerable<AirIdentifier> models,
+        IEnumerable<AirIdentifier> airIdentifiers,
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Checks the availability of a single model.
+    /// Checks the availability of a single AIR identifier.
     /// </summary>
-    /// <param name="model">The AIR identifier of the model to check.</param>
+    /// <param name="air">The AIR identifier to check.</param>
     /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
-    /// <returns>Availability information for the model.</returns>
+    /// <returns>Availability information for the AIR identifier.</returns>
     Task<Result<ProviderAssetAvailability>> GetAsync(
-        AirIdentifier model,
+        AirIdentifier air,
         CancellationToken cancellationToken = default);
 }

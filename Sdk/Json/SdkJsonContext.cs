@@ -32,7 +32,7 @@ using CivitaiSharp.Sdk.Models.Usage;
         typeof(ProviderAssetAvailabilityDictionaryConverter)
     ])]
 // Job request types
-[JsonSerializable(typeof(TextToImageJobRequest))]
+[JsonSerializable(typeof(ImageGenerationJobRequest))]
 [JsonSerializable(typeof(BatchJobRequest))]
 [JsonSerializable(typeof(QueryJobsRequest))]
 [JsonSerializable(typeof(ImageJobParams))]
@@ -54,8 +54,8 @@ using CivitaiSharp.Sdk.Models.Usage;
 // Collection types
 [JsonSerializable(typeof(IReadOnlyList<JobStatus>))]
 [JsonSerializable(typeof(List<JobStatus>))]
-[JsonSerializable(typeof(IReadOnlyList<TextToImageJobRequest>))]
-[JsonSerializable(typeof(List<TextToImageJobRequest>))]
+[JsonSerializable(typeof(IReadOnlyList<ImageGenerationJobRequest>))]
+[JsonSerializable(typeof(List<ImageGenerationJobRequest>))]
 [JsonSerializable(typeof(IReadOnlyList<ImageJobControlNet>))]
 [JsonSerializable(typeof(List<ImageJobControlNet>))]
 [JsonSerializable(typeof(IReadOnlyDictionary<AirIdentifier, ImageJobNetworkParams>))]

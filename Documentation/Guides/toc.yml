@@ -6,12 +6,18 @@ items:
       href: installation.md
     - name: Getting an API Key
       href: getting-api-key.md
-    - name: AI Resource Identifier (AIR)
-      href: air-identifier.md
     - name: Quick Start
       href: quick-start.md
     - name: Configuration
       href: configuration.md
+
+- name: AI Resource Identifier (AIR)
+  expanded: true
+  items:
+    - name: AIR Overview
+      href: air-identifier.md
+    - name: AIR Builder
+      href: air-builder.md
 
 - name: Core Library
   expanded: true
@@ -42,6 +48,8 @@ items:
       href: sdk-introduction.md
     - name: Jobs Service
       href: sdk-jobs.md
+    - name: Webhook Callbacks
+      href: sdk-webhooks.md
     - name: Coverage Service
       href: sdk-coverage.md
     - name: Usage Service

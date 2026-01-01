@@ -41,6 +41,16 @@
 </strong>
 </p>
 
+<p align="center">
+  <a href="https://discord.gg/qP2ZXxp9Ub">
+    <img src="https://img.shields.io/badge/Discord-コミュニティに参加-5865F2?style=flat&logo=discord&logoColor=white" alt="Discordコミュニティ"/>
+  </a>
+</p>
+
+<p align="center">
+  CivitaiSharpや他のプロジェクトについて、サポート、フィードバック、ディスカッションのためにDiscordサーバーに参加してください！
+</p>
+
 ## 目次
 1. [パッケージとリリーススケジュール](#1-パッケージとリリーススケジュール)
 2. [インストール](#2-インストール)

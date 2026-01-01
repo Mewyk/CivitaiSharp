@@ -41,6 +41,16 @@
 </strong>
 </p>
 
+<p align="center">
+  <a href="https://discord.gg/qP2ZXxp9Ub">
+    <img src="https://img.shields.io/badge/Discord-Join%20Community-5865F2?style=flat&logo=discord&logoColor=white" alt="Discord Community"/>
+  </a>
+</p>
+
+<p align="center">
+  Join our Discord server for help, feedback, and discussions about CivitaiSharp and other projects!
+</p>
+
 ## Table of Contents
 1. [Packages and Release Schedule](#1-packages-and-release-schedule)
 2. [Installation](#2-installation)

@@ -41,6 +41,16 @@
 </strong>
 </p>
 
+<p align="center">
+  <a href="https://discord.gg/qP2ZXxp9Ub">
+    <img src="https://img.shields.io/badge/Discord-Únete%20a%20la%20Comunidad-5865F2?style=flat&logo=discord&logoColor=white" alt="Comunidad Discord"/>
+  </a>
+</p>
+
+<p align="center">
+  ¡Únete a nuestro servidor de Discord para obtener ayuda, dar feedback y participar en discusiones sobre CivitaiSharp y otros proyectos!
+</p>
+
 ## Tabla de Contenidos
 1. [Paquetes y Calendario de Lanzamiento](#1-paquetes-y-calendario-de-lanzamiento)
 2. [Instalación](#2-instalación)

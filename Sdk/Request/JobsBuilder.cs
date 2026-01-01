@@ -63,16 +63,16 @@ public sealed record JobsBuilder
     /// </summary>
     /// <returns>A new <see cref="TextToImageBuilder"/> instance.</returns>
     /// <remarks>
-    /// Use the returned builder to configure generation parameters (AIR identifier, positive prompt, size, etc.)
+    /// Use the returned builder to configure generation parameters (AIR identifier, positive prompt, dimensions, etc.)
     /// and call <see cref="TextToImageBuilder.ExecuteAsync"/> to submit the job.
     /// </remarks>
     /// <example>
     /// <code>
     /// var result = await sdkClient.Jobs
     ///     .CreateTextToImage()
-    ///     .WithAir(AirIdentifier.Parse("urn:air:sdxl:checkpoint:civitai:4201@130072"))
+    ///     .WithAir(new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072))
     ///     .WithPositivePrompt("a beautiful landscape")
-    ///     .WithSize(1024, 1024)
+    ///     .WithDimensions(1024, 1024)
     ///     .ExecuteAsync();
     /// </code>
     /// </example>

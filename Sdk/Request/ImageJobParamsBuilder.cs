@@ -78,7 +78,7 @@ public sealed record ImageJobParamsBuilder(
     /// <param name="width">The width in pixels. Must be a multiple of 8. Range: 64-2048.</param>
     /// <param name="height">The height in pixels. Must be a multiple of 8. Range: 64-2048.</param>
     /// <returns>A new builder instance with the updated dimensions.</returns>
-    public ImageJobParamsBuilder WithSize(int width, int height)
+    public ImageJobParamsBuilder WithDimensions(int width, int height)
         => this with { Width = width, Height = height };
 
     /// <summary>

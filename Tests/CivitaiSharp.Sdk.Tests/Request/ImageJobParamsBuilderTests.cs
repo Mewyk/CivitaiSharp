@@ -74,11 +74,11 @@ public sealed class ImageJobParamsBuilderTests
     }
 
     [Fact]
-    public void WithSize_SetsBothWidthAndHeight()
+    public void WithDimensions_SetsBothWidthAndHeight()
     {
         var builder = ImageJobParamsBuilder.Create()
             .WithPositivePrompt("test")
-            .WithSize(1024, 768);
+            .WithDimensions(1024, 768);
 
         var result = builder.Build();
 
@@ -189,7 +189,7 @@ public sealed class ImageJobParamsBuilderTests
             .WithScheduler(Scheduler.DpmPlusPlus2M)
             .WithSteps(25)
             .WithConfigurationScale(7.0m)
-            .WithSize(1024, 1024)
+            .WithDimensions(1024, 1024)
             .WithSeed(42)
             .WithClipSkip(2)
             .Build();

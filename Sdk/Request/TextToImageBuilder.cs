@@ -127,10 +127,10 @@ public sealed record TextToImageBuilder
     /// <param name="width">The width in pixels. Must be a multiple of 8. Range: 64-2048.</param>
     /// <param name="height">The height in pixels. Must be a multiple of 8. Range: 64-2048.</param>
     /// <returns>A new builder instance with the updated dimensions.</returns>
-    public TextToImageBuilder WithSize(int width, int height)
+    public TextToImageBuilder WithDimensions(int width, int height)
     {
         var builder = _paramsBuilder ?? ImageJobParamsBuilder.Create();
-        return new(_httpClient, _options, _air, builder.WithSize(width, height), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
+        return new(_httpClient, _options, _air, builder.WithDimensions(width, height), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip);
     }
 
     /// <summary>

@@ -18,6 +18,15 @@ New to CivitaiSharp? Start here:
 | [Quick Start](quick-start.md) | Get up and running in minutes |
 | [Configuration](configuration.md) | Configure the client for your needs |
 
+## AI Resource Identifier (AIR)
+
+Understand and work with AIR identifiers for model references:
+
+| Guide | Description |
+|-------|-------------|
+| [AIR Overview](air-identifier.md) | Parse, validate, and work with AIR identifiers |
+| [AIR Builder](air-builder.md) | Fluent builder pattern for constructing AIR identifiers |
+
 ## Core Library
 
 The Core library provides low-level access to the Civitai Public API with fluent request builders.
@@ -32,6 +41,7 @@ The Core library provides low-level access to the Civitai Public API with fluent
 | [Creators](creators.md) | Find content creators |
 | [Error Handling](error-handling.md) | Handle errors with the Result pattern |
 | [Pagination](pagination.md) | Navigate paginated results |
+| [API Behavior and Quirks](api-quirks.md) | Known API behaviors and workarounds |
 
 ## SDK Library
 
@@ -40,7 +50,9 @@ The SDK provides high-level abstractions for image generation and advanced workf
 | Guide | Description |
 |-------|-------------|
 | [SDK Introduction](sdk-introduction.md) | Overview of CivitaiSharp.Sdk |
-| [AI Resource Identifier (AIR)](air-identifier.md) | Parse and validate AIR identifiers |
+| [Jobs Service](sdk-jobs.md) | Submit and manage image generation jobs |
+| [Coverage Service](sdk-coverage.md) | Check model availability before job submission |
+| [Usage Service](sdk-usage.md) | Monitor resource usage and limits |
 
 ## Tools Library
 
@@ -52,9 +64,3 @@ The Tools library provides utilities for file hashing, downloading, and HTML par
 | [File Hashing](file-hashing.md) | Compute SHA256, SHA512, BLAKE3, and CRC32 hashes |
 | [Downloading Files](downloading-files.md) | Download images and models with path patterns |
 | [HTML Parsing](html-parsing.md) | Convert descriptions to Markdown or plain text |
-
-## Reference
-
-| Guide | Description |
-|-------|-------------|
-| [API Behavior and Quirks](api-quirks.md) | Known API behaviors and workarounds |

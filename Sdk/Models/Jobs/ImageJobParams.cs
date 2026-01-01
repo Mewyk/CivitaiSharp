@@ -82,19 +82,4 @@ public sealed class ImageJobParams
     /// </remarks>
     [JsonPropertyName("clipSkip")]
     public int? ClipSkip { get; init; }
-
-    /// <summary>
-    /// Gets or sets the source image URL for image-to-image generation.
-    /// </summary>
-    [JsonPropertyName("image")]
-    public string? Image { get; init; }
-
-    /// <summary>
-    /// Gets or sets the denoising strength for image-to-image generation. Range: 0.0-1.0.
-    /// </summary>
-    /// <remarks>
-    /// Lower values preserve more of the source image; higher values allow more change.
-    /// </remarks>
-    [JsonPropertyName("strength")]
-    public decimal? Strength { get; init; }
 }

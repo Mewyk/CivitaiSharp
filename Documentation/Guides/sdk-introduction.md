@@ -45,7 +45,7 @@ public class ImageGenerationService(ISdkClient sdkClient)
     public async Task GenerateImageAsync()
     {
         var result = await sdkClient.Jobs
-            .CreateTextToImage()
+            .CreateImage()
             .WithAir(new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072))
             .WithPositivePrompt("a beautiful sunset over mountains")
             .WithNegativePrompt("blurry, low quality")
@@ -69,7 +69,7 @@ public class ImageGenerationService(ISdkClient sdkClient)
 Create and manage image generation jobs using fluent builders:
 
 **Creating Jobs:**
-- `CreateTextToImage()` - Returns a `TextToImageBuilder` for configuring and submitting jobs
+- `CreateImage()` - Returns an `ImageGenerationBuilder` for configuring and submitting image generation jobs
 
 **Querying Jobs:**
 - `Query` - Returns a cached `JobQueryBuilder` for fluent job queries

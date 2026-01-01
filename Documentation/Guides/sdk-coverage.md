@@ -102,7 +102,7 @@ public async Task<Result<JobStatusCollection>> GenerateWithValidationAsync(
     
     // Model is available, proceed with job submission
     return await sdkClient.Jobs
-        .CreateTextToImage()
+        .CreateImage()
         .WithAir(checkpointModel)
         .WithPositivePrompt(promptText)
         .WithDimensions(1024, 1024)
@@ -278,7 +278,7 @@ public async Task<Result<JobStatusCollection>> GenerateAsync(
     }
     
     return await sdkClient.Jobs
-        .CreateTextToImage()
+        .CreateImage()
         .WithAir(model)
         .WithPositivePrompt(prompt)
         .ExecuteAsync();

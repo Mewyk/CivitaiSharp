@@ -59,23 +59,36 @@ public sealed record JobsBuilder
     public JobQueryBuilder Query => _queryBuilder;
 
     /// <summary>
-    /// Creates a new text-to-image job builder for submitting generation requests.
+    /// Creates a new image generation job builder for submitting generation requests.
+    /// Supports both text-to-image and image-to-image generation modes.
     /// </summary>
-    /// <returns>A new <see cref="TextToImageBuilder"/> instance.</returns>
+    /// <returns>A new <see cref="ImageGenerationBuilder"/> instance.</returns>
     /// <remarks>
     /// Use the returned builder to configure generation parameters (AIR identifier, positive prompt, dimensions, etc.)
-    /// and call <see cref="TextToImageBuilder.ExecuteAsync"/> to submit the job.
+    /// and call <see cref="ImageGenerationBuilder.ExecuteAsync"/> to submit the job.
+    /// For image-to-image generation, also use <see cref="ImageGenerationBuilder.WithSourceImageUrl"/> and
+    /// <see cref="ImageGenerationBuilder.WithDenoisingStrength"/>.
     /// </remarks>
     /// <example>
     /// <code>
+    /// // Text-to-image
     /// var result = await sdkClient.Jobs
-    ///     .CreateTextToImage()
+    ///     .CreateImage()
     ///     .WithAir(new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072))
     ///     .WithPositivePrompt("a beautiful landscape")
     ///     .WithDimensions(1024, 1024)
     ///     .ExecuteAsync();
+    /// 
+    /// // Image-to-image
+    /// var result = await sdkClient.Jobs
+    ///     .CreateImage()
+    ///     .WithAir(new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072))
+    ///     .WithPositivePrompt("add dramatic sunset lighting")
+    ///     .WithSourceImageUrl("https://example.com/source.jpg")
+    ///     .WithDenoisingStrength(0.7m)
+    ///     .ExecuteAsync();
     /// </code>
     /// </example>
-    public TextToImageBuilder CreateTextToImage()
+    public ImageGenerationBuilder CreateImage()
         => new(_httpClient, _options);
 }

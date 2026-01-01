@@ -513,11 +513,11 @@ services.AddCivitaiSdk(options =>
 await using var provider = services.BuildServiceProvider();
 var sdkClient = provider.GetRequiredService<ISdkClient>();
 
-// Crear un trabajo de texto a imagen
+// Crear un trabajo de generación de imágenes
 var model = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
 
 var result = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(model)
     .WithPositivePrompt("una hermosa puesta de sol sobre montañas, muy detallada")
     .WithNegativePrompt("borroso, baja calidad")
@@ -567,7 +567,7 @@ Utilice todos los parámetros disponibles para un control detallado:
 var baseCheckpoint = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
 
 var comprehensiveJob = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(baseCheckpoint)
     .WithPositivePrompt("obra maestra, mejor calidad, foto profesional de un paisaje urbano ciberpunk nocturno, luces de neón, calles mojadas por la lluvia, arquitectura muy detallada")
     .WithNegativePrompt("borroso, baja calidad, mala anatomía, marca de agua, firma, artefactos jpeg, peor calidad")
@@ -601,7 +601,7 @@ var styleLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 234567, 
 var lightingLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 345678, 567890);
 
 var multiLoRAJob = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(baseCheckpoint)
     .WithPositivePrompt("retrato de personaje anime, iluminación cinematográfica, rostro detallado")
     .WithNegativePrompt("borroso, baja calidad, manos malas")
@@ -638,7 +638,7 @@ var detailLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 345678,
 var controlNetModel = new AirIdentifier("sdxl", AirAssetType.ControlNet, "civitai", 456789, 678901);
 
 var controlNetJob = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(baseCheckpoint)
     .WithPositivePrompt("foto profesional de una persona con traje de negocios, iluminación de estudio, enfoque nítido")
     .WithNegativePrompt("borroso, baja calidad, mala anatomía, deformado")

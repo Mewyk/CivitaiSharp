@@ -11,20 +11,22 @@ The Jobs service provides comprehensive functionality for submitting, tracking, 
 
 The Jobs service provides two fluent builders:
 
-1. **TextToImageBuilder** - Fluent, immutable builder for creating and submitting jobs (accessed via `CreateTextToImage()`)
+1. **ImageGenerationBuilder** - Fluent, immutable builder for creating and submitting image generation jobs (accessed via `CreateImage()`)
 2. **JobQueryBuilder** - Fluent, immutable builder for querying and managing jobs (accessed via `Query` property)
+
+The ImageGenerationBuilder supports both text-to-image and image-to-image generation modes.
 
 Both builders follow CivitaiSharp's immutable, thread-safe design pattern.
 
 ## Creating Jobs
 
-### Basic Text-to-Image Generation
+### Basic Image Generation
 
-Use the `CreateTextToImage()` method to get a fluent builder:
+Use the `CreateImage()` method to get a fluent builder:
 
 ```csharp
 var result = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072))
     .WithPositivePrompt("a beautiful sunset over mountains")
     .WithNegativePrompt("blurry, low quality")
@@ -49,7 +51,7 @@ Configure additional parameters for more control:
 
 ```csharp
 var result = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(model)
     .WithPositivePrompt("detailed portrait")
     .WithSeed(12345)
@@ -70,7 +72,7 @@ Add LoRAs and other networks to enhance generation:
 var lora = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 123456, 789);
 
 var result = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(baseModel)
     .WithPositivePrompt("character portrait")
     .WithAdditionalNetwork(lora, builder => builder
@@ -87,7 +89,7 @@ Guide generation with ControlNet:
 
 ```csharp
 var result = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(model)
     .WithPositivePrompt("person standing")
     .WithControlNet(builder => builder
@@ -105,12 +107,12 @@ Submit multiple jobs at once:
 
 ```csharp
 var landscapeJob = sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(firstCheckpoint)
     .WithPositivePrompt("landscape");
 
 var portraitJob = sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(secondCheckpoint)
     .WithPositivePrompt("portrait");
 
@@ -124,13 +126,13 @@ if (result is Result<JobStatusCollection>.Success success)
 
 ### Complete Parameter Example
 
-Demonstration of all available text-to-image parameters:
+Demonstration of all available image generation parameters:
 
 ```csharp
 var baseCheckpoint = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
 
 var fullParameterJob = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(baseCheckpoint)
     .WithPositivePrompt("masterpiece, best quality, professional photograph, cyberpunk street scene, neon lights, rain, reflections, highly detailed, 8k uhd")
     .WithNegativePrompt("blurry, low quality, bad anatomy, deformed, watermark, signature, text, jpeg artifacts, worst quality, low resolution")
@@ -166,7 +168,7 @@ var styleLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 456789, 
 var lightingLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 567890, 678901);
 
 var multiLoRAJob = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(baseCheckpoint)
     .WithPositivePrompt("cinematic_lighting photo of fantasy_character wearing medieval_armor in dramatic pose, volumetric fog, golden hour")
     .WithNegativePrompt("blurry, low quality, bad hands, bad face, deformed, ugly")
@@ -210,7 +212,7 @@ var detailEnhancerLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai",
 var controlNetPose = new AirIdentifier("sdxl", AirAssetType.ControlNet, "civitai", 456789, 567890);
 
 var controlNetWithLoRAJob = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(baseCheckpoint)
     .WithPositivePrompt("professional_portrait of a business executive, sharp focus, studio lighting, detailed facial features, formal attire")
     .WithNegativePrompt("blurry, low quality, bad anatomy, distorted face, casual clothing")
@@ -274,7 +276,7 @@ var styleLoRAAnime = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 345
 
 // Job 1: Realistic landscape
 var landscapeJob = sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(checkpoint)
     .WithPositivePrompt("breathtaking mountain landscape, golden hour, professional photography")
     .WithNegativePrompt("blurry, low quality")
@@ -286,7 +288,7 @@ var landscapeJob = sdkClient.Jobs
 
 // Job 2: Anime character portrait
 var animePortraitJob = sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(checkpoint)
     .WithPositivePrompt("anime character portrait, detailed face, colorful, masterpiece")
     .WithNegativePrompt("blurry, bad anatomy, low quality")
@@ -299,7 +301,7 @@ var animePortraitJob = sdkClient.Jobs
 
 // Job 3: Abstract art
 var abstractJob = sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(checkpoint)
     .WithPositivePrompt("abstract digital art, vibrant colors, geometric patterns, modern")
     .WithNegativePrompt("realistic, photographic, blurry")
@@ -393,7 +395,7 @@ Filter jobs using custom properties set during submission:
 ```csharp
 // When submitting, add custom properties
 var submitResult = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(model)
     .WithPositivePrompt("landscape")
     .WithProperty("userId", JsonSerializer.SerializeToElement("12345"))
@@ -494,9 +496,9 @@ These methods are accessed through `sdkClient.Jobs.Query`:
 | `TaintAsync` | `Guid jobId, CancellationToken` | Mark a specific job as tainted by ID |
 | `TaintAsync` | `string token, CancellationToken` | Mark all jobs in a batch as tainted by token |
 
-### TextToImageBuilder Methods
+### ImageGenerationBuilder Methods
 
-Accessed through `sdkClient.Jobs.CreateTextToImage()`:
+Accessed through `sdkClient.Jobs.CreateImage()`:
 
 #### Required Parameters
 
@@ -553,16 +555,16 @@ Accessed through `sdkClient.Jobs.CreateTextToImage()`:
 | Method | Description |
 |--------|-------------|
 | `ExecuteAsync(CancellationToken)` | Submit the job and return job status collection with polling token |
-| `ExecuteBatchAsync(IEnumerable<TextToImageBuilder>, CancellationToken)` | Submit multiple jobs as a batch |
+| `ExecuteBatchAsync(IEnumerable<ImageGenerationBuilder>, CancellationToken)` | Submit multiple jobs as a batch |
 
 ## Builder Design Principles
 
 ### Immutability
 
-The TextToImageBuilder is an immutable record. Each method returns a new instance:
+The ImageGenerationBuilder is an immutable record. Each method returns a new instance:
 
 ```csharp
-var baseJobConfiguration = sdkClient.Jobs.CreateTextToImage()
+var baseJobConfiguration = sdkClient.Jobs.CreateImage()
     .WithAir(checkpointModel)
     .WithDimensions(1024, 1024);
 
@@ -577,12 +579,12 @@ Because the builder is immutable, it's thread-safe and can be shared:
 
 ```csharp
 // Safe to share across threads
-private readonly TextToImageJobBuilder _baseJobConfiguration;
+private readonly ImageGenerationBuilder _baseJobConfiguration;
 
 public MyService(ISdkClient client)
 {
     _baseJob = client.Jobs
-        .CreateTextToImage()
+        .CreateImage()
         .WithAir(model)
         .WithDimensions(1024, 1024)
         .WithSteps(30);
@@ -605,25 +607,25 @@ builder.WithPositivePrompt("");
 builder.WithParams(p => p.WithSteps(0));
 
 // Throws InvalidOperationException - model and prompt required
-await sdkClient.Jobs.CreateTextToImage().ExecuteAsync();
+await sdkClient.Jobs.CreateImage().ExecuteAsync();
 ```
 
 ## Best Practices
 
 ### Use the Fluent Builder
 
-Always use `CreateTextToImage()` for type-safe, validated job creation:
+Always use `CreateImage()` for type-safe, validated job creation:
 
 ```csharp
 // Recommended - type-safe, validated, immutable
 await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(model)
     .WithPositivePrompt("landscape")
     .ExecuteAsync();
 
 // Not recommended - manual construction requires JsonElement handling
-var request = new TextToImageJobRequest
+var request = new ImageGenerationJobRequest
 {
     Model = model,
     Params = new ImageJobParams { Prompt = "landscape" }
@@ -637,12 +639,12 @@ Take advantage of immutability to cache common configurations:
 
 ```csharp
 // Cache common configurations
-private readonly TextToImageJobBuilder _baseJob;
+private readonly ImageGenerationBuilder _baseJob;
 
 public ImageService(ISdkClient client)
 {
     _baseJob = client.Jobs
-        .CreateTextToImage()
+        .CreateImage()
         .WithAir(commonModel)
         .WithDimensions(1024, 1024)
         .WithSteps(30);
@@ -658,7 +660,7 @@ Add metadata to jobs for easy filtering:
 
 ```csharp
 await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(model)
     .WithPositivePrompt(prompt)
     .WithProperty("userId", JsonSerializer.SerializeToElement(userId))
@@ -674,7 +676,7 @@ Jobs are asynchronous - use appropriate polling strategies:
 ```csharp
 // Good - properly async with polling
 var submitResult = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(model)
     .WithPositivePrompt(prompt)
     .ExecuteAsync();
@@ -700,7 +702,7 @@ All methods return `Result<T>` for consistent error handling:
 
 ```csharp
 var result = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(model)
     .WithPositivePrompt(prompt)
     .ExecuteAsync();

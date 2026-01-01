@@ -19,9 +19,7 @@ public sealed record ImageJobParamsBuilder(
     int? Width = null,
     int? Height = null,
     long? Seed = null,
-    int? ClipSkip = null,
-    string? Image = null,
-    decimal? Strength = null)
+    int? ClipSkip = null)
 {
     /// <summary>
     /// Creates a new <see cref="ImageJobParamsBuilder"/> instance.
@@ -117,25 +115,6 @@ public sealed record ImageJobParamsBuilder(
         => this with { ClipSkip = clipSkip };
 
     /// <summary>
-    /// Sets the source image URL for image-to-image generation.
-    /// </summary>
-    /// <param name="imageUrl">The source image URL.</param>
-    /// <returns>A new builder instance with the updated source image.</returns>
-    public ImageJobParamsBuilder WithSourceImage(string imageUrl)
-        => this with { Image = imageUrl };
-
-    /// <summary>
-    /// Sets the denoising strength for image-to-image generation.
-    /// </summary>
-    /// <param name="strength">The strength value. Range: 0.0-1.0.</param>
-    /// <returns>A new builder instance with the updated strength.</returns>
-    /// <remarks>
-    /// Lower values preserve more of the source image; higher values allow more change.
-    /// </remarks>
-    public ImageJobParamsBuilder WithStrength(decimal strength)
-        => this with { Strength = strength };
-
-    /// <summary>
     /// Builds the <see cref="ImageJobParams"/> instance.
     /// </summary>
     /// <returns>The configured <see cref="ImageJobParams"/>.</returns>
@@ -157,9 +136,7 @@ public sealed record ImageJobParamsBuilder(
             Width = Width,
             Height = Height,
             Seed = Seed,
-            ClipSkip = ClipSkip,
-            Image = Image,
-            Strength = Strength
+            ClipSkip = ClipSkip
         };
     }
 }

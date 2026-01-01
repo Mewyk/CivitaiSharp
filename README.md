@@ -508,11 +508,11 @@ services.AddCivitaiSdk(options =>
 await using var provider = services.BuildServiceProvider();
 var sdkClient = provider.GetRequiredService<ISdkClient>();
 
-// Create a text-to-image job
+// Create an image generation job
 var model = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
 
 var result = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(model)
     .WithPositivePrompt("a beautiful sunset over mountains, highly detailed")
     .WithNegativePrompt("blurry, low quality")
@@ -562,7 +562,7 @@ Use all available parameters for fine-tuned control:
 var baseCheckpoint = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
 
 var comprehensiveJob = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(baseCheckpoint)
     .WithPositivePrompt("masterpiece, best quality, professional photo of a cyberpunk cityscape at night, neon lights, rain-slicked streets, highly detailed architecture")
     .WithNegativePrompt("blurry, low quality, bad anatomy, watermark, signature, jpeg artifacts, worst quality")
@@ -596,7 +596,7 @@ var styleLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 234567, 
 var lightingLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 345678, 567890);
 
 var multiLoRAJob = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(baseCheckpoint)
     .WithPositivePrompt("anime character portrait, cinematic lighting, detailed face")
     .WithNegativePrompt("blurry, low quality, bad hands")
@@ -633,7 +633,7 @@ var detailLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 345678,
 var controlNetModel = new AirIdentifier("sdxl", AirAssetType.ControlNet, "civitai", 456789, 678901);
 
 var controlNetJob = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(baseCheckpoint)
     .WithPositivePrompt("professional photo of a person in business attire, studio lighting, sharp focus")
     .WithNegativePrompt("blurry, low quality, bad anatomy, deformed")

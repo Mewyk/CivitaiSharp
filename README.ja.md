@@ -513,11 +513,11 @@ services.AddCivitaiSdk(options =>
 await using var provider = services.BuildServiceProvider();
 var sdkClient = provider.GetRequiredService<ISdkClient>();
 
-// テキストから画像へのジョブを作成
+// 画像生成ジョブを作成
 var model = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
 
 var result = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(model)
     .WithPositivePrompt("夕日に照らされた美しい山々、高精細")
     .WithNegativePrompt("ぼやけた、低品質")
@@ -567,7 +567,7 @@ var queryResult = await sdkClient.Jobs.Query
 var baseCheckpoint = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
 
 var comprehensiveJob = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(baseCheckpoint)
     .WithPositivePrompt("masterpiece, best quality, 夜のサイバーパンク都市景観のプロフェッショナル写真, ネオンライト, 雨に濡れた通り, 高詳細な建築")
     .WithNegativePrompt("blurry, low quality, bad anatomy, watermark, signature, jpeg artifacts, worst quality")
@@ -601,7 +601,7 @@ var styleLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 234567, 
 var lightingLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 345678, 567890);
 
 var multiLoRAJob = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(baseCheckpoint)
     .WithPositivePrompt("アニメキャラクターのポートレート, シネマティックライティング, 詳細な顔")
     .WithNegativePrompt("blurry, low quality, bad hands")
@@ -638,7 +638,7 @@ var detailLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 345678,
 var controlNetModel = new AirIdentifier("sdxl", AirAssetType.ControlNet, "civitai", 456789, 678901);
 
 var controlNetJob = await sdkClient.Jobs
-    .CreateTextToImage()
+    .CreateImage()
     .WithAir(baseCheckpoint)
     .WithPositivePrompt("ビジネス服を着た人物のプロフェッショナル写真, スタジオライティング, シャープフォーカス")
     .WithNegativePrompt("blurry, low quality, bad anatomy, deformed")

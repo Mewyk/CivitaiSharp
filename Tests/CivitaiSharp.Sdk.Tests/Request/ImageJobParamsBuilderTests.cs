@@ -137,30 +137,6 @@ public sealed class ImageJobParamsBuilderTests
     }
 
     [Fact]
-    public void WithSourceImage_SetsImageUrl()
-    {
-        var builder = ImageJobParamsBuilder.Create()
-            .WithPositivePrompt("test")
-            .WithSourceImage("https://example.com/image.png");
-
-        var result = builder.Build();
-
-        Assert.Equal("https://example.com/image.png", result.Image);
-    }
-
-    [Fact]
-    public void WithStrength_SetsStrengthValue()
-    {
-        var builder = ImageJobParamsBuilder.Create()
-            .WithPositivePrompt("test")
-            .WithStrength(0.7m);
-
-        var result = builder.Build();
-
-        Assert.Equal(0.7m, result.Strength);
-    }
-
-    [Fact]
     public void Build_WithoutPrompt_ThrowsInvalidOperationException()
     {
         var builder = ImageJobParamsBuilder.Create();

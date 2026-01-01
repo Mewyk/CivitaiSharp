@@ -347,7 +347,7 @@ public async Task<Result<JobStatusCollection>> GenerateAsync(string prompt)
     
     // Continue with job submission
     return await sdkClient.Jobs
-        .CreateTextToImage()
+        .CreateImage()
         .WithAir(model)
         .WithPositivePrompt(prompt)
         .ExecuteAsync();

@@ -494,14 +494,14 @@ var comprehensiveJob = await sdkClient.Jobs
     .WithDimensions(1024, 1536)
     .WithSteps(35)
     .WithConfigurationScale(8.0m)
-    .WithSampler(Scheduler.DpmPlusPlus2MKarras)
+    .WithScheduler(Scheduler.DpmPlusPlus2MKarras)
     .WithSeed(987654321)
     .WithClipSkip(2)
     .WithQuantity(4) // Generate 4 variations
-    .WithPriority(false) // Normal priority
-    .WithCallbackUrl("https://myapp.com/webhook/image-complete")
+    .WithPriority(Priority.Default)
+    .WithCallbackUrl("https://example.tld/webhook/image-complete")
     .WithRetries(3)
-    .WithTimeout(600) // 10 minutes
+    .WithTimeout(TimeSpan.FromMinutes(10))
     .ExecuteAsync();
 
 if (comprehensiveJob is Result<JobStatusCollection>.Success jobSuccess)
@@ -568,7 +568,7 @@ var controlNetJob = await sdkClient.Jobs
     // ControlNet for pose guidance
     .WithControlNet(controlNet => controlNet
         .WithModel(controlNetModel)
-        .WithImage("https://example.com/reference-pose.png")
+        .WithImage("https://example.tld/reference-pose.png")
         .WithWeight(1.0m)
         .WithStartingControlStep(0.0m)
         .WithEndingControlStep(0.8m))

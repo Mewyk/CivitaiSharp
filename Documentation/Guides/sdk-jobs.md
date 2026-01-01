@@ -30,6 +30,7 @@ var result = await sdkClient.Jobs
     .WithAir(new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072))
     .WithPositivePrompt("a beautiful sunset over mountains")
     .WithNegativePrompt("blurry, low quality")
+    .WithScheduler(Scheduler.EulerAncestral)
     .WithDimensions(1024, 1024)
     .WithSteps(30)
     .WithConfigurationScale(7.5m)
@@ -54,12 +55,13 @@ var result = await sdkClient.Jobs
     .CreateImage()
     .WithAir(model)
     .WithPositivePrompt("detailed portrait")
+    .WithScheduler(Scheduler.DpmPlusPlus2MKarras)
     .WithSeed(12345)
     .WithSteps(50)
     .WithConfigurationScale(8.5m)
     .WithQuantity(4)  // Generate 4 images
     .WithClipSkip(2)
-    .WithCallbackUrl("https://myapp.com/webhook")
+    .WithCallbackUrl("https://example.tld/webhook")
     .WithRetries(3)
     .ExecuteAsync();
 ```
@@ -94,7 +96,7 @@ var result = await sdkClient.Jobs
     .WithPositivePrompt("person standing")
     .WithControlNet(builder => builder
         .WithModel(controlNetModel)
-        .WithImage("https://example.com/pose.png")
+        .WithImage("https://example.tld/pose.png")
         .WithWeight(1.0m)
         .WithStartingControlStep(0.0m)
         .WithEndingControlStep(1.0m))
@@ -136,17 +138,17 @@ var fullParameterJob = await sdkClient.Jobs
     .WithAir(baseCheckpoint)
     .WithPositivePrompt("masterpiece, best quality, professional photograph, cyberpunk street scene, neon lights, rain, reflections, highly detailed, 8k uhd")
     .WithNegativePrompt("blurry, low quality, bad anatomy, deformed, watermark, signature, text, jpeg artifacts, worst quality, low resolution")
+    .WithScheduler(Scheduler.DpmPlusPlus2MKarras)
     .WithDimensions(1024, 1536) // Portrait orientation
     .WithSteps(40) // Higher steps for quality
     .WithConfigurationScale(8.5m) // Strong prompt adherence
-    .WithSampler(Scheduler.DpmPlusPlus2MKarras) // High-quality sampler
     .WithSeed(987654321) // Reproducible results
     .WithClipSkip(2) // Better artistic interpretation
     .WithQuantity(4) // Generate 4 variations
-    .WithPriority(false) // Normal queue priority
-    .WithCallbackUrl("https://myapp.com/webhook/generation-complete") // Async notification
+    .WithPriority(Priority.Default)
+    .WithCallbackUrl("https://example.tld/webhook/generation-complete") // Async notification
     .WithRetries(3) // Retry failed jobs
-    .WithTimeout(900) // 15-minute timeout
+    .WithTimeout(TimeSpan.FromMinutes(15)) // 15-minute timeout
     .ExecuteAsync();
 
 if (fullParameterJob is Result<JobStatusCollection>.Success jobSuccess)
@@ -172,10 +174,10 @@ var multiLoRAJob = await sdkClient.Jobs
     .WithAir(baseCheckpoint)
     .WithPositivePrompt("cinematic_lighting photo of fantasy_character wearing medieval_armor in dramatic pose, volumetric fog, golden hour")
     .WithNegativePrompt("blurry, low quality, bad hands, bad face, deformed, ugly")
+    .WithScheduler(Scheduler.DpmPlusPlus2MSdeKarras)
     .WithDimensions(768, 1024)
     .WithSteps(35)
     .WithConfigurationScale(7.5m)
-    .WithSampler(Scheduler.DpmPlusPlus2MKarras)
     // Character LoRA - highest strength for defining features
     .WithAdditionalNetwork(characterLoRA, network => network
         .WithStrength(0.95m)
@@ -216,14 +218,14 @@ var controlNetWithLoRAJob = await sdkClient.Jobs
     .WithAir(baseCheckpoint)
     .WithPositivePrompt("professional_portrait of a business executive, sharp focus, studio lighting, detailed facial features, formal attire")
     .WithNegativePrompt("blurry, low quality, bad anatomy, distorted face, casual clothing")
+    .WithScheduler(Scheduler.EulerAncestral)
     .WithDimensions(832, 1216) // Professional portrait ratio
     .WithSteps(40)
     .WithConfigurationScale(7.0m)
-    .WithSampler(Scheduler.DpmPlusPlus2MKarras)
     // ControlNet for precise pose guidance
     .WithControlNet(controlNet => controlNet
         .WithModel(controlNetPose)
-        .WithImage("https://example.com/reference-pose.png")
+        .WithImage("https://example.tld/reference-pose.png")
         .WithWeight(1.0m) // Full control strength
         .WithStartingControlStep(0.0m) // Apply from beginning
         .WithEndingControlStep(0.75m)) // Release control near end for natural finish
@@ -234,7 +236,7 @@ var controlNetWithLoRAJob = await sdkClient.Jobs
     // Detail enhancement LoRA for sharpness
     .WithAdditionalNetwork(detailEnhancerLoRA, network => network
         .WithStrength(0.6m))
-    .WithCallbackUrl("https://myapp.com/webhook/portrait-complete")
+    .WithCallbackUrl("https://example.tld/webhook/portrait-complete")
     .ExecuteAsync();
 
 if (controlNetWithLoRAJob is Result<JobStatusCollection>.Success controlSuccess)
@@ -280,6 +282,7 @@ var landscapeJob = sdkClient.Jobs
     .WithAir(checkpoint)
     .WithPositivePrompt("breathtaking mountain landscape, golden hour, professional photography")
     .WithNegativePrompt("blurry, low quality")
+    .WithScheduler(Scheduler.DpmPlusPlus2MKarras)
     .WithDimensions(1344, 768) // Landscape 16:9
     .WithSteps(30)
     .WithConfigurationScale(7.0m)
@@ -292,6 +295,7 @@ var animePortraitJob = sdkClient.Jobs
     .WithAir(checkpoint)
     .WithPositivePrompt("anime character portrait, detailed face, colorful, masterpiece")
     .WithNegativePrompt("blurry, bad anatomy, low quality")
+    .WithScheduler(Scheduler.EulerAncestral)
     .WithDimensions(768, 1024) // Portrait 3:4
     .WithSteps(35)
     .WithConfigurationScale(8.0m)
@@ -305,6 +309,7 @@ var abstractJob = sdkClient.Jobs
     .WithAir(checkpoint)
     .WithPositivePrompt("abstract digital art, vibrant colors, geometric patterns, modern")
     .WithNegativePrompt("realistic, photographic, blurry")
+    .WithScheduler(Scheduler.Euler)
     .WithDimensions(1024, 1024) // Square 1:1
     .WithSteps(40)
     .WithConfigurationScale(9.0m);
@@ -512,6 +517,7 @@ Accessed through `sdkClient.Jobs.CreateImage()`:
 | Method | Description |
 |--------|-------------|
 | `WithNegativePrompt(string)` | Set negative prompt |
+| `WithScheduler(Scheduler)` | Set sampling algorithm (e.g., Euler, EulerAncestral, DpmPlusPlus2MKarras) |
 | `WithDimensions(int, int)` | Set width and height (must be multiples of 8, range: 64-2048) |
 | `WithSteps(int)` | Set sampling steps (range: 1-100, default: 20) |
 | `WithConfigurationScale(decimal)` | Set CFG scale (range: 1-30, default: 7) |
@@ -526,7 +532,7 @@ Accessed through `sdkClient.Jobs.CreateImage()`:
 | `WithAdditionalNetwork(AirIdentifier, ImageJobNetworkParamsBuilder)` | Add LoRA or embedding using a builder |
 | `WithAdditionalNetwork(AirIdentifier, Func<ImageJobNetworkParamsBuilder, ImageJobNetworkParamsBuilder>)` | Add LoRA or embedding using a configuration action |
 
-### ControlNet
+#### ControlNet
 
 | Method | Description |
 |--------|-------------|
@@ -769,7 +775,6 @@ if (submitResult is Result<JobStatusCollection>.Success success)
 - **WithWait()** blocks the calling thread but is simpler to implement
 - **Manual polling** requires more code but offers flexibility and control
 - **Webhooks** (recommended for production) eliminate polling entirely - see [Webhook Callbacks Guide](sdk-webhooks.md)
-```
 
 ## Error Handling
 

@@ -480,7 +480,7 @@ var result = await sdkClient.Jobs
     .CreateImage()
     .WithAir(model)
     .WithPositivePrompt(prompt)
-    .WithCallbackUrl("https://your-ngrok-url.ngrok-free.app/api/webhooks/civitai")
+    .WithCallbackUrl("https://example.tld/api/webhooks/civitai")
     .ExecuteAsync();
 ```
 

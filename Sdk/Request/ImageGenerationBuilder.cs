@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CivitaiSharp.Core.Response;
 using CivitaiSharp.Sdk.Air;
+using CivitaiSharp.Sdk.Enums;
 using CivitaiSharp.Sdk.Http;
 using CivitaiSharp.Sdk.Models.Jobs;
 using CivitaiSharp.Sdk.Models.Results;
@@ -173,6 +174,21 @@ public sealed record ImageGenerationBuilder
     {
         var builder = _paramsBuilder ?? ImageJobParamsBuilder.Create();
         return new(_httpClient, _options, _air, builder.WithSeed(seed), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip, _sourceImageUrl, _denoisingStrength);
+    }
+
+    /// <summary>
+    /// Sets the sampling algorithm/scheduler to use for generation.
+    /// </summary>
+    /// <param name="scheduler">The scheduler/sampler algorithm.</param>
+    /// <returns>A new builder instance with the updated scheduler.</returns>
+    /// <remarks>
+    /// Common schedulers include Euler, EulerAncestral, DpmPlusPlus2M, and DpmPlusPlus2MKarras.
+    /// The choice of scheduler affects both generation quality and speed.
+    /// </remarks>
+    public ImageGenerationBuilder WithScheduler(Scheduler scheduler)
+    {
+        var builder = _paramsBuilder ?? ImageJobParamsBuilder.Create();
+        return new(_httpClient, _options, _air, builder.WithScheduler(scheduler), _additionalNetworks, _controlNets, _quantity, _priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip, _sourceImageUrl, _denoisingStrength);
     }
 
     /// <summary>

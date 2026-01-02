@@ -210,13 +210,13 @@ if (budgetStatusResult is Result<BudgetMonitor.BudgetStatus>.Success budgetStatu
     switch (budgetStatus.Level)
     {
         case BudgetMonitor.BudgetLevel.Warning:
-            Console.WriteLine("⚠️ Warning: 70% of monthly budget consumed");
+            Console.WriteLine("WARNING: 70% of monthly budget consumed");
             break;
         case BudgetMonitor.BudgetLevel.Critical:
-            Console.WriteLine("🚨 Critical: 90% of monthly budget consumed");
+            Console.WriteLine("CRITICAL: 90% of monthly budget consumed");
             break;
         case BudgetMonitor.BudgetLevel.Exceeded:
-            Console.WriteLine("❌ Budget exceeded! No further jobs allowed");
+            Console.WriteLine("ERROR: Budget exceeded! No further jobs allowed");
             return;
     }
 }
@@ -456,7 +456,7 @@ foreach (var prompt in prompts)
         
         if (throttleRecommendation.ShouldThrottle)
         {
-            Console.WriteLine($"⏸️ Throttling: {throttleRecommendation.Reason}");
+            Console.WriteLine($"THROTTLING: {throttleRecommendation.Reason}");
             Console.WriteLine($"Waiting {throttleRecommendation.SuggestedDelay.TotalMinutes:N0} minutes...");
             
             await Task.Delay(throttleRecommendation.SuggestedDelay, cancellationToken);
@@ -474,7 +474,7 @@ foreach (var prompt in prompts)
     
     if (batchJobResult is Result<JobStatusCollection>.Success batchJobSuccess)
     {
-        Console.WriteLine($"✅ Job submitted: {prompt.Substring(0, 30)}...");
+        Console.WriteLine($"SUCCESS: Job submitted: {prompt.Substring(0, 30)}...");
     }
     
     // Small delay between jobs
@@ -607,12 +607,12 @@ if (await projectTracker.CanSubmitJobAsync(targetProjectId, projectJobCost, canc
     {
         // Record actual cost (in real scenario, get from completed job)
         projectTracker.RecordJobCost(targetProjectId, projectJobCost);
-        Console.WriteLine($"✅ Job submitted for project: {targetProjectId}");
+        Console.WriteLine($"SUCCESS: Job submitted for project: {targetProjectId}");
     }
 }
 else
 {
-    Console.WriteLine($"❌ Cannot submit job for project: {targetProjectId}");
+    Console.WriteLine($"ERROR: Cannot submit job for project: {targetProjectId}");
 }
 
 // Generate project report
@@ -636,7 +636,7 @@ foreach (var (_, project) in projectTracker.GetAllProjects())
     
     if (percentUsed >= 90)
     {
-        Console.WriteLine($"  ⚠️ Warning: {percentUsed:N1}% of budget used");
+        Console.WriteLine($"  WARNING: {percentUsed:N1}% of budget used");
     }
 }
 ```

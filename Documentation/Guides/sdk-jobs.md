@@ -39,9 +39,9 @@ var result = await sdkClient.Jobs
 if (result is Result<JobStatusCollection>.Success success)
 {
     Console.WriteLine($"Job submitted with token: {success.Data.Token}");
-    foreach (var job in success.Data.Jobs)
+    foreach (var job in success.Data.JobsList)
     {
-        Console.WriteLine($"Job ID: {job.JobId}, Status: {job.Status}");
+        Console.WriteLine($"Job ID: {job.JobId}, Cost: {job.Cost}");
     }
 }
 ```
@@ -153,7 +153,7 @@ var fullParameterJob = await sdkClient.Jobs
 
 if (fullParameterJob is Result<JobStatusCollection>.Success jobSuccess)
 {
-    Console.WriteLine($"Submitted {jobSuccess.Data.Jobs.Count} jobs");
+    Console.WriteLine($"Submitted {jobSuccess.Data.JobsList.Count} jobs");
     Console.WriteLine($"Batch token: {jobSuccess.Data.Token}");
 }
 ```
@@ -251,7 +251,7 @@ if (controlNetWithLoRAJob is Result<JobStatusCollection>.Success controlSuccess)
     
     if (completedJob is Result<JobStatusCollection>.Success completed)
     {
-        foreach (var job in completed.Data.Jobs)
+        foreach (var job in completed.Data.JobsList)
         {
             if (job.Status == "succeeded" && job.Result?.BlobUrl is string imageUrl)
             {
@@ -319,7 +319,7 @@ var batchResult = await landscapeJob.ExecuteBatchAsync([animePortraitJob, abstra
 
 if (batchResult is Result<JobStatusCollection>.Success batchSuccess)
 {
-    Console.WriteLine($"Batch of {batchSuccess.Data.Jobs.Count} jobs submitted");
+    Console.WriteLine($"Batch of {batchSuccess.Data.JobsList.Count} jobs submitted");
     Console.WriteLine($"Batch token: {batchSuccess.Data.Token}");
     
     // Poll for status updates
@@ -329,7 +329,7 @@ if (batchResult is Result<JobStatusCollection>.Success batchSuccess)
     
     if (statusResult is Result<JobStatusCollection>.Success statusSuccess)
     {
-        foreach (var job in statusSuccess.Data.Jobs)
+        foreach (var job in statusSuccess.Data.JobsList)
         {
             Console.WriteLine($"Job {job.JobId}: {job.Status}");
         }
@@ -368,9 +368,9 @@ var result = await sdkClient.Jobs.Query
 
 if (result is Result<JobStatusCollection>.Success success)
 {
-    foreach (var job in success.Data.Jobs)
+    foreach (var job in success.Data.JobsList)
     {
-        Console.WriteLine($"{job.JobId}: {job.Status}");
+        Console.WriteLine($"{job.JobId}: Cost {job.Cost}, Scheduled: {job.Scheduled}\");
     }
 }
 ```
@@ -388,7 +388,7 @@ var result = await sdkClient.Jobs.Query
 // Jobs will be in completed/failed state when this returns
 if (result is Result<JobStatusCollection>.Success success)
 {
-    var completed = success.Data.Jobs.Where(j => j.Status == "succeeded");
+    var completed = success.Data.JobsList.Where(j => j.Scheduled == false);
     Console.WriteLine($"Completed: {completed.Count()} jobs");
 }
 ```
@@ -416,7 +416,7 @@ var queryResult = await sdkClient.Jobs.Query
 
 if (queryResult is Result<JobStatusCollection>.Success success)
 {
-    Console.WriteLine($"Found {success.Data.Jobs.Count} matching jobs");
+    Console.WriteLine($"Found {success.Data.JobsList.Count} matching jobs");
 }
 ```
 

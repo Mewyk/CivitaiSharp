@@ -707,17 +707,12 @@ var coverageResult = await sdkClient.Coverage.GetAsync(model);
 
 if (coverageResult is Result<ProviderAssetAvailability>.Success coverage)
 {
-    if (coverage.Data.Available)
+    Console.WriteLine($"Availability: {coverage.Data.Availability}");
+    Console.WriteLine($"Workers: {coverage.Data.Workers}");
+    
+    if (coverage.Data.Availability == AvailabilityStatus.Available)
     {
-        Console.WriteLine("Model is available!");
-        foreach (var (provider, status) in coverage.Data.Providers)
-        {
-            Console.WriteLine($"  {provider}: Queue position {status.QueuePosition}");
-        }
-    }
-    else
-    {
-        Console.WriteLine("Model not available on any provider");
+        Console.WriteLine($"Model is available with {coverage.Data.Workers} workers");
     }
 }
 
@@ -729,7 +724,7 @@ if (batchResult is Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvaila
 {
     foreach (var (resource, availability) in batch.Data)
     {
-        Console.WriteLine($"{resource}: {availability.Available}");
+        Console.WriteLine($"{resource}: {availability.Availability} (Workers: {availability.Workers})");
     }
 }
 ```
@@ -747,9 +742,10 @@ var usageResult = await sdkClient.Usage.GetConsumptionAsync();
 
 if (usageResult is Result<ConsumptionDetails>.Success usage)
 {
-    Console.WriteLine($"Total Jobs: {usage.Data.TotalJobs}");
-    Console.WriteLine($"Total Credits: {usage.Data.TotalCredits:F2}");
-    Console.WriteLine($"Period: {usage.Data.StartDate} to {usage.Data.EndDate}");
+    Console.WriteLine($"Job Count: {usage.Data.JobCount}");
+    Console.WriteLine($"Total Cost: {usage.Data.TotalCost:F2} Buzz");
+    Console.WriteLine($"Remaining Credits: {usage.Data.RemainingCredits:F2}");
+    Console.WriteLine($"Period: {usage.Data.PeriodStart} to {usage.Data.PeriodEnd}");
 }
 
 // Get usage for specific date range
@@ -761,17 +757,13 @@ var monthlyResult = await sdkClient.Usage.GetConsumptionAsync(startDate, endDate
 if (monthlyResult is Result<ConsumptionDetails>.Success monthly)
 {
     Console.WriteLine($"January 2025:");
-    Console.WriteLine($"  Jobs: {monthly.Data.TotalJobs}");
-    Console.WriteLine($"  Credits: {monthly.Data.TotalCredits:F2}");
+    Console.WriteLine($"  Jobs: {monthly.Data.JobCount}");
+    Console.WriteLine($"  Total Cost: {monthly.Data.TotalCost:F2} Buzz");
+    Console.WriteLine($"  Remaining Credits: {monthly.Data.RemainingCredits:F2}");
     
-    if (monthly.Data.JobsByType is not null)
+    if (monthly.Data.JobCount > 0)
     {
-        Console.WriteLine("  Breakdown by type:");
-        foreach (var (jobType, count) in monthly.Data.JobsByType)
-        {
-            var credits = monthly.Data.CreditsByType?.GetValueOrDefault(jobType, 0) ?? 0;
-            Console.WriteLine($"    {jobType}: {count} jobs, {credits:F2} credits");
-        }
+        Console.WriteLine($"  Average Cost: {monthly.Data.AverageCostPerJob:F2} Buzz per job");
     }
 }
 ```

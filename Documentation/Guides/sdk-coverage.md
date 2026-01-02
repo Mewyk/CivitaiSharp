@@ -19,18 +19,33 @@ The Coverage service provides methods to:
 ### Check Single Model Availability
 
 ```csharp
-var checkpointModel = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
+// Create AIR identifier using constructor
+var checkpointModel = new AirIdentifier(
+    AirEcosystem.StableDiffusionXl,
+    AirAssetType.Checkpoint,
+    AirSource.Civitai,
+    modelId: 4201,
+    versionId: 130072);
 
-var result = await sdkClient.Coverage.GetAsync(checkpointModel);
+// Or use the builder pattern for more flexibility
+var checkpointModelFromBuilder = new AirBuilder()
+    .WithEcosystem(AirEcosystem.StableDiffusionXl)
+    .WithAssetType(AirAssetType.Checkpoint)
+    .WithSource(AirSource.Civitai)
+    .WithModelId(4201)
+    .WithVersionId(130072)
+    .Build();
 
-if (result is Result<ProviderAssetAvailability>.Success success)
+var coverageResult = await sdkClient.Coverage.GetAsync(checkpointModel, cancellationToken);
+
+if (coverageResult is Result<ProviderAssetAvailability>.Success coverageSuccess)
 {
-    Console.WriteLine($"Available: {success.Data.Available}");
-    foreach (var provider in success.Data.Providers)
+    Console.WriteLine($"Availability: {coverageSuccess.Data.Availability}");
+    Console.WriteLine($"Workers: {coverageSuccess.Data.Workers}");
+    
+    if (coverageSuccess.Data.Availability == AvailabilityStatus.Available)
     {
-        Console.WriteLine($"Provider: {provider.Key}");
-        Console.WriteLine($"  Available: {provider.Value.Available}");
-        Console.WriteLine($"  Queue Position: {provider.Value.QueuePosition}");
+        Console.WriteLine($"Model is available with {coverageSuccess.Data.Workers} workers");
     }
 }
 ```
@@ -38,19 +53,36 @@ if (result is Result<ProviderAssetAvailability>.Success success)
 ### Check Multiple Models
 
 ```csharp
-var checkpointModel = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
-var loraModel = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 328553, 368189);
-var vaeModel = new AirIdentifier("sd1", AirAssetType.Vae, "civitai", 22354, 123456);
+var checkpointModel = new AirIdentifier(
+    AirEcosystem.StableDiffusionXl,
+    AirAssetType.Checkpoint,
+    AirSource.Civitai,
+    modelId: 4201,
+    versionId: 130072);
+
+var loraModel = new AirIdentifier(
+    AirEcosystem.StableDiffusionXl,
+    AirAssetType.Lora,
+    AirSource.Civitai,
+    modelId: 328553,
+    versionId: 368189);
+
+var vaeModel = new AirIdentifier(
+    AirEcosystem.StableDiffusion1,
+    AirAssetType.Vae,
+    AirSource.Civitai,
+    modelId: 22354,
+    versionId: 123456);
 
 var modelsToCheck = new[] { checkpointModel, loraModel, vaeModel };
 
-var result = await sdkClient.Coverage.GetAsync(modelsToCheck);
+var batchCoverageResult = await sdkClient.Coverage.GetAsync(modelsToCheck, cancellationToken);
 
-if (result is Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>.Success success)
+if (batchCoverageResult is Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>.Success batchSuccess)
 {
-    foreach (var (modelIdentifier, availability) in success.Data)
+    foreach (var (modelIdentifier, availability) in batchSuccess.Data)
     {
-        Console.WriteLine($"{modelIdentifier}: {availability.Available}");
+        Console.WriteLine($"{modelIdentifier}: {availability.Availability} (Workers: {availability.Workers})");
     }
 }
 ```
@@ -59,21 +91,564 @@ if (result is Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailabilit
 
 ### ProviderAssetAvailability
 
-The main result type containing overall availability and provider-specific details:
+The main result type containing availability information:
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `Available` | `bool` | Whether the resource is available on any provider |
-| `Providers` | `Dictionary<string, ProviderJobStatus>` | Provider-specific availability details |
+| `Availability` | `AvailabilityStatus` | The availability status (Available, Unavailable, Degraded) |
+| `Workers` | `int` | Number of workers with this model loaded (0 means unavailable) |
 
-### ProviderJobStatus
+### AvailabilityStatus
 
-Provider-specific information:
+Enum values for availability status:
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `Available` | `bool` | Whether this specific provider has the resource |
-| `QueuePosition` | `int?` | Current queue depth (null if not available) |
+| Value | Description |
+|-------|-------------|
+| `Available` | Model is available and ready for generation |
+| `Unavailable` | Model is not currently available |
+| `Degraded` | Model is available but with limited capacity (may experience delays) |
+
+## Common Use Cases
+
+### Use Case 1: Simple Availability Check
+
+**Scenario**: Check if a model is ready before submitting a single job.
+
+**When to use**: Quick validation before simple image generation tasks.
+
+```csharp
+public async Task<bool> IsModelReadyAsync(AirIdentifier model, CancellationToken cancellationToken)
+{
+    var coverageResult = await sdkClient.Coverage.GetAsync(model, cancellationToken);
+    
+    return coverageResult is Result<ProviderAssetAvailability>.Success success &&
+           success.Data.Availability == AvailabilityStatus.Available &&
+           success.Data.Workers > 0;
+}
+
+// Usage example
+var sdxlCheckpoint = new AirBuilder()
+    .WithEcosystem(AirEcosystem.StableDiffusionXl)
+    .WithAssetType(AirAssetType.Checkpoint)
+    .WithModelId(4201)
+    .WithVersionId(130072)
+    .Build();
+
+if (await IsModelReadyAsync(sdxlCheckpoint, cancellationToken))
+{
+    // Submit job
+    var jobSubmissionResult = await sdkClient.Jobs
+        .CreateImage()
+        .WithAir(sdxlCheckpoint)
+        .WithPositivePrompt("a beautiful landscape")
+        .WithDimensions(1024, 1024)
+        .ExecuteAsync(cancellationToken);
+}
+```
+
+### Use Case 2: Complex Multi-Resource Validation
+
+**Scenario**: Validate all resources (checkpoint + multiple LoRAs + ControlNet) before submitting a complex job.
+
+**When to use**: Production applications where job failures are costly.
+
+```csharp
+public sealed class ResourceValidator(ISdkClient sdkClient)
+{
+    public async Task<(bool IsValid, List<string> Issues)> ValidateResourcesAsync(
+        AirIdentifier checkpoint,
+        IReadOnlyList<AirIdentifier> loras,
+        AirIdentifier? controlNet = null,
+        CancellationToken cancellationToken = default)
+    {
+        var issues = new List<string>();
+        
+        // Collect all resources
+        var allResources = new List<AirIdentifier> { checkpoint };
+        allResources.AddRange(loras);
+        if (controlNet is not null)
+        {
+            allResources.Add(controlNet);
+        }
+        
+        // Single API call for all resources
+        var result = await sdkClient.Coverage.GetAsync(allResources, cancellationToken);
+        
+        if (result is not Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>.Success success)
+        {
+            issues.Add($"Failed to check coverage: {result.ErrorOrDefault?.Message}");
+            return (false, issues);
+        }
+        
+        // Validate each resource
+        foreach (var (resource, availability) in success.Data)
+        {
+            var resourceType = resource.AssetType switch
+            {
+                AirAssetType.Checkpoint => "Checkpoint",
+                AirAssetType.Lora => "LoRA",
+                AirAssetType.ControlNet => "ControlNet",
+                _ => "Resource"
+            };
+            
+            switch (availability.Availability)
+            {
+                case AvailabilityStatus.Unavailable:
+                    issues.Add($"{resourceType} '{resource}' is unavailable (0 workers)");
+                    break;
+                    
+                case AvailabilityStatus.Degraded:
+                    issues.Add($"{resourceType} '{resource}' is degraded ({availability.Workers} workers) - expect delays");
+                    break;
+                    
+                case AvailabilityStatus.Available when availability.Workers < 3:
+                    issues.Add($"{resourceType} '{resource}' has low capacity ({availability.Workers} workers) - may be slow");
+                    break;
+            }
+        }
+        
+        var isValid = issues.All(i => !i.Contains("unavailable"));
+        return (isValid, issues);
+    }
+}
+
+// Full Example Usage
+var validator = new ResourceValidator(sdkClient);
+
+var sdxlCheckpoint = new AirBuilder()
+    .WithEcosystem(AirEcosystem.StableDiffusionXl)
+    .WithAssetType(AirAssetType.Checkpoint)
+    .WithModelId(4201)
+    .WithVersionId(130072)
+    .Build();
+
+var characterLora = new AirBuilder()
+    .WithEcosystem(AirEcosystem.StableDiffusionXl)
+    .WithAssetType(AirAssetType.Lora)
+    .WithModelId(123456)
+    .WithVersionId(789012)
+    .Build();
+
+var styleLora = new AirBuilder()
+    .WithEcosystem(AirEcosystem.StableDiffusionXl)
+    .WithAssetType(AirAssetType.Lora)
+    .WithModelId(234567)
+    .WithVersionId(890123)
+    .Build();
+
+var poseControlNet = new AirBuilder()
+    .WithEcosystem(AirEcosystem.StableDiffusionXl)
+    .WithAssetType(AirAssetType.ControlNet)
+    .WithModelId(345678)
+    .WithVersionId(901234)
+    .Build();
+
+var loraModels = new[] { characterLora, styleLora };
+
+var (isValid, validationIssues) = await validator.ValidateResourcesAsync(
+    sdxlCheckpoint, 
+    loraModels, 
+    poseControlNet,
+    cancellationToken);
+
+if (!isValid)
+{
+    Console.WriteLine("Resource validation failed:");
+    foreach (var issue in validationIssues)
+    {
+        Console.WriteLine($"  - {issue}");
+    }
+    return;
+}
+
+// All resources valid - proceed with job
+var complexJobResult = await sdkClient.Jobs
+    .CreateImage()
+    .WithAir(sdxlCheckpoint)
+    .WithPositivePrompt("detailed character portrait")
+    .WithAdditionalNetwork(characterLora, network => network.WithStrength(0.8m))
+    .WithAdditionalNetwork(styleLora, network => network.WithStrength(0.6m))
+    .WithControlNet(cn => cn
+        .WithModel(poseControlNet)
+        .WithImage("https://example.tld/pose.png")
+        .WithWeight(1.0m))
+    .WithDimensions(768, 1024)
+    .ExecuteAsync(cancellationToken);
+```
+
+### Use Case 3: Load Balancing with Worker Count
+
+**Scenario**: Select the best available model variant based on worker availability.
+
+**When to use**: When you have multiple versions/variants of a model and want optimal performance.
+
+```csharp
+public sealed class ModelSelector(ISdkClient sdkClient)
+{
+    public async Task<AirIdentifier?> SelectBestAvailableModelAsync(
+        IReadOnlyList<AirIdentifier> candidates,
+        CancellationToken cancellationToken = default)
+    {
+        if (candidates.Count == 0)
+            return null;
+            
+        var result = await sdkClient.Coverage.GetAsync(candidates, cancellationToken);
+        
+        if (result is not Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>.Success success)
+            return null;
+        
+        // Select model with highest worker count
+        var bestModel = success.Data
+            .Where(kvp => kvp.Value.Availability == AvailabilityStatus.Available)
+            .OrderByDescending(kvp => kvp.Value.Workers)
+            .Select(kvp => new { Model = kvp.Key, kvp.Value.Workers })
+            .FirstOrDefault();
+        
+        if (bestModel is not null)
+        {
+            Console.WriteLine($"Selected model with {bestModel.Workers} workers");
+            return bestModel.Model;
+        }
+        
+        // Fallback: accept degraded if no fully available models
+        var degradedModel = success.Data
+            .Where(kvp => kvp.Value.Availability == AvailabilityStatus.Degraded)
+            .OrderByDescending(kvp => kvp.Value.Workers)
+            .Select(kvp => kvp.Key)
+            .FirstOrDefault();
+        
+        if (degradedModel is not null)
+        {
+            Console.WriteLine("Warning: Using degraded model (all preferred models unavailable)");
+        }
+        
+        return degradedModel;
+    }
+}
+
+// Full Example
+var selector = new ModelSelector(sdkClient);
+
+// Multiple checkpoint options (different versions or similar models)
+var sdxlVersion10 = new AirBuilder()
+    .WithEcosystem(AirEcosystem.StableDiffusionXl)
+    .WithAssetType(AirAssetType.Checkpoint)
+    .WithModelId(4201)
+    .WithVersionId(130072)
+    .Build();
+
+var sdxlVersion09 = new AirBuilder()
+    .WithEcosystem(AirEcosystem.StableDiffusionXl)
+    .WithAssetType(AirAssetType.Checkpoint)
+    .WithModelId(4201)
+    .WithVersionId(128713)
+    .Build();
+
+var ponyXlCheckpoint = new AirBuilder()
+    .WithEcosystem(AirEcosystem.Pony)
+    .WithAssetType(AirAssetType.Checkpoint)
+    .WithModelId(257749)
+    .WithVersionId(290640)
+    .Build();
+
+var checkpointCandidates = new[] { sdxlVersion10, sdxlVersion09, ponyXlCheckpoint };
+
+var bestAvailableCheckpoint = await selector.SelectBestAvailableModelAsync(
+    checkpointCandidates,
+    cancellationToken);
+
+if (bestAvailableCheckpoint is null)
+{
+    Console.WriteLine("No available checkpoints found");
+    return;
+}
+
+Console.WriteLine($"Using checkpoint: {bestAvailableCheckpoint}");
+
+var selectionJobResult = await sdkClient.Jobs
+    .CreateImage()
+    .WithAir(bestAvailableCheckpoint)
+    .WithPositivePrompt("high quality render")
+    .WithDimensions(1024, 1024)
+    .ExecuteAsync(cancellationToken);
+```
+
+### Use Case 4: Retry with Fallback Models
+
+**Scenario**: Attempt job with preferred model, fallback to alternatives if unavailable.
+
+**When to use**: Production systems requiring high reliability and automatic failover.
+
+```csharp
+public sealed class RobustJobSubmitter(ISdkClient sdkClient)
+{
+    public async Task<Result<JobStatusCollection>> SubmitWithFallbackAsync(
+        IReadOnlyList<AirIdentifier> checkpointPriority,
+        string prompt,
+        int width = 1024,
+        int height = 1024,
+        CancellationToken cancellationToken = default)
+    {
+        // Check all candidates at once
+        var coverageResult = await sdkClient.Coverage.GetAsync(checkpointPriority, cancellationToken);
+        
+        if (coverageResult is not Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>.Success coverage)
+        {
+            Console.WriteLine("Coverage check failed, attempting with first checkpoint anyway");
+            return await SubmitJobAsync(checkpointPriority[0], prompt, width, height, cancellationToken);
+        }
+        
+        // Try checkpoints in priority order
+        foreach (var checkpoint in checkpointPriority)
+        {
+            if (!coverage.Data.TryGetValue(checkpoint, out var availability))
+                continue;
+            
+            if (availability.Availability == AvailabilityStatus.Available && availability.Workers > 0)
+            {
+                Console.WriteLine($"Using checkpoint: {checkpoint} ({availability.Workers} workers)");
+                return await SubmitJobAsync(checkpoint, prompt, width, height, cancellationToken);
+            }
+        }
+        
+        // Check for degraded models as last resort
+        foreach (var checkpoint in checkpointPriority)
+        {
+            if (coverage.Data.TryGetValue(checkpoint, out var availability) &&
+                availability.Availability == AvailabilityStatus.Degraded &&
+                availability.Workers > 0)
+            {
+                Console.WriteLine($"Warning: Using degraded checkpoint: {checkpoint} ({availability.Workers} workers)");
+                return await SubmitJobAsync(checkpoint, prompt, width, height, cancellationToken);
+            }
+        }
+        
+        // All unavailable - return error
+        return new Result<JobStatusCollection>.Failure(
+            new Error(
+                ErrorCode.ResourceUnavailable,
+                "All checkpoint models are currently unavailable"
+            )
+        );
+    }
+    
+    private Task<Result<JobStatusCollection>> SubmitJobAsync(
+        AirIdentifier checkpoint,
+        string prompt,
+        int width,
+        int height,
+        CancellationToken cancellationToken)
+    {
+        return sdkClient.Jobs
+            .CreateImage()
+            .WithAir(checkpoint)
+            .WithPositivePrompt(prompt)
+            .WithDimensions(width, height)
+            .ExecuteAsync(cancellationToken);
+    }
+}
+
+// Full Example
+var submitter = new RobustJobSubmitter(sdkClient);
+
+// Define checkpoint priority (most preferred first)
+var primaryCheckpoint = new AirBuilder()
+    .WithEcosystem(AirEcosystem.StableDiffusionXl)
+    .WithAssetType(AirAssetType.Checkpoint)
+    .WithModelId(4201)
+    .WithVersionId(130072)
+    .Build();
+
+var fallbackCheckpoint = new AirBuilder()
+    .WithEcosystem(AirEcosystem.StableDiffusionXl)
+    .WithAssetType(AirAssetType.Checkpoint)
+    .WithModelId(133005)
+    .WithVersionId(348913)
+    .Build();
+
+var secondaryFallbackCheckpoint = new AirBuilder()
+    .WithEcosystem(AirEcosystem.Pony)
+    .WithAssetType(AirAssetType.Checkpoint)
+    .WithModelId(257749)
+    .WithVersionId(290640)
+    .Build();
+
+var checkpointPriority = new[] { primaryCheckpoint, fallbackCheckpoint, secondaryFallbackCheckpoint };
+
+var fallbackSubmissionResult = await submitter.SubmitWithFallbackAsync(
+    checkpointPriority,
+    "masterpiece, high quality, detailed landscape",
+    width: 1024,
+    height: 768,
+    cancellationToken);
+
+if (fallbackSubmissionResult is Result<JobStatusCollection>.Success submissionSuccess)
+{
+    Console.WriteLine($"Job submitted successfully: {submissionSuccess.Data.Token}");
+}
+else
+{
+    Console.WriteLine($"Job submission failed: {fallbackSubmissionResult.ErrorOrDefault?.Message}");
+}
+```
+
+### Use Case 5: Cached Coverage Checker
+
+**Scenario**: High-frequency coverage checks with intelligent caching.
+
+**When to use**: Applications that check coverage frequently (e.g., UI showing available models).
+
+```csharp
+public sealed class CachedCoverageChecker(ISdkClient sdkClient)
+{
+    private readonly record struct CacheEntry(
+        ProviderAssetAvailability Data,
+        DateTime Timestamp);
+    
+    private readonly Dictionary<AirIdentifier, CacheEntry> _cache = [];
+    private readonly TimeSpan _cacheLifetime = TimeSpan.FromMinutes(5);
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
+    
+    public async Task<Result<ProviderAssetAvailability>> GetWithCacheAsync(
+        AirIdentifier model,
+        CancellationToken cancellationToken = default)
+    {
+        // Check cache first
+        if (_cache.TryGetValue(model, out var cached))
+        {
+            if (DateTime.UtcNow - cached.Timestamp < _cacheLifetime)
+            {
+                return new Result<ProviderAssetAvailability>.Success(cached.Data);
+            }
+        }
+        
+        // Fetch fresh data
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            // Double-check after acquiring lock
+            if (_cache.TryGetValue(model, out cached) &&
+                DateTime.UtcNow - cached.Timestamp < _cacheLifetime)
+            {
+                return new Result<ProviderAssetAvailability>.Success(cached.Data);
+            }
+            
+            var result = await sdkClient.Coverage.GetAsync(model, cancellationToken);
+            
+            if (result is Result<ProviderAssetAvailability>.Success success)
+            {
+                _cache[model] = new CacheEntry(success.Data, DateTime.UtcNow);
+            }
+            
+            return result;
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+    
+    public async Task<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>> GetBatchWithCacheAsync(
+        IEnumerable<AirIdentifier> models,
+        CancellationToken cancellationToken = default)
+    {
+        var modelList = models.ToList();
+        var results = new Dictionary<AirIdentifier, ProviderAssetAvailability>();
+        var toFetch = new List<AirIdentifier>();
+        
+        // Check cache
+        foreach (var model in modelList)
+        {
+            if (_cache.TryGetValue(model, out var cached) &&
+                DateTime.UtcNow - cached.Timestamp < _cacheLifetime)
+            {
+                results[model] = cached.Data;
+            }
+            else
+            {
+                toFetch.Add(model);
+            }
+        }
+        
+        // Fetch uncached models
+        if (toFetch.Count > 0)
+        {
+            await _semaphore.WaitAsync(cancellationToken);
+            try
+            {
+                var fetchResult = await sdkClient.Coverage.GetAsync(toFetch, cancellationToken);
+                
+                if (fetchResult is Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>.Success success)
+                {
+                    foreach (var (model, availability) in success.Data)
+                    {
+                        _cache[model] = new CacheEntry(availability, DateTime.UtcNow);
+                        results[model] = availability;
+                    }
+                }
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+        
+        return results;
+    }
+    
+    public void ClearCache() => _cache.Clear();
+    
+    public void ClearCache(AirIdentifier model) => _cache.Remove(model);
+}
+
+// Full Example
+var cachedChecker = new CachedCoverageChecker(sdkClient);
+
+var sdxlCheckpointToCache = new AirBuilder()
+    .WithEcosystem(AirEcosystem.StableDiffusionXl)
+    .WithAssetType(AirAssetType.Checkpoint)
+    .WithModelId(4201)
+    .WithVersionId(130072)
+    .Build();
+
+// First call - fetches from API
+var firstCheckResult = await cachedChecker.GetWithCacheAsync(sdxlCheckpointToCache, cancellationToken);
+Console.WriteLine($"First check: {firstCheckResult.ValueOrDefault?.Availability} (from API)");
+
+// Second call within 5 minutes - uses cache
+var secondCheckResult = await cachedChecker.GetWithCacheAsync(sdxlCheckpointToCache, cancellationToken);
+Console.WriteLine($"Second check: {secondCheckResult.ValueOrDefault?.Availability} (from cache)");
+
+// Batch check with partial cache hits
+var sdxlCheckpointForBatch = new AirBuilder()
+    .WithEcosystem(AirEcosystem.StableDiffusionXl)
+    .WithAssetType(AirAssetType.Checkpoint)
+    .WithModelId(4201)
+    .WithVersionId(130072)
+    .Build();
+
+var detailLoraForBatch = new AirBuilder()
+    .WithEcosystem(AirEcosystem.StableDiffusionXl)
+    .WithAssetType(AirAssetType.Lora)
+    .WithModelId(123456)
+    .WithVersionId(789012)
+    .Build();
+
+var styleLoraForBatch = new AirBuilder()
+    .WithEcosystem(AirEcosystem.StableDiffusionXl)
+    .WithAssetType(AirAssetType.Lora)
+    .WithModelId(234567)
+    .WithVersionId(890123)
+    .Build();
+
+var modelsToCheck = new[] { sdxlCheckpointForBatch, detailLoraForBatch, styleLoraForBatch };
+
+var batchCoverageResults = await cachedChecker.GetBatchWithCacheAsync(modelsToCheck, cancellationToken);
+foreach (var (model, availability) in batchCoverageResults)
+{
+    Console.WriteLine($"{model.AssetType}: {availability.Availability} ({availability.Workers} workers)");
+}
+```
 
 ## Practical Examples
 
@@ -94,7 +669,7 @@ public async Task<Result<JobStatusCollection>> GenerateWithValidationAsync(
             coverageResult.Error);
     }
     
-    if (!coverageSuccess.Data.Available)
+    if (coverageSuccess.Data.Availability != AvailabilityStatus.Available)
     {
         return Result<JobStatusCollection>.FromApiError(
             "Model not available on generation infrastructure");
@@ -131,7 +706,7 @@ public async Task<bool> ValidateJobResourcesAsync(
     
     // Verify all resources are available
     var unavailable = success.Data
-        .Where(kvp => !kvp.Value.Available)
+        .Where(kvp => kvp.Value.Availability != AvailabilityStatus.Available)
         .Select(kvp => kvp.Key)
         .ToArray();
     
@@ -152,29 +727,29 @@ public async Task<bool> ValidateJobResourcesAsync(
 ### Select Provider Based on Queue Depth
 
 ```csharp
-public async Task<string?> FindBestProviderAsync(AirIdentifier model)
+public async Task<bool> CheckModelAvailabilityAsync(AirIdentifier model)
 {
     var result = await sdkClient.Coverage.GetAsync(model);
     
     if (result is not Result<ProviderAssetAvailability>.Success success)
     {
-        return null;
+        return false;
     }
     
-    // Find provider with shortest queue
-    var bestProvider = success.Data.Providers
-        .Where(p => p.Value.Available)
-        .OrderBy(p => p.Value.QueuePosition ?? int.MaxValue)
-        .Select(p => p.Key)
-        .FirstOrDefault();
-    
-    if (bestProvider is not null)
+    // Check availability and worker count
+    if (success.Data.Availability == AvailabilityStatus.Available && success.Data.Workers > 0)
     {
-        var queuePos = success.Data.Providers[bestProvider].QueuePosition;
-        Console.WriteLine($"Best provider: {bestProvider} (Queue: {queuePos ?? 0})");
+        Console.WriteLine($"Model available with {success.Data.Workers} workers");
+        return true;
+    }
+    else if (success.Data.Availability == AvailabilityStatus.Degraded)
+    {
+        Console.WriteLine($"Model available but degraded ({success.Data.Workers} workers)");
+        return true;
     }
     
-    return bestProvider;
+    Console.WriteLine("Model not available");
+    return false;
 }
 ```
 
@@ -188,13 +763,13 @@ var result = await sdkClient.Coverage.GetAsync(model);
 switch (result)
 {
     case Result<ProviderAssetAvailability>.Success success:
-        if (success.Data.Available)
+        if (success.Data.Availability == AvailabilityStatus.Available)
         {
-            Console.WriteLine("Model is available");
+            Console.WriteLine($"Model is available ({success.Data.Workers} workers)");
         }
         else
         {
-            Console.WriteLine("Model not available on any provider");
+            Console.WriteLine($"Model status: {success.Data.Availability}");
         }
         break;
         
@@ -234,8 +809,9 @@ public async Task<bool> IsCachedAvailableAsync(AirIdentifier model)
     
     if (result is Result<ProviderAssetAvailability>.Success success)
     {
-        _coverageCache[model] = (DateTime.UtcNow, success.Data.Available);
-        return success.Data.Available;
+        var isAvailable = success.Data.Availability == AvailabilityStatus.Available;
+        _coverageCache[model] = (DateTime.UtcNow, isAvailable);
+        return isAvailable;
     }
     
     return false;
@@ -271,7 +847,8 @@ public async Task<Result<JobStatusCollection>> GenerateAsync(
     if (validateCoverage)
     {
         var coverageResult = await sdkClient.Coverage.GetAsync(model);
-        if (coverageResult is Result<ProviderAssetAvailability>.Success { Data.Available: false })
+        if (coverageResult is Result<ProviderAssetAvailability>.Success success &&
+            success.Data.Availability != AvailabilityStatus.Available)
         {
             return Result<JobStatusCollection>.FromApiError("Model not available");
         }
@@ -301,7 +878,7 @@ public async Task<IEnumerable<AirIdentifier>> GetAvailableModelsAsync(
     }
     
     return success.Data
-        .Where(kvp => kvp.Value.Available)
+        .Where(kvp => kvp.Value.Availability == AvailabilityStatus.Available)
         .Select(kvp => kvp.Key)
         .ToArray();
 }

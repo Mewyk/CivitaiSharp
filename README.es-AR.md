@@ -619,16 +619,19 @@ var multiLoRAJob = await sdkClient.Jobs
     .WithSteps(30)
     .WithConfigurationScale(7.5m)
     // LoRA de personaje con alta intensidad
-    .WithAdditionalNetwork(characterLoRA, network => network
+    .WithAdditionalNetwork(characterLoRA, NetworkBuilder.Create()
         .WithStrength(0.9m)
-        .WithTriggerWord("anime_style"))
-    // LoRA de estilo con intensidad media
-    .WithAdditionalNetwork(styleLoRA, network => network
+        .WithTriggerWord("anime_style")
+        .Build())
+    // LoRA de estilo con fuerza media
+    .WithAdditionalNetwork(styleLoRA, NetworkBuilder.Create()
         .WithStrength(0.6m)
-        .WithTriggerWord("cinematic"))
-    // LoRA de iluminación con intensidad sutil
-    .WithAdditionalNetwork(lightingLoRA, network => network
-        .WithStrength(0.4m))
+        .WithTriggerWord("cinematic")
+        .Build())
+    // LoRA de iluminación con fuerza sutil
+    .WithAdditionalNetwork(lightingLoRA, NetworkBuilder.Create()
+        .WithStrength(0.4m)
+        .Build())
     .ExecuteAsync();
 
 if (multiLoRAJob is Result<JobStatusCollection>.Success loraSuccess)
@@ -645,7 +648,6 @@ Combine ControlNet para guía de pose con LoRAs para estilo:
 var baseCheckpoint = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
 var styleLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 234567, 456789);
 var detailLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 345678, 567890);
-var controlNetModel = new AirIdentifier("sdxl", AirAssetType.ControlNet, "civitai", 456789, 678901);
 
 var controlNetJob = await sdkClient.Jobs
     .CreateImage()
@@ -656,19 +658,22 @@ var controlNetJob = await sdkClient.Jobs
     .WithSteps(35)
     .WithConfigurationScale(7.0m)
     // ControlNet para guía de pose
-    .WithControlNet(controlNet => controlNet
-        .WithModel(controlNetModel)
-        .WithImage("https://example.tld/reference-pose.png")
+    .WithControlNet(ControlNetBuilder.Create()
+        .WithImageUrl("https://example.tld/reference-pose.png")
+        .WithPreprocessor(ControlNetPreprocessor.Canny)
         .WithWeight(1.0m)
-        .WithStartingControlStep(0.0m)
-        .WithEndingControlStep(0.8m))
+        .WithStartStep(0.0m)
+        .WithEndStep(0.8m)
+        .Build())
     // LoRA de estilo
-    .WithAdditionalNetwork(styleLoRA, network => network
+    .WithAdditionalNetwork(styleLoRA, NetworkBuilder.Create()
         .WithStrength(0.7m)
-        .WithTriggerWord("professional_photo"))
+        .WithTriggerWord("professional_photo")
+        .Build())
     // LoRA de mejora de detalles
-    .WithAdditionalNetwork(detailLoRA, network => network
-        .WithStrength(0.5m))
+    .WithAdditionalNetwork(detailLoRA, NetworkBuilder.Create()
+        .WithStrength(0.5m)
+        .Build())
     .ExecuteAsync();
 
 if (controlNetJob is Result<JobStatusCollection>.Success controlNetSuccess)

@@ -4,12 +4,12 @@ using CivitaiSharp.Sdk.Enums;
 using CivitaiSharp.Sdk.Request;
 using Xunit;
 
-public sealed class ImageJobControlNetBuilderTests
+public sealed class ControlNetBuilderTests
 {
     [Fact]
     public void Create_ReturnsNewBuilderInstance()
     {
-        var builder = ImageJobControlNetBuilder.Create();
+        var builder = ControlNetBuilder.Create();
 
         Assert.NotNull(builder);
     }
@@ -17,7 +17,7 @@ public sealed class ImageJobControlNetBuilderTests
     [Fact]
     public void WithImageUrl_SetsImageUrlAndClearsBlobKey()
     {
-        var builder = ImageJobControlNetBuilder.Create()
+        var builder = ControlNetBuilder.Create()
             .WithImageUrl("https://example.com/control.png");
 
         var result = builder.Build();
@@ -29,7 +29,7 @@ public sealed class ImageJobControlNetBuilderTests
     [Fact]
     public void WithBlobKey_SetsBlobKeyAndClearsImageUrl()
     {
-        var builder = ImageJobControlNetBuilder.Create()
+        var builder = ControlNetBuilder.Create()
             .WithBlobKey("blob-key-12345");
 
         var result = builder.Build();
@@ -41,7 +41,7 @@ public sealed class ImageJobControlNetBuilderTests
     [Fact]
     public void WithImageUrl_AfterWithBlobKey_OverwritesBlobKey()
     {
-        var builder = ImageJobControlNetBuilder.Create()
+        var builder = ControlNetBuilder.Create()
             .WithBlobKey("blob-key-12345")
             .WithImageUrl("https://example.com/control.png");
 
@@ -54,7 +54,7 @@ public sealed class ImageJobControlNetBuilderTests
     [Fact]
     public void WithPreprocessor_SetsPreprocessorValue()
     {
-        var builder = ImageJobControlNetBuilder.Create()
+        var builder = ControlNetBuilder.Create()
             .WithImageUrl("https://example.com/control.png")
             .WithPreprocessor(ControlNetPreprocessor.Canny);
 
@@ -66,7 +66,7 @@ public sealed class ImageJobControlNetBuilderTests
     [Fact]
     public void WithWeight_SetsWeightValue()
     {
-        var builder = ImageJobControlNetBuilder.Create()
+        var builder = ControlNetBuilder.Create()
             .WithImageUrl("https://example.com/control.png")
             .WithWeight(0.9m);
 
@@ -78,7 +78,7 @@ public sealed class ImageJobControlNetBuilderTests
     [Fact]
     public void WithStartStep_SetsStartStepValue()
     {
-        var builder = ImageJobControlNetBuilder.Create()
+        var builder = ControlNetBuilder.Create()
             .WithImageUrl("https://example.com/control.png")
             .WithStartStep(0.1m);
 
@@ -90,7 +90,7 @@ public sealed class ImageJobControlNetBuilderTests
     [Fact]
     public void WithEndStep_SetsEndStepValue()
     {
-        var builder = ImageJobControlNetBuilder.Create()
+        var builder = ControlNetBuilder.Create()
             .WithImageUrl("https://example.com/control.png")
             .WithEndStep(0.9m);
 
@@ -102,7 +102,7 @@ public sealed class ImageJobControlNetBuilderTests
     [Fact]
     public void WithStepRange_SetsBothStartAndEndStep()
     {
-        var builder = ImageJobControlNetBuilder.Create()
+        var builder = ControlNetBuilder.Create()
             .WithImageUrl("https://example.com/control.png")
             .WithStepRange(0.2m, 0.8m);
 
@@ -115,7 +115,7 @@ public sealed class ImageJobControlNetBuilderTests
     [Fact]
     public void Build_WithoutImageSource_ThrowsInvalidOperationException()
     {
-        var builder = ImageJobControlNetBuilder.Create();
+        var builder = ControlNetBuilder.Create();
 
         var exception = Assert.Throws<InvalidOperationException>(() => builder.Build());
         Assert.Contains("Either ImageUrl or BlobKey must be provided", exception.Message);
@@ -124,7 +124,7 @@ public sealed class ImageJobControlNetBuilderTests
     [Fact]
     public void BuilderIsImmutable_ReturnsNewInstanceOnEachMethod()
     {
-        var builder1 = ImageJobControlNetBuilder.Create();
+        var builder1 = ControlNetBuilder.Create();
         var builder2 = builder1.WithImageUrl("https://example.com/control.png");
         var builder3 = builder2.WithWeight(0.5m);
 
@@ -135,7 +135,7 @@ public sealed class ImageJobControlNetBuilderTests
     [Fact]
     public void CompleteFluentAPI_BuildsCorrectControlNet()
     {
-        var result = ImageJobControlNetBuilder.Create()
+        var result = ControlNetBuilder.Create()
             .WithImageUrl("https://example.com/control.png")
             .WithPreprocessor(ControlNetPreprocessor.Depth)
             .WithWeight(0.85m)

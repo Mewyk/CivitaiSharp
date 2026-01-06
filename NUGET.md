@@ -459,9 +459,10 @@ if (result is Result<JobStatusCollection>.Success success)
 
     if (statusResult is Result<JobStatusCollection>.Success statusSuccess)
     {
-        foreach (var job in statusSuccess.Data.Jobs)
+        foreach (var job in statusSuccess.Data.JobsList)
         {
-            Console.WriteLine($"Job {job.JobId}: {job.Status}");
+            var status = job.Scheduled ? "Processing" : "Complete";
+            Console.WriteLine($"Job {job.JobId}: {status}");
         }
     }
 }
@@ -506,7 +507,7 @@ var comprehensiveJob = await sdkClient.Jobs
 
 if (comprehensiveJob is Result<JobStatusCollection>.Success jobSuccess)
 {
-    Console.WriteLine($"Submitted {jobSuccess.Data.Jobs.Count} jobs with token: {jobSuccess.Data.Token}");
+    Console.WriteLine($"Submitted {jobSuccess.Data.JobsList.Count} jobs with token: {jobSuccess.Data.Token}");
 }
 ```
 
@@ -529,16 +530,19 @@ var multiLoRAJob = await sdkClient.Jobs
     .WithSteps(30)
     .WithConfigurationScale(7.5m)
     // Character LoRA with high strength
-    .WithAdditionalNetwork(characterLoRA, network => network
+    .WithAdditionalNetwork(characterLoRA, NetworkBuilder.Create()
         .WithStrength(0.9m)
-        .WithTriggerWord("anime_style"))
+        .WithTriggerWord("anime_style")
+        .Build())
     // Style LoRA with medium strength
-    .WithAdditionalNetwork(styleLoRA, network => network
+    .WithAdditionalNetwork(styleLoRA, NetworkBuilder.Create()
         .WithStrength(0.6m)
-        .WithTriggerWord("cinematic"))
+        .WithTriggerWord("cinematic")
+        .Build())
     // Lighting LoRA with subtle strength
-    .WithAdditionalNetwork(lightingLoRA, network => network
-        .WithStrength(0.4m))
+    .WithAdditionalNetwork(lightingLoRA, NetworkBuilder.Create()
+        .WithStrength(0.4m)
+        .Build())
     .ExecuteAsync();
 
 if (multiLoRAJob is Result<JobStatusCollection>.Success loraSuccess)
@@ -555,7 +559,6 @@ Combine ControlNet for pose guidance with LoRAs for style:
 var baseCheckpoint = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
 var styleLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 234567, 456789);
 var detailLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 345678, 567890);
-var controlNetModel = new AirIdentifier("sdxl", AirAssetType.ControlNet, "civitai", 456789, 678901);
 
 var controlNetJob = await sdkClient.Jobs
     .CreateImage()
@@ -566,19 +569,22 @@ var controlNetJob = await sdkClient.Jobs
     .WithSteps(35)
     .WithConfigurationScale(7.0m)
     // ControlNet for pose guidance
-    .WithControlNet(controlNet => controlNet
-        .WithModel(controlNetModel)
-        .WithImage("https://example.tld/reference-pose.png")
+    .WithControlNet(ControlNetBuilder.Create()
+        .WithImageUrl("https://example.tld/reference-pose.png")
+        .WithPreprocessor(ControlNetPreprocessor.Canny)
         .WithWeight(1.0m)
-        .WithStartingControlStep(0.0m)
-        .WithEndingControlStep(0.8m))
+        .WithStartStep(0.0m)
+        .WithEndStep(0.8m)
+        .Build())
     // Style LoRA
-    .WithAdditionalNetwork(styleLoRA, network => network
+    .WithAdditionalNetwork(styleLoRA, NetworkBuilder.Create()
         .WithStrength(0.7m)
-        .WithTriggerWord("professional_photo"))
+        .WithTriggerWord("professional_photo")
+        .Build())
     // Detail enhancement LoRA
-    .WithAdditionalNetwork(detailLoRA, network => network
-        .WithStrength(0.5m))
+    .WithAdditionalNetwork(detailLoRA, NetworkBuilder.Create()
+        .WithStrength(0.5m)
+        .Build())
     .ExecuteAsync();
 
 if (controlNetJob is Result<JobStatusCollection>.Success controlNetSuccess)
@@ -593,7 +599,7 @@ if (controlNetJob is Result<JobStatusCollection>.Success controlNetSuccess)
 
     if (completedJob is Result<JobStatusCollection>.Success completed)
     {
-        foreach (var job in completed.Data.Jobs)
+        foreach (var job in completed.Data.JobsList)
         {
             if (job.Result?.BlobUrl is string blobUrl)
             {

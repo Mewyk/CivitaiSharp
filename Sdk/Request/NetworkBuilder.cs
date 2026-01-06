@@ -10,7 +10,7 @@ using CivitaiSharp.Sdk.Models.Jobs;
 /// This builder follows an immutable design pattern. Each method returns a new instance
 /// with the updated configuration, making it thread-safe and cacheable.
 /// </remarks>
-public sealed record ImageJobNetworkParamsBuilder(
+public sealed record NetworkBuilder(
     NetworkType? Type = null,
     decimal? Strength = null,
     string? TriggerWord = null,
@@ -18,17 +18,17 @@ public sealed record ImageJobNetworkParamsBuilder(
 {
 
     /// <summary>
-    /// Creates a new <see cref="ImageJobNetworkParamsBuilder"/> instance.
+    /// Creates a new <see cref="NetworkBuilder"/> instance.
     /// </summary>
     /// <returns>A new builder instance.</returns>
-    public static ImageJobNetworkParamsBuilder Create() => new();
+    public static NetworkBuilder Create() => new();
 
     /// <summary>
     /// Sets the network type.
     /// </summary>
     /// <param name="type">The network type (LoRA, embedding, etc.). Required.</param>
     /// <returns>A new builder instance with the updated type.</returns>
-    public ImageJobNetworkParamsBuilder WithType(NetworkType type)
+    public NetworkBuilder WithType(NetworkType type)
         => this with { Type = type };
 
     /// <summary>
@@ -36,7 +36,7 @@ public sealed record ImageJobNetworkParamsBuilder(
     /// </summary>
     /// <param name="strength">The strength value. Typically 0.0-2.0, default: 1.0.</param>
     /// <returns>A new builder instance with the updated strength.</returns>
-    public ImageJobNetworkParamsBuilder WithStrength(decimal strength)
+    public NetworkBuilder WithStrength(decimal strength)
         => this with { Strength = strength };
 
     /// <summary>
@@ -44,7 +44,7 @@ public sealed record ImageJobNetworkParamsBuilder(
     /// </summary>
     /// <param name="triggerWord">The trigger word(s) to activate the network.</param>
     /// <returns>A new builder instance with the updated trigger word.</returns>
-    public ImageJobNetworkParamsBuilder WithTriggerWord(string triggerWord)
+    public NetworkBuilder WithTriggerWord(string triggerWord)
         => this with { TriggerWord = triggerWord };
 
     /// <summary>
@@ -52,7 +52,7 @@ public sealed record ImageJobNetworkParamsBuilder(
     /// </summary>
     /// <param name="clipStrength">The CLIP strength. Range: 0.0-2.0.</param>
     /// <returns>A new builder instance with the updated CLIP strength.</returns>
-    public ImageJobNetworkParamsBuilder WithClipStrength(decimal clipStrength)
+    public NetworkBuilder WithClipStrength(decimal clipStrength)
         => this with { ClipStrength = clipStrength };
 
     /// <summary>

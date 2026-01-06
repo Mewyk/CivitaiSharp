@@ -187,7 +187,6 @@ public sealed class ResourceValidator(ISdkClient sdkClient)
             {
                 AirAssetType.Checkpoint => "Checkpoint",
                 AirAssetType.Lora => "LoRA",
-                AirAssetType.ControlNet => "ControlNet",
                 _ => "Resource"
             };
             
@@ -236,20 +235,12 @@ var styleLora = new AirBuilder()
     .WithVersionId(890123)
     .Build();
 
-var poseControlNet = new AirBuilder()
-    .WithEcosystem(AirEcosystem.StableDiffusionXl)
-    .WithAssetType(AirAssetType.ControlNet)
-    .WithModelId(345678)
-    .WithVersionId(901234)
-    .Build();
-
 var loraModels = new[] { characterLora, styleLora };
 
 var (isValid, validationIssues) = await validator.ValidateResourcesAsync(
     sdxlCheckpoint, 
-    loraModels, 
-    poseControlNet,
-    cancellationToken);
+    loraModels,
+    cancellationToken: cancellationToken);
 
 if (!isValid)
 {
@@ -266,12 +257,17 @@ var complexJobResult = await sdkClient.Jobs
     .CreateImage()
     .WithAir(sdxlCheckpoint)
     .WithPositivePrompt("detailed character portrait")
-    .WithAdditionalNetwork(characterLora, network => network.WithStrength(0.8m))
-    .WithAdditionalNetwork(styleLora, network => network.WithStrength(0.6m))
-    .WithControlNet(cn => cn
-        .WithModel(poseControlNet)
-        .WithImage("https://example.tld/pose.png")
-        .WithWeight(1.0m))
+    .WithAdditionalNetwork(characterLora, NetworkBuilder.Create()
+        .WithStrength(0.8m)
+        .Build())
+    .WithAdditionalNetwork(styleLora, NetworkBuilder.Create()
+        .WithStrength(0.6m)
+        .Build())
+    .WithControlNet(ControlNetBuilder.Create()
+        .WithImageUrl("https://example.tld/pose.png")
+        .WithPreprocessor(ControlNetPreprocessor.Canny)
+        .WithWeight(1.0m)
+        .Build())
     .WithDimensions(768, 1024)
     .ExecuteAsync(cancellationToken);
 ```

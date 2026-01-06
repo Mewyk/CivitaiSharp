@@ -619,16 +619,19 @@ var multiLoRAJob = await sdkClient.Jobs
     .WithSteps(30)
     .WithConfigurationScale(7.5m)
     // 高強度のキャラクターLoRA
-    .WithAdditionalNetwork(characterLoRA, network => network
+    .WithAdditionalNetwork(characterLoRA, NetworkBuilder.Create()
         .WithStrength(0.9m)
-        .WithTriggerWord("anime_style"))
+        .WithTriggerWord("anime_style")
+        .Build())
     // 中強度のスタイルLoRA
-    .WithAdditionalNetwork(styleLoRA, network => network
+    .WithAdditionalNetwork(styleLoRA, NetworkBuilder.Create()
         .WithStrength(0.6m)
-        .WithTriggerWord("cinematic"))
+        .WithTriggerWord("cinematic")
+        .Build())
     // 微妙な強度のライティングLoRA
-    .WithAdditionalNetwork(lightingLoRA, network => network
-        .WithStrength(0.4m))
+    .WithAdditionalNetwork(lightingLoRA, NetworkBuilder.Create()
+        .WithStrength(0.4m)
+        .Build())
     .ExecuteAsync();
 
 if (multiLoRAJob is Result<JobStatusCollection>.Success loraSuccess)
@@ -645,7 +648,6 @@ if (multiLoRAJob is Result<JobStatusCollection>.Success loraSuccess)
 var baseCheckpoint = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
 var styleLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 234567, 456789);
 var detailLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 345678, 567890);
-var controlNetModel = new AirIdentifier("sdxl", AirAssetType.ControlNet, "civitai", 456789, 678901);
 
 var controlNetJob = await sdkClient.Jobs
     .CreateImage()
@@ -656,19 +658,22 @@ var controlNetJob = await sdkClient.Jobs
     .WithSteps(35)
     .WithConfigurationScale(7.0m)
     // ポーズガイダンス用のControlNet
-    .WithControlNet(controlNet => controlNet
-        .WithModel(controlNetModel)
-        .WithImage("https://example.tld/reference-pose.png")
+    .WithControlNet(ControlNetBuilder.Create()
+        .WithImageUrl("https://example.tld/reference-pose.png")
+        .WithPreprocessor(ControlNetPreprocessor.Canny)
         .WithWeight(1.0m)
-        .WithStartingControlStep(0.0m)
-        .WithEndingControlStep(0.8m))
+        .WithStartStep(0.0m)
+        .WithEndStep(0.8m)
+        .Build())
     // スタイルLoRA
-    .WithAdditionalNetwork(styleLoRA, network => network
+    .WithAdditionalNetwork(styleLoRA, NetworkBuilder.Create()
         .WithStrength(0.7m)
-        .WithTriggerWord("professional_photo"))
+        .WithTriggerWord("professional_photo")
+        .Build())
     // ディテール強化LoRA
-    .WithAdditionalNetwork(detailLoRA, network => network
-        .WithStrength(0.5m))
+    .WithAdditionalNetwork(detailLoRA, NetworkBuilder.Create()
+        .WithStrength(0.5m)
+        .Build())
     .ExecuteAsync();
 
 if (controlNetJob is Result<JobStatusCollection>.Success controlNetSuccess)

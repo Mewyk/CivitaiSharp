@@ -25,6 +25,11 @@ Both builders follow CivitaiSharp's immutable, thread-safe design pattern.
 Use the `CreateImage()` method to get a fluent builder:
 
 ```csharp
+using CivitaiSharp.Core.Response;
+using CivitaiSharp.Sdk.Air;
+using CivitaiSharp.Sdk.Enums;
+using CivitaiSharp.Sdk.Models.Results;
+
 var result = await sdkClient.Jobs
     .CreateImage()
     .WithAir(new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072))
@@ -77,11 +82,13 @@ var result = await sdkClient.Jobs
     .CreateImage()
     .WithAir(baseModel)
     .WithPositivePrompt("character portrait")
-    .WithAdditionalNetwork(lora, builder => builder
+    .WithAdditionalNetwork(lora, NetworkBuilder.Create()
         .WithStrength(0.8m)
-        .WithTriggerWord("character"))
-    .WithAdditionalNetwork(anotherLora, builder => builder
-        .WithStrength(0.5m))
+        .WithTriggerWord("character")
+        .Build())
+    .WithAdditionalNetwork(anotherLora, NetworkBuilder.Create()
+        .WithStrength(0.5m)
+        .Build())
     .ExecuteAsync();
 ```
 
@@ -94,12 +101,13 @@ var result = await sdkClient.Jobs
     .CreateImage()
     .WithAir(model)
     .WithPositivePrompt("person standing")
-    .WithControlNet(builder => builder
-        .WithModel(controlNetModel)
-        .WithImage("https://example.tld/pose.png")
+    .WithControlNet(ControlNetBuilder.Create()
+        .WithImageUrl("https://example.tld/pose.png")
+        .WithPreprocessor(ControlNetPreprocessor.Canny)
         .WithWeight(1.0m)
-        .WithStartingControlStep(0.0m)
-        .WithEndingControlStep(1.0m))
+        .WithStartStep(0.0m)
+        .WithEndStep(1.0m)
+        .Build())
     .ExecuteAsync();
 ```
 
@@ -179,21 +187,25 @@ var multiLoRAJob = await sdkClient.Jobs
     .WithSteps(35)
     .WithConfigurationScale(7.5m)
     // Character LoRA - highest strength for defining features
-    .WithAdditionalNetwork(characterLoRA, network => network
+    .WithAdditionalNetwork(characterLoRA, NetworkBuilder.Create()
         .WithStrength(0.95m)
-        .WithTriggerWord("fantasy_character"))
+        .WithTriggerWord("fantasy_character")
+        .Build())
     // Clothing LoRA - high strength for accurate outfit
-    .WithAdditionalNetwork(clothingLoRA, network => network
+    .WithAdditionalNetwork(clothingLoRA, NetworkBuilder.Create()
         .WithStrength(0.85m)
-        .WithTriggerWord("medieval_armor"))
+        .WithTriggerWord("medieval_armor")
+        .Build())
     // Style LoRA - medium strength for artistic influence
-    .WithAdditionalNetwork(styleLoRA, network => network
+    .WithAdditionalNetwork(styleLoRA, NetworkBuilder.Create()
         .WithStrength(0.65m)
-        .WithTriggerWord("cinematic_style"))
+        .WithTriggerWord("cinematic_style")
+        .Build())
     // Lighting LoRA - subtle strength to enhance atmosphere
-    .WithAdditionalNetwork(lightingLoRA, network => network
+    .WithAdditionalNetwork(lightingLoRA, NetworkBuilder.Create()
         .WithStrength(0.45m)
-        .WithTriggerWord("cinematic_lighting"))
+        .WithTriggerWord("cinematic_lighting")
+        .Build())
     .WithQuantity(2)
     .ExecuteAsync();
 
@@ -211,7 +223,6 @@ Combine pose control with style enhancement:
 var baseCheckpoint = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
 var portraitStyleLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 234567, 345678);
 var detailEnhancerLoRA = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 345678, 456789);
-var controlNetPose = new AirIdentifier("sdxl", AirAssetType.ControlNet, "civitai", 456789, 567890);
 
 var controlNetWithLoRAJob = await sdkClient.Jobs
     .CreateImage()
@@ -223,19 +234,22 @@ var controlNetWithLoRAJob = await sdkClient.Jobs
     .WithSteps(40)
     .WithConfigurationScale(7.0m)
     // ControlNet for precise pose guidance
-    .WithControlNet(controlNet => controlNet
-        .WithModel(controlNetPose)
-        .WithImage("https://example.tld/reference-pose.png")
+    .WithControlNet(ControlNetBuilder.Create()
+        .WithImageUrl("https://example.tld/reference-pose.png")
+        .WithPreprocessor(ControlNetPreprocessor.Canny)
         .WithWeight(1.0m) // Full control strength
-        .WithStartingControlStep(0.0m) // Apply from beginning
-        .WithEndingControlStep(0.75m)) // Release control near end for natural finish
+        .WithStartStep(0.0m) // Apply from beginning
+        .WithEndStep(0.75m) // Release control near end for natural finish
+        .Build())
     // Portrait style LoRA for professional look
-    .WithAdditionalNetwork(portraitStyleLoRA, network => network
+    .WithAdditionalNetwork(portraitStyleLoRA, NetworkBuilder.Create()
         .WithStrength(0.8m)
-        .WithTriggerWord("professional_portrait"))
+        .WithTriggerWord("professional_portrait")
+        .Build())
     // Detail enhancement LoRA for sharpness
-    .WithAdditionalNetwork(detailEnhancerLoRA, network => network
-        .WithStrength(0.6m))
+    .WithAdditionalNetwork(detailEnhancerLoRA, NetworkBuilder.Create()
+        .WithStrength(0.6m)
+        .Build())
     .WithCallbackUrl("https://example.tld/webhook/portrait-complete")
     .ExecuteAsync();
 
@@ -253,7 +267,8 @@ if (controlNetWithLoRAJob is Result<JobStatusCollection>.Success controlSuccess)
     {
         foreach (var job in completed.Data.JobsList)
         {
-            if (job.Status == "succeeded" && job.Result?.BlobUrl is string imageUrl)
+            // Check if job is complete and has a result URL
+            if (!job.Scheduled && job.Result?.BlobUrl is string imageUrl)
             {
                 Console.WriteLine($"Generated portrait: {imageUrl}");
                 
@@ -286,8 +301,9 @@ var landscapeJob = sdkClient.Jobs
     .WithDimensions(1344, 768) // Landscape 16:9
     .WithSteps(30)
     .WithConfigurationScale(7.0m)
-    .WithAdditionalNetwork(styleLoRARealistic, network => network
-        .WithStrength(0.7m));
+    .WithAdditionalNetwork(styleLoRARealistic, NetworkBuilder.Create()
+        .WithStrength(0.7m)
+        .Build());
 
 // Job 2: Anime character portrait
 var animePortraitJob = sdkClient.Jobs
@@ -299,9 +315,10 @@ var animePortraitJob = sdkClient.Jobs
     .WithDimensions(768, 1024) // Portrait 3:4
     .WithSteps(35)
     .WithConfigurationScale(8.0m)
-    .WithAdditionalNetwork(styleLoRAAnime, network => network
+    .WithAdditionalNetwork(styleLoRAAnime, NetworkBuilder.Create()
         .WithStrength(0.9m)
-        .WithTriggerWord("anime_style"));
+        .WithTriggerWord("anime_style")
+        .Build());
 
 // Job 3: Abstract art
 var abstractJob = sdkClient.Jobs
@@ -331,7 +348,8 @@ if (batchResult is Result<JobStatusCollection>.Success batchSuccess)
     {
         foreach (var job in statusSuccess.Data.JobsList)
         {
-            Console.WriteLine($"Job {job.JobId}: {job.Status}");
+            var status = job.Scheduled ? "Processing" : "Complete";
+            Console.WriteLine($"Job {job.JobId}: {status}");
         }
     }
 }
@@ -350,7 +368,8 @@ var result = await sdkClient.Jobs.Query
 
 if (result is Result<JobStatus>.Success success)
 {
-    Console.WriteLine($"Status: {success.Data.Status}");
+    var status = success.Data.Scheduled ? "Processing" : "Complete";
+    Console.WriteLine($"Status: {status}");
     if (success.Data.Result?.BlobUrl is not null)
     {
         Console.WriteLine($"Image URL: {success.Data.Result.BlobUrl}");
@@ -370,7 +389,7 @@ if (result is Result<JobStatusCollection>.Success success)
 {
     foreach (var job in success.Data.JobsList)
     {
-        Console.WriteLine($"{job.JobId}: Cost {job.Cost}, Scheduled: {job.Scheduled}\");
+        Console.WriteLine($"{job.JobId}: Cost {job.Cost}, Scheduled: {job.Scheduled}");
     }
 }
 ```
@@ -529,16 +548,16 @@ Accessed through `sdkClient.Jobs.CreateImage()`:
 | Method | Description |
 |--------|-------------|
 | `WithAdditionalNetwork(AirIdentifier, ImageJobNetworkParams)` | Add LoRA or embedding with network configuration |
-| `WithAdditionalNetwork(AirIdentifier, ImageJobNetworkParamsBuilder)` | Add LoRA or embedding using a builder |
-| `WithAdditionalNetwork(AirIdentifier, Func<ImageJobNetworkParamsBuilder, ImageJobNetworkParamsBuilder>)` | Add LoRA or embedding using a configuration action |
+| `WithAdditionalNetwork(AirIdentifier, NetworkBuilder)` | Add LoRA or embedding using a builder |
+| `WithAdditionalNetwork(AirIdentifier, Func<NetworkBuilder, NetworkBuilder>)` | Add LoRA or embedding using a configuration action |
 
 #### ControlNet
 
 | Method | Description |
 |--------|-------------|
 | `WithControlNet(ImageJobControlNet)` | Add ControlNet configuration |
-| `WithControlNet(ImageJobControlNetBuilder)` | Add ControlNet using a builder |
-| `WithControlNet(Func<ImageJobControlNetBuilder, ImageJobControlNetBuilder>)` | Add ControlNet using a configuration action |
+| `WithControlNet(ControlNetBuilder)` | Add ControlNet using a builder |
+| `WithControlNet(Func<ControlNetBuilder, ControlNetBuilder>)` | Add ControlNet using a configuration action |
 
 #### Job Configuration
 
@@ -709,12 +728,13 @@ if (submitResult is Result<JobStatusCollection>.Success success)
         
         var statusResult = await sdkClient.Jobs.Query.GetByTokenAsync(token);
         
-        if (statusResult is Result<JobStatus>.Success statusSuccess)
+        if (statusResult is Result<JobStatusCollection>.Success statusSuccess)
         {
-            var status = statusSuccess.Data;
+            // Check the first job's status (or iterate through all jobs)
+            var status = statusSuccess.Data.JobsList.FirstOrDefault();
             
             // Check if job is complete (scheduled = false)
-            if (!status.Scheduled)
+            if (status is not null && !status.Scheduled)
             {
                 if (status.Result?.BlobUrl is string imageUrl)
                 {
@@ -759,11 +779,12 @@ if (submitResult is Result<JobStatusCollection>.Success success)
         .WithWait()
         .GetByTokenAsync(token);
     
-    if (completedResult is Result<JobStatus>.Success completedSuccess)
+    if (completedResult is Result<JobStatusCollection>.Success completedSuccess)
     {
-        var status = completedSuccess.Data;
+        // Check the first job's status (or iterate through all jobs)
+        var status = completedSuccess.Data.JobsList.FirstOrDefault();
         
-        if (status.Result?.BlobUrl is string imageUrl)
+        if (status?.Result?.BlobUrl is string imageUrl)
         {
             Console.WriteLine($"Job complete! Image URL: {imageUrl}");
         }

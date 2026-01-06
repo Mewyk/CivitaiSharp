@@ -9,7 +9,7 @@ using CivitaiSharp.Sdk.Json.Converters;
 /// Configuration for a ControlNet to apply during generation.
 /// </summary>
 /// <remarks>
-/// Either <see cref="ImageUrl"/> or <see cref="Image"/> must be provided, but not both.
+/// Either <see cref="ImageUrl"/> or <see cref="BlobKey"/> must be provided, but not both.
 /// </remarks>
 public sealed class ImageJobControlNet
 {
@@ -17,26 +17,22 @@ public sealed class ImageJobControlNet
     /// Gets or sets the URL of the control image.
     /// </summary>
     /// <remarks>
-    /// Provide either this property or <see cref="Image"/>, not both.
+    /// Provide either this property or <see cref="BlobKey"/>, not both.
     /// </remarks>
     [JsonPropertyName("imageUrl")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? ImageUrl { get; init; }
 
     /// <summary>
-    /// Gets or sets the base64-encoded control image data.
+    /// Gets or sets the blob key referencing an already-uploaded control image.
     /// </summary>
     /// <remarks>
-    /// <para>
     /// Provide either this property or <see cref="ImageUrl"/>, not both.
-    /// </para>
-    /// <para>
-    /// Format: <c>data:image/png;base64,iVBORw0KGgo...</c> or raw base64 string.
-    /// </para>
+    /// Use this when the image has been pre-uploaded to Civitai's blob storage.
     /// </remarks>
-    [JsonPropertyName("image")]
+    [JsonPropertyName("blobKey")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Image { get; init; }
+    public string? BlobKey { get; init; }
 
     /// <summary>
     /// Gets or sets the preprocessor to apply to the control image.
@@ -64,7 +60,7 @@ public sealed class ImageJobControlNet
     public decimal? EndStep { get; init; }
 
     /// <summary>
-    /// Validates that exactly one of <see cref="ImageUrl"/> or <see cref="Image"/> is provided.
+    /// Validates that exactly one of <see cref="ImageUrl"/> or <see cref="BlobKey"/> is provided.
     /// </summary>
     /// <exception cref="InvalidOperationException">
     /// Thrown when neither or both properties are provided.
@@ -72,18 +68,18 @@ public sealed class ImageJobControlNet
     public void Validate()
     {
         var hasUrl = !string.IsNullOrWhiteSpace(ImageUrl);
-        var hasImage = !string.IsNullOrWhiteSpace(Image);
+        var hasBlobKey = !string.IsNullOrWhiteSpace(BlobKey);
 
-        if (!hasUrl && !hasImage)
+        if (!hasUrl && !hasBlobKey)
         {
             throw new InvalidOperationException(
-                "Either ImageUrl or Image must be provided for ControlNet configuration.");
+                "Either ImageUrl or BlobKey must be provided for ControlNet configuration.");
         }
 
-        if (hasUrl && hasImage)
+        if (hasUrl && hasBlobKey)
         {
             throw new InvalidOperationException(
-                "Only one of ImageUrl or Image can be provided for ControlNet configuration, not both.");
+                "Only one of ImageUrl or BlobKey can be provided for ControlNet configuration, not both.");
         }
     }
 }

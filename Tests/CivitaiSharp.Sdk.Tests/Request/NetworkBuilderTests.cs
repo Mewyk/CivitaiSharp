@@ -4,12 +4,12 @@ using CivitaiSharp.Sdk.Enums;
 using CivitaiSharp.Sdk.Request;
 using Xunit;
 
-public sealed class ImageJobNetworkParamsBuilderTests
+public sealed class NetworkBuilderTests
 {
     [Fact]
     public void Create_ReturnsNewBuilderInstance()
     {
-        var builder = ImageJobNetworkParamsBuilder.Create();
+        var builder = NetworkBuilder.Create();
 
         Assert.NotNull(builder);
     }
@@ -17,7 +17,7 @@ public sealed class ImageJobNetworkParamsBuilderTests
     [Fact]
     public void WithType_SetsTypeValue()
     {
-        var builder = ImageJobNetworkParamsBuilder.Create()
+        var builder = NetworkBuilder.Create()
             .WithType(NetworkType.Lora);
 
         var result = builder.Build();
@@ -28,7 +28,7 @@ public sealed class ImageJobNetworkParamsBuilderTests
     [Fact]
     public void WithStrength_SetsStrengthValue()
     {
-        var builder = ImageJobNetworkParamsBuilder.Create()
+        var builder = NetworkBuilder.Create()
             .WithType(NetworkType.Lora)
             .WithStrength(0.8m);
 
@@ -40,7 +40,7 @@ public sealed class ImageJobNetworkParamsBuilderTests
     [Fact]
     public void WithTriggerWord_SetsTriggerWordValue()
     {
-        var builder = ImageJobNetworkParamsBuilder.Create()
+        var builder = NetworkBuilder.Create()
             .WithType(NetworkType.Lora)
             .WithTriggerWord("anime style");
 
@@ -52,7 +52,7 @@ public sealed class ImageJobNetworkParamsBuilderTests
     [Fact]
     public void WithClipStrength_SetsClipStrengthValue()
     {
-        var builder = ImageJobNetworkParamsBuilder.Create()
+        var builder = NetworkBuilder.Create()
             .WithType(NetworkType.Lora)
             .WithClipStrength(1.2m);
 
@@ -64,7 +64,7 @@ public sealed class ImageJobNetworkParamsBuilderTests
     [Fact]
     public void Build_WithoutType_ThrowsInvalidOperationException()
     {
-        var builder = ImageJobNetworkParamsBuilder.Create();
+        var builder = NetworkBuilder.Create();
 
         var exception = Assert.Throws<InvalidOperationException>(() => builder.Build());
         Assert.Contains("Type is required", exception.Message);
@@ -73,7 +73,7 @@ public sealed class ImageJobNetworkParamsBuilderTests
     [Fact]
     public void BuilderIsImmutable_ReturnsNewInstanceOnEachMethod()
     {
-        var builder1 = ImageJobNetworkParamsBuilder.Create();
+        var builder1 = NetworkBuilder.Create();
         var builder2 = builder1.WithType(NetworkType.Lora);
         var builder3 = builder2.WithStrength(0.5m);
 
@@ -84,7 +84,7 @@ public sealed class ImageJobNetworkParamsBuilderTests
     [Fact]
     public void CompleteFluentAPI_BuildsCorrectNetworkParams()
     {
-        var result = ImageJobNetworkParamsBuilder.Create()
+        var result = NetworkBuilder.Create()
             .WithType(NetworkType.Lora)
             .WithStrength(0.9m)
             .WithTriggerWord("cyberpunk")

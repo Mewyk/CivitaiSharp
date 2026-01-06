@@ -10,7 +10,7 @@ using CivitaiSharp.Sdk.Models.Jobs;
 /// This builder follows an immutable design pattern. Each method returns a new instance
 /// with the updated configuration, making it thread-safe and cacheable.
 /// </remarks>
-public sealed record ImageJobControlNetBuilder(
+public sealed record ControlNetBuilder(
     string? ImageUrl = null,
     string? BlobKey = null,
     ControlNetPreprocessor? Preprocessor = null,
@@ -20,10 +20,10 @@ public sealed record ImageJobControlNetBuilder(
 {
 
     /// <summary>
-    /// Creates a new <see cref="ImageJobControlNetBuilder"/> instance.
+    /// Creates a new <see cref="ControlNetBuilder"/> instance.
     /// </summary>
     /// <returns>A new builder instance.</returns>
-    public static ImageJobControlNetBuilder Create() => new();
+    public static ControlNetBuilder Create() => new();
 
     /// <summary>
     /// Sets the URL of the control image.
@@ -33,7 +33,7 @@ public sealed record ImageJobControlNetBuilder(
     /// <remarks>
     /// Provide either this or <see cref="WithBlobKey"/>, not both.
     /// </remarks>
-    public ImageJobControlNetBuilder WithImageUrl(string imageUrl)
+    public ControlNetBuilder WithImageUrl(string imageUrl)
         => this with { ImageUrl = imageUrl, BlobKey = null };
 
     /// <summary>
@@ -45,7 +45,7 @@ public sealed record ImageJobControlNetBuilder(
     /// Provide either this or <see cref="WithImageUrl"/>, not both.
     /// Use this when the control image has been pre-uploaded to Civitai's blob storage.
     /// </remarks>
-    public ImageJobControlNetBuilder WithBlobKey(string blobKey)
+    public ControlNetBuilder WithBlobKey(string blobKey)
         => this with { BlobKey = blobKey, ImageUrl = null };
 
     /// <summary>
@@ -53,7 +53,7 @@ public sealed record ImageJobControlNetBuilder(
     /// </summary>
     /// <param name="preprocessor">The preprocessor type.</param>
     /// <returns>A new builder instance with the updated preprocessor.</returns>
-    public ImageJobControlNetBuilder WithPreprocessor(ControlNetPreprocessor preprocessor)
+    public ControlNetBuilder WithPreprocessor(ControlNetPreprocessor preprocessor)
         => this with { Preprocessor = preprocessor };
 
     /// <summary>
@@ -61,7 +61,7 @@ public sealed record ImageJobControlNetBuilder(
     /// </summary>
     /// <param name="weight">The weight value. Range: 0.0-2.0, default: 1.0.</param>
     /// <returns>A new builder instance with the updated weight.</returns>
-    public ImageJobControlNetBuilder WithWeight(decimal weight)
+    public ControlNetBuilder WithWeight(decimal weight)
         => this with { Weight = weight };
 
     /// <summary>
@@ -69,7 +69,7 @@ public sealed record ImageJobControlNetBuilder(
     /// </summary>
     /// <param name="startStep">The start step. Range: 0.0-1.0.</param>
     /// <returns>A new builder instance with the updated start step.</returns>
-    public ImageJobControlNetBuilder WithStartStep(decimal startStep)
+    public ControlNetBuilder WithStartStep(decimal startStep)
         => this with { StartStep = startStep };
 
     /// <summary>
@@ -77,7 +77,7 @@ public sealed record ImageJobControlNetBuilder(
     /// </summary>
     /// <param name="endStep">The end step. Range: 0.0-1.0.</param>
     /// <returns>A new builder instance with the updated end step.</returns>
-    public ImageJobControlNetBuilder WithEndStep(decimal endStep)
+    public ControlNetBuilder WithEndStep(decimal endStep)
         => this with { EndStep = endStep };
 
     /// <summary>
@@ -86,7 +86,7 @@ public sealed record ImageJobControlNetBuilder(
     /// <param name="startStep">The start step. Range: 0.0-1.0.</param>
     /// <param name="endStep">The end step. Range: 0.0-1.0.</param>
     /// <returns>A new builder instance with the updated step range.</returns>
-    public ImageJobControlNetBuilder WithStepRange(decimal startStep, decimal endStep)
+    public ControlNetBuilder WithStepRange(decimal startStep, decimal endStep)
         => this with { StartStep = startStep, EndStep = endStep };
 
     /// <summary>

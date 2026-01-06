@@ -254,7 +254,7 @@ public sealed record ImageGenerationBuilder
     /// <param name="network">The AIR identifier for the network.</param>
     /// <param name="networkBuilder">The configured network parameters builder.</param>
     /// <returns>A new builder instance with the added network.</returns>
-    public ImageGenerationBuilder WithAdditionalNetwork(AirIdentifier network, ImageJobNetworkParamsBuilder networkBuilder)
+    public ImageGenerationBuilder WithAdditionalNetwork(AirIdentifier network, NetworkBuilder networkBuilder)
     {
         ArgumentNullException.ThrowIfNull(networkBuilder);
         return WithAdditionalNetwork(network, networkBuilder.Build());
@@ -266,10 +266,10 @@ public sealed record ImageGenerationBuilder
     /// <param name="network">The AIR identifier for the network.</param>
     /// <param name="configure">Action to configure the network parameters builder.</param>
     /// <returns>A new builder instance with the added network.</returns>
-    public ImageGenerationBuilder WithAdditionalNetwork(AirIdentifier network, Func<ImageJobNetworkParamsBuilder, ImageJobNetworkParamsBuilder> configure)
+    public ImageGenerationBuilder WithAdditionalNetwork(AirIdentifier network, Func<NetworkBuilder, NetworkBuilder> configure)
     {
         ArgumentNullException.ThrowIfNull(configure);
-        var builder = configure(ImageJobNetworkParamsBuilder.Create());
+        var builder = configure(NetworkBuilder.Create());
         return WithAdditionalNetwork(network, builder.Build());
     }
 
@@ -290,7 +290,7 @@ public sealed record ImageGenerationBuilder
     /// </summary>
     /// <param name="controlNetBuilder">The configured ControlNet builder.</param>
     /// <returns>A new builder instance with the added ControlNet.</returns>
-    public ImageGenerationBuilder WithControlNet(ImageJobControlNetBuilder controlNetBuilder)
+    public ImageGenerationBuilder WithControlNet(ControlNetBuilder controlNetBuilder)
     {
         ArgumentNullException.ThrowIfNull(controlNetBuilder);
         return WithControlNet(controlNetBuilder.Build());
@@ -301,10 +301,10 @@ public sealed record ImageGenerationBuilder
     /// </summary>
     /// <param name="configure">Action to configure the ControlNet builder.</param>
     /// <returns>A new builder instance with the added ControlNet.</returns>
-    public ImageGenerationBuilder WithControlNet(Func<ImageJobControlNetBuilder, ImageJobControlNetBuilder> configure)
+    public ImageGenerationBuilder WithControlNet(Func<ControlNetBuilder, ControlNetBuilder> configure)
     {
         ArgumentNullException.ThrowIfNull(configure);
-        var builder = configure(ImageJobControlNetBuilder.Create());
+        var builder = configure(ControlNetBuilder.Create());
         return WithControlNet(builder.Build());
     }
 

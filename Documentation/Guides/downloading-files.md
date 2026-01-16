@@ -62,7 +62,7 @@ Path patterns for images support these tokens:
 | `{Height}` | Image height in pixels | `1024` |
 | `{BaseModel}` | Base model used | `SDXL 1.0` |
 | `{NsfwLevel}` | Content level | `None`, `Soft`, `Mature` |
-| `{Date}` | Creation date | `2024-01-15` |
+| `{Date}` | Creation date | `2026-01-15` |
 | `{Extension}` | File extension | `png`, `jpg`, `webp` |
 
 ### Pattern Examples
@@ -92,7 +92,7 @@ Result: `ArtistName/12345678.png`
   }
 }
 ```
-Result: `SDXL 1.0/ArtistName/2024-01-15_12345678.png`
+Result: `SDXL 1.0/ArtistName/2026-01-15_12345678.png`
 
 ## Downloading Model Files
 

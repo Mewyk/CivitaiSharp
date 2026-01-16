@@ -100,13 +100,67 @@ The main result type containing availability information:
 
 ### AvailabilityStatus
 
-Enum values for availability status:
+Enum values for model availability status:
 
-| Value | Description |
-|-------|-------------|
-| `Available` | Model is available and ready for generation |
-| `Unavailable` | Model is not currently available |
-| `Degraded` | Model is available but with limited capacity (may experience delays) |
+| Value | Description | Meaning |
+|-------|-------------|---------|
+| `Available` | Model is available and ready for generation | Workers are loaded and ready |
+| `Unavailable` | Model is not currently available | No workers have this model loaded |
+| `Degraded` | Model is available but with limited capacity | Some workers available, may experience delays |
+
+### Provider
+
+Complete list of infrastructure providers:
+
+| Value | Description | Use Case |
+|-------|-------------|----------|
+| `Civitai` | Civitai's first-party infrastructure | Primary recommended provider |
+| `OctoML` | OctoML cloud provider | High-performance GPU infrastructure |
+| `SaladML` | SaladML distributed computing | Cost-effective distributed processing |
+| `PicFinder` | PicFinder specialized provider | Specialized image generation infrastructure |
+| `RunPods` | RunPods cloud GPU provider | Flexible GPU cloud computing |
+| `ValdiAI` | ValdiAI infrastructure | AI-optimized infrastructure |
+| `OctoMLNext` | Next-generation OctoML | Enhanced OctoML infrastructure |
+| `RunDiffusion` | RunDiffusion specialized provider | Diffusion model specialized infrastructure |
+| `SaladShared` | SaladCloud shared resources | Shared distributed computing resources |
+
+### JobSupport
+
+Provider capability levels:
+
+| Value | Description | Action Recommended |
+|-------|-------------|-------------------|
+| `Unsupported` | Provider does not support this model type | Try different provider or model |
+| `Unavailable` | Provider supports but temporarily unavailable | Wait and retry, or use different provider |
+| `Available` | Provider supports and ready to process | Safe to submit jobs |
+
+```csharp
+// Complete example showing availability status checking
+var coverage = await sdkClient.Coverage.GetAsync(model);
+
+if (coverage is Result<ProviderAssetAvailability>.Success result)
+{
+    // Check overall availability
+    switch (result.Data.Availability)
+    {
+        case AvailabilityStatus.Available:
+            Console.WriteLine("Model is ready for generation");
+            Console.WriteLine($"Workers available: {result.Data.Workers}");
+            break;
+            
+        case AvailabilityStatus.Degraded:
+            Console.WriteLine("Model available but with limited capacity");
+            Console.WriteLine($"Workers available: {result.Data.Workers}");
+            Console.WriteLine("Expect longer queue times");
+            break;
+            
+        case AvailabilityStatus.Unavailable:
+            Console.WriteLine("Model is not available");
+            Console.WriteLine("No workers currently have this model loaded");
+            break;
+    }
+}
+```
 
 ## Common Use Cases
 
@@ -660,15 +714,12 @@ public async Task<Result<JobStatusCollection>> GenerateWithValidationAsync(
     
     if (coverageResult is not Result<ProviderAssetAvailability>.Success coverageSuccess)
     {
-        return Result<JobStatusCollection>.FromError(
-            "Failed to check model availability",
-            coverageResult.Error);
-    }
-    
-    if (coverageSuccess.Data.Availability != AvailabilityStatus.Available)
-    {
-        return Result<JobStatusCollection>.FromApiError(
-            "Model not available on generation infrastructure");
+        return new Result<JobStatusCollection>.Failure(
+            new Error(
+                ErrorCode.ResourceUnavailable,
+                "All checkpoint models are currently unavailable"
+            )
+        );
     }
     
     // Model is available, proceed with job submission
@@ -769,14 +820,9 @@ switch (result)
         }
         break;
         
-    case Result<ProviderAssetAvailability>.ApiError apiError:
-        Console.WriteLine($"API Error: {apiError.Message}");
+    case Result<ProviderAssetAvailability>.Failure failure:
+        Console.WriteLine($"Error: {failure.Error.Message}");
         // Proceed anyway - coverage check is optional
-        break;
-        
-    case Result<ProviderAssetAvailability>.NetworkError networkError:
-        Console.WriteLine($"Network Error: {networkError.Exception.Message}");
-        // Retry or proceed with caution
         break;
 }
 ```
@@ -846,7 +892,9 @@ public async Task<Result<JobStatusCollection>> GenerateAsync(
         if (coverageResult is Result<ProviderAssetAvailability>.Success success &&
             success.Data.Availability != AvailabilityStatus.Available)
         {
-            return Result<JobStatusCollection>.FromApiError("Model not available");
+            return new Result<JobStatusCollection>.Failure(
+                Error.Create(ErrorCode.ResourceUnavailable, "Model not available")
+            );
         }
     }
     

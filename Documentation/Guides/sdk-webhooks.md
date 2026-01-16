@@ -59,7 +59,7 @@ When a job completes, Civitai sends an HTTP POST request with the job status in 
     "blobKey": "abc123xyz",
     "available": true,
     "blobUrl": "https://orchestration.civitai.com/api/download/jobs/abc123xyz",
-    "blobUrlExpirationDate": "2026-01-02T12:00:00Z"
+    "blobUrlExpirationDate": "2026-02-15T12:00:00Z"
   },
   "properties": {
     "userId": "12345",
@@ -583,8 +583,8 @@ app.MapPost("/api/jobs/submit", async (
     {
         Result<JobStatusCollection>.Success success => 
             Results.Ok(new { token = success.Data.Token }),
-        Result<JobStatusCollection>.ApiError error => 
-            Results.BadRequest(new { error = error.Message }),
+        Result<JobStatusCollection>.Failure failure => 
+            Results.BadRequest(new { error = failure.Error.Message }),
         _ => Results.StatusCode(500)
     };
 });

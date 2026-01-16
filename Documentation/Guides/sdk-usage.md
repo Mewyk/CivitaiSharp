@@ -24,29 +24,25 @@ var result = await sdkClient.Usage.GetConsumptionAsync();
 
 if (result is Result<ConsumptionDetails>.Success success)
 {
+    Console.WriteLine($"Images Generated: {success.Data.Images}");
     Console.WriteLine($"Total Cost: {success.Data.TotalCost:F2} Buzz");
-    Console.WriteLine($"Total Credits: {success.Data.TotalCredits:F2}");
-    Console.WriteLine($"Remaining Credits: {success.Data.RemainingCredits:F2}");
-    Console.WriteLine($"Job Count: {success.Data.JobCount}");
-    Console.WriteLine($"Average Cost Per Job: {success.Data.AverageCostPerJob:F2}");
-    Console.WriteLine($"Period: {success.Data.PeriodStart} to {success.Data.PeriodEnd}");
+    Console.WriteLine($"Period: {success.Data.StartDate} to {success.Data.EndDate}");
 }
 ```
 
 ### Get Consumption for Specific Period
 
 ```csharp
-var startDate = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-var endDate = new DateTime(2025, 1, 31, 23, 59, 59, DateTimeKind.Utc);
+var startDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+var endDate = new DateTime(2026, 1, 31, 23, 59, 59, DateTimeKind.Utc);
 
 var result = await sdkClient.Usage.GetConsumptionAsync(startDate, endDate);
 
 if (result is Result<ConsumptionDetails>.Success success)
 {
-    Console.WriteLine($"January 2025 Usage:");
-    Console.WriteLine($"  Jobs: {success.Data.JobCount}");
+    Console.WriteLine($"January 2026 Usage:");
+    Console.WriteLine($"  Images: {success.Data.Images}");
     Console.WriteLine($"  Total Cost: {success.Data.TotalCost:F2} Buzz");
-    Console.WriteLine($"  Remaining Credits: {success.Data.RemainingCredits:F2}");
 }
 ```
 
@@ -58,13 +54,10 @@ The main result type containing consumption statistics:
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `TotalCost` | `decimal` | Total Buzz spent in the period |
-| `TotalCredits` | `decimal` | Total credits allocated to the account |
-| `RemainingCredits` | `decimal` | Remaining credits available |
-| `PeriodStart` | `DateTime?` | Start of the reporting period (UTC) |
-| `PeriodEnd` | `DateTime?` | End of the reporting period (UTC) |
-| `JobCount` | `int` | Number of jobs submitted in the period |
-| `AverageCostPerJob` | `decimal` | Average cost per job in the period |
+| `Images` | `int?` | Total number of images generated in the period |
+| `TotalCost` | `decimal?` | Total Buzz spent in the period |
+| `StartDate` | `DateTime?` | Start of the reporting period (UTC) |
+| `EndDate` | `DateTime?` | End of the reporting period (UTC) |
 
 ## Common Use Cases
 
@@ -75,27 +68,28 @@ The main result type containing consumption statistics:
 **When to use**: Before starting new work to verify sufficient credits.
 
 ```csharp
-public async Task<(bool HasCredits, decimal Remaining)> CheckCreditsAsync()
+public async Task<ConsumptionDetails?> GetConsumptionStatusAsync()
 {
     var result = await sdkClient.Usage.GetConsumptionAsync(cancellationToken: default);
     
     if (result is Result<ConsumptionDetails>.Success success)
     {
-        return (success.Data.RemainingCredits > 0, success.Data.RemainingCredits);
+        return success.Data;
     }
     
-    return (false, 0);
+    return null;
 }
 
 // Usage
-var (hasCredits, remaining) = await CheckCreditsAsync();
-if (!hasCredits)
+var consumption = await GetConsumptionStatusAsync();
+if (consumption is null)
 {
-    Console.WriteLine("No credits remaining!");
+    Console.WriteLine("Could not retrieve consumption data");
     return;
 }
 
-Console.WriteLine($"Available credits: {remaining:N0} Buzz");
+Console.WriteLine($"Total spent: {consumption.TotalCost:N2} Buzz");
+Console.WriteLine($"Images generated: {consumption.Images}");
 
 // Proceed with job submission
 var jobResult = await sdkClient.Jobs
@@ -106,40 +100,31 @@ var jobResult = await sdkClient.Jobs
     .ExecuteAsync();
 ```
 
-### Use Case 2: Budget Monitoring Service
+### Use Case 2: Budget Tracking
 
-**Scenario**: Real-time budget monitoring with warnings and limits.
+**Scenario**: Track spending over time against a monthly budget.
 
-**When to use**: Production applications requiring cost control.
+**When to use**: Production applications requiring cost monitoring.
 
 ```csharp
-public sealed class BudgetMonitor(ISdkClient sdkClient)
+public sealed class BudgetTracker(ISdkClient sdkClient)
 {
     public sealed record BudgetStatus(
         decimal TotalBudget,
-        decimal Consumed,
-        decimal Remaining,
-        decimal PercentageUsed,
-        int JobsSubmitted,
-        decimal AverageCostPerJob,
-        BudgetLevel Level);
-    
-    public enum BudgetLevel
-    {
-        Healthy,      // < 70% used
-        Warning,      // 70-90% used
-        Critical,     // 90-100% used
-        Exceeded      // > 100% used
-    }
+        decimal? Consumed,
+        decimal? Remaining,
+        decimal? PercentageUsed,
+        int? ImagesGenerated);
     
     public async Task<Result<BudgetStatus>> GetBudgetStatusAsync(
         decimal monthlyBudget,
+        DateTime startDate,
+        DateTime endDate,
         CancellationToken cancellationToken = default)
     {
-        // Get consumption for current billing period
         var result = await sdkClient.Usage.GetConsumptionAsync(
-            startDate: null, // Defaults to current period
-            endDate: null,
+            startDate: startDate,
+            endDate: endDate,
             cancellationToken: cancellationToken);
         
         if (result is not Result<ConsumptionDetails>.Success success)
@@ -147,98 +132,41 @@ public sealed class BudgetMonitor(ISdkClient sdkClient)
             return new Result<BudgetStatus>.Failure(result.ErrorOrDefault!);
         }
         
-        var consumed = success.Data.TotalCost;
+        var consumed = success.Data.TotalCost ?? 0;
         var remaining = monthlyBudget - consumed;
         var percentageUsed = monthlyBudget > 0 ? (consumed / monthlyBudget) * 100 : 0;
-        
-        var level = percentageUsed switch
-        {
-            < 70 => BudgetLevel.Healthy,
-            < 90 => BudgetLevel.Warning,
-            <= 100 => BudgetLevel.Critical,
-            _ => BudgetLevel.Exceeded
-        };
         
         var status = new BudgetStatus(
             TotalBudget: monthlyBudget,
             Consumed: consumed,
             Remaining: remaining,
             PercentageUsed: percentageUsed,
-            JobsSubmitted: success.Data.JobCount,
-            AverageCostPerJob: success.Data.AverageCostPerJob,
-            Level: level);
+            ImagesGenerated: success.Data.Images);
         
         return new Result<BudgetStatus>.Success(status);
     }
-    
-    public async Task<bool> CanAffordJobAsync(
-        decimal estimatedJobCost,
-        decimal monthlyBudget,
-        decimal safetyThreshold = 0.95m, // Reserve 5% buffer
-        CancellationToken cancellationToken = default)
-    {
-        var statusResult = await GetBudgetStatusAsync(monthlyBudget, cancellationToken);
-        
-        if (statusResult is not Result<BudgetStatus>.Success success)
-            return false;
-        
-        var maxAllowed = monthlyBudget * safetyThreshold;
-        var afterJob = success.Data.Consumed + estimatedJobCost;
-        
-        return afterJob <= maxAllowed;
-    }
 }
 
-// Full Example
-var budgetMonitor = new BudgetMonitor(sdkClient);
-var monthlyBudget = 10000m; // 10,000 Buzz monthly budget
+// Example Usage
+var tracker = new BudgetTracker(sdkClient);
+var monthlyBudget = 10000m;
+var startOfMonth = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+var now = DateTime.UtcNow;
 
-// Check budget status
-var budgetStatusResult = await budgetMonitor.GetBudgetStatusAsync(monthlyBudget, cancellationToken);
+var budgetResult = await tracker.GetBudgetStatusAsync(
+    monthlyBudget,
+    startOfMonth,
+    now,
+    cancellationToken);
 
-if (budgetStatusResult is Result<BudgetMonitor.BudgetStatus>.Success budgetStatusSuccess)
+if (budgetResult is Result<BudgetTracker.BudgetStatus>.Success success)
 {
-    var budgetStatus = budgetStatusSuccess.Data;
-    
-    Console.WriteLine($"Budget Status: {budgetStatus.Level}");
-    Console.WriteLine($"Consumed: {budgetStatus.Consumed:N2} Buzz ({budgetStatus.PercentageUsed:N1}%)");
-    Console.WriteLine($"Remaining: {budgetStatus.Remaining:N2} Buzz");
-    Console.WriteLine($"Jobs Submitted: {budgetStatus.JobsSubmitted}");
-    Console.WriteLine($"Average Cost: {budgetStatus.AverageCostPerJob:N2} Buzz/job");
-    
-    // Alert based on level
-    switch (budgetStatus.Level)
-    {
-        case BudgetMonitor.BudgetLevel.Warning:
-            Console.WriteLine("WARNING: 70% of monthly budget consumed");
-            break;
-        case BudgetMonitor.BudgetLevel.Critical:
-            Console.WriteLine("CRITICAL: 90% of monthly budget consumed");
-            break;
-        case BudgetMonitor.BudgetLevel.Exceeded:
-            Console.WriteLine("ERROR: Budget exceeded! No further jobs allowed");
-            return;
-    }
+    var status = success.Data;
+    Console.WriteLine($"Budget: {status.TotalBudget:N2} Buzz");
+    Console.WriteLine($"Consumed: {status.Consumed:N2} Buzz ({status.PercentageUsed:N1}%)");
+    Console.WriteLine($"Remaining: {status.Remaining:N2} Buzz");
+    Console.WriteLine($"Images Generated: {status.ImagesGenerated}");
 }
-
-// Check if we can afford next job (estimated 50 Buzz)
-var estimatedJobCost = 50m;
-var canAffordJob = await budgetMonitor.CanAffordJobAsync(estimatedJobCost, monthlyBudget, cancellationToken: cancellationToken);
-
-if (!canAffordJob)
-{
-    Console.WriteLine($"Cannot afford job (estimated {estimatedJobCost} Buzz) - would exceed safety threshold");
-    return;
-}
-
-// Submit job
-var budgetedJobResult = await sdkClient.Jobs
-    .CreateImage()
-    .WithAir(checkpoint)
-    .WithPositivePrompt("complex detailed scene")
-    .WithDimensions(1024, 1024)
-    .WithSteps(30)
-    .ExecuteAsync(cancellationToken);
 ```
 
 ### Use Case 3: Cost Analysis and Reporting
@@ -254,12 +182,11 @@ public sealed class ConsumptionAnalyzer(ISdkClient sdkClient)
         DateTime PeriodStart,
         DateTime PeriodEnd,
         int DaysInPeriod,
-        decimal TotalCost,
-        int TotalJobs,
-        decimal AverageCostPerJob,
-        decimal AverageCostPerDay,
-        decimal ProjectedMonthlyCost,
-        decimal RemainingCredits);
+        decimal? TotalCost,
+        int? TotalImages,
+        decimal? AverageCostPerImage,
+        decimal? AverageCostPerDay,
+        decimal? ProjectedMonthlyCost);
     
     public async Task<Result<ConsumptionReport>> GenerateReportAsync(
         DateTime startDate,
@@ -278,19 +205,22 @@ public sealed class ConsumptionAnalyzer(ISdkClient sdkClient)
         
         var data = success.Data;
         var daysInPeriod = (endDate - startDate).Days;
-        var avgCostPerDay = daysInPeriod > 0 ? data.TotalCost / daysInPeriod : 0;
+        var totalCost = data.TotalCost ?? 0;
+        var totalImages = data.Images ?? 0;
+        
+        var avgCostPerDay = daysInPeriod > 0 ? totalCost / daysInPeriod : 0;
+        var avgCostPerImage = totalImages > 0 ? totalCost / totalImages : 0;
         var projectedMonthlyCost = avgCostPerDay * 30;
         
         var report = new ConsumptionReport(
             PeriodStart: startDate,
             PeriodEnd: endDate,
             DaysInPeriod: daysInPeriod,
-            TotalCost: data.TotalCost,
-            TotalJobs: data.JobCount,
-            AverageCostPerJob: data.AverageCostPerJob,
+            TotalCost: totalCost,
+            TotalImages: totalImages,
+            AverageCostPerImage: avgCostPerImage,
             AverageCostPerDay: avgCostPerDay,
-            ProjectedMonthlyCost: projectedMonthlyCost,
-            RemainingCredits: data.RemainingCredits);
+            ProjectedMonthlyCost: projectedMonthlyCost);
         
         return new Result<ConsumptionReport>.Success(report);
     }
@@ -338,12 +268,11 @@ if (monthlyReportResult is Result<ConsumptionAnalyzer.ConsumptionReport>.Success
     Console.WriteLine($"Days: {monthlyReport.DaysInPeriod}");
     Console.WriteLine();
     Console.WriteLine($"Total Cost: {monthlyReport.TotalCost:N2} Buzz");
-    Console.WriteLine($"Total Jobs: {monthlyReport.TotalJobs:N0}");
-    Console.WriteLine($"Average Cost/Job: {monthlyReport.AverageCostPerJob:N2} Buzz");
+    Console.WriteLine($"Total Images: {monthlyReport.TotalImages:N0}");
+    Console.WriteLine($"Average Cost/Image: {monthlyReport.AverageCostPerImage:N2} Buzz");
     Console.WriteLine($"Average Cost/Day: {monthlyReport.AverageCostPerDay:N2} Buzz");
     Console.WriteLine();
     Console.WriteLine($"Projected Monthly: {monthlyReport.ProjectedMonthlyCost:N2} Buzz");
-    Console.WriteLine($"Remaining Credits: {monthlyReport.RemainingCredits:N2} Buzz");
 }
 
 // Generate 6-month trend
@@ -352,16 +281,16 @@ var trendAnalysisResult = await analyzer.GenerateMonthlyTrendAsync(6, cancellati
 if (trendAnalysisResult is Result<List<ConsumptionAnalyzer.ConsumptionReport>>.Success trendSuccess)
 {
     Console.WriteLine("\n=== 6-Month Trend ===");
-    Console.WriteLine($"{"Month",-12} {"Jobs",8} {"Cost",12} {"Avg/Job",12}");
+    Console.WriteLine($"{"Month",-12} {"Images",8} {"Cost",12} {"Avg/Image",12}");
     Console.WriteLine(new string('-', 46));
     
     foreach (var trendReport in trendSuccess.Data)
     {
         Console.WriteLine(
             $"{trendReport.PeriodStart:yyyy-MM,-12} " +
-            $"{trendReport.TotalJobs,8:N0} " +
+            $"{trendReport.TotalImages,8:N0} " +
             $"{trendReport.TotalCost,12:N2} " +
-            $"{trendReport.AverageCostPerJob,12:N2}");
+            $"{trendReport.AverageCostPerImage,12:N2}");
     }
 }
 ```
@@ -541,13 +470,6 @@ public sealed class ProjectCostTracker
             return false;
         }
         
-        // Check account has sufficient credits
-        if (success.Data.RemainingCredits < estimatedCost)
-        {
-            Console.WriteLine($"Insufficient account credits: {success.Data.RemainingCredits:N2} < {estimatedCost:N2}");
-            return false;
-        }
-        
         return true;
     }
     
@@ -680,7 +602,7 @@ public async Task ShowMonthlyTrendsAsync()
         if (result is Result<ConsumptionDetails>.Success success)
         {
             Console.WriteLine($"{month:yyyy-MM}:");
-            Console.WriteLine($"  Jobs: {success.Data.JobCount,6}");
+            Console.WriteLine($"  Images: {success.Data.Images,6}");
             Console.WriteLine($"  Total Cost: {success.Data.TotalCost,8:F2} Buzz");
         }
     }
@@ -690,14 +612,17 @@ public async Task ShowMonthlyTrendsAsync()
 ### Calculate Average Cost Per Job
 
 ```csharp
-public async Task<decimal?> GetAverageCostPerJobAsync(DateTime start, DateTime end)
+public async Task<decimal?> GetAverageCostPerImageAsync(DateTime start, DateTime end)
 {
     var result = await sdkClient.Usage.GetConsumptionAsync(start, end);
     
     if (result is Result<ConsumptionDetails>.Success success)
     {
-        Console.WriteLine($"Average cost per job: {success.Data.AverageCostPerJob:F3} Buzz");
-        return success.Data.AverageCostPerJob;
+        var images = success.Data.Images ?? 0;
+        var totalCost = success.Data.TotalCost ?? 0;
+        var avgCost = images > 0 ? totalCost / images : 0;
+        Console.WriteLine($"Average cost per image: {avgCost:F3} Buzz");
+        return avgCost;
     }
     
     return null;
@@ -756,13 +681,9 @@ public async Task ShowUsageSummaryAsync(DateTime start, DateTime end)
     }
     
     var data = success.Data;
-    Console.WriteLine($"Usage Summary ({data.PeriodStart:yyyy-MM-dd} to {data.PeriodEnd:yyyy-MM-dd}):");
-    Console.WriteLine($"  Total Jobs: {data.JobCount}");
+    Console.WriteLine($"Usage Summary ({data.StartDate:yyyy-MM-dd} to {data.EndDate:yyyy-MM-dd}):");
+    Console.WriteLine($"  Total Images: {data.Images}");
     Console.WriteLine($"  Total Cost: {data.TotalCost:F2} Buzz");
-    Console.WriteLine($"  Average Cost per Job: {data.AverageCostPerJob:F2} Buzz");
-    Console.WriteLine($"  Total Credits Allocated: {data.TotalCredits:F2}");
-    Console.WriteLine($"  Remaining Credits: {data.RemainingCredits:F2}");
-    Console.WriteLine($"  Credit Usage: {((data.TotalCredits - data.RemainingCredits) / data.TotalCredits * 100):F1}%");
 }
 ```
 
@@ -796,11 +717,12 @@ public async Task<bool> CanSubmitJobAsync(decimal creditCost)
     // Example: limit to 1000 Buzz per day
     const decimal dailyLimit = 1000m;
     var todayStart = DateTime.UtcNow.Date;
+    var currentTotalCost = _cachedUsage.TotalCost ?? 0;
     
     // Note: This is simplified - in production, track daily usage separately
-    if (_cachedUsage.TotalCost + creditCost > dailyLimit)
+    if (currentTotalCost + creditCost > dailyLimit)
     {
-        Console.WriteLine($"Daily limit would be exceeded: {_cachedUsage.TotalCost + creditCost:F2} / {dailyLimit:F2}");
+        Console.WriteLine($"Daily limit would be exceeded: {currentTotalCost + creditCost:F2} / {dailyLimit:F2}");
         return false;
     }
     
@@ -818,17 +740,12 @@ var result = await sdkClient.Usage.GetConsumptionAsync();
 switch (result)
 {
     case Result<ConsumptionDetails>.Success success:
-        Console.WriteLine($"Current usage: {success.Data.TotalCost:F2} Buzz ({success.Data.JobCount} jobs)");
+        Console.WriteLine($"Current usage: {success.Data.TotalCost:F2} Buzz ({success.Data.Images} images)");
         break;
         
-    case Result<ConsumptionDetails>.ApiError apiError:
-        Console.WriteLine($"API Error: {apiError.Message}");
+    case Result<ConsumptionDetails>.Failure failure:
+        Console.WriteLine($"Error: {failure.Error.Message}");
         // Usage tracking is non-critical, continue operation
-        break;
-        
-    case Result<ConsumptionDetails>.NetworkError networkError:
-        Console.WriteLine($"Network Error: {networkError.Exception.Message}");
-        // Consider caching previous values or using defaults
         break;
 }
 ```
@@ -879,12 +796,12 @@ Always use UTC dates to avoid timezone confusion:
 
 ```csharp
 // Good - explicit UTC
-var start = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-var end = new DateTime(2025, 1, 31, 23, 59, 59, DateTimeKind.Utc);
+var start = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+var end = new DateTime(2026, 1, 31, 23, 59, 59, DateTimeKind.Utc);
 await sdkClient.Usage.GetConsumptionAsync(start, end);
 
 // Bad - local time can cause issues
-var start = new DateTime(2025, 1, 1);
+var start = new DateTime(2026, 1, 1);
 await sdkClient.Usage.GetConsumptionAsync(start, start.AddMonths(1));
 ```
 

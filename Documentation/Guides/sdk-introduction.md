@@ -58,6 +58,25 @@ public class ImageGenerationService(ISdkClient sdkClient)
         if (result is Result<JobStatusCollection>.Success success)
         {
             Console.WriteLine($"Job submitted: {success.Data.Token}");
+            
+            // Wait for completion (blocks up to ~10 minutes)
+            var completedResult = await sdkClient.Jobs.Query
+                .WithWait()
+                .GetByTokenAsync(success.Data.Token);
+            
+            if (completedResult is Result<JobStatusCollection>.Success completedSuccess)
+            {
+                var job = completedSuccess.Data.JobsList.FirstOrDefault();
+                
+                if (job?.LastEvent?.Type == JobEventType.Succeeded)
+                {
+                    Console.WriteLine($"Image ready: {job.Result?.BlobUrl}");
+                }
+                else if (job?.LastEvent?.Type == JobEventType.Failed)
+                {
+                    Console.WriteLine("Job failed");
+                }
+            }
         }
     }
 }

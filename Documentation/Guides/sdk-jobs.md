@@ -359,7 +359,7 @@ if (batchResult is Result<JobStatusCollection>.Success batchSuccess)
 
 ### Query by Job ID
 
-Retrieve a specific job's status:
+Retrieve a specific job's status with complete event type handling:
 
 ```csharp
 var result = await sdkClient.Jobs.Query
@@ -368,11 +368,77 @@ var result = await sdkClient.Jobs.Query
 
 if (result is Result<JobStatus>.Success success)
 {
-    var status = success.Data.Scheduled ? "Processing" : "Complete";
-    Console.WriteLine($"Status: {status}");
-    if (success.Data.Result?.BlobUrl is not null)
+    var job = success.Data;
+    
+    Console.WriteLine($"Job ID: {job.JobId}");
+    Console.WriteLine($"Scheduled: {job.Scheduled}");
+    Console.WriteLine($"Position: {job.Position}");
+    
+    if (job.LastEvent is JobEvent lastEvent)
     {
-        Console.WriteLine($"Image URL: {success.Data.Result.BlobUrl}");
+        Console.WriteLine($"Last Event: {lastEvent.Type} on {lastEvent.Provider}");
+    }
+    
+    if (!job.Scheduled)
+    {
+        // Job complete
+        switch (job.LastEvent?.Type)
+        {
+            case JobEventType.Succeeded when job.Result?.BlobUrl is string imageUrl:
+                Console.WriteLine($"Job completed successfully!");
+                Console.WriteLine($"Image URL: {imageUrl}");
+                break;
+                
+            case JobEventType.Failed:
+                Console.WriteLine("Job failed");
+                break;
+                
+            case JobEventType.Expired:
+                Console.WriteLine("Job expired (timeout)");
+                break;
+                
+            case JobEventType.Deleted:
+                Console.WriteLine("Job was cancelled");
+                break;
+                
+            default:
+                if (job.Result?.BlobUrl is string url)
+                {
+                    Console.WriteLine($"Job complete: {url}");
+                }
+                break;
+        }
+    }
+    else if (job.LastEvent is JobEvent processingEvent)
+    {
+        // Job still processing
+        switch (processingEvent.Type)
+        {
+            case JobEventType.Initialized:
+                Console.WriteLine($"Job queued on {processingEvent.Provider}");
+                break;
+                
+            case JobEventType.Claimed:
+                Console.WriteLine($"Worker {processingEvent.WorkerId} on {processingEvent.Provider} is processing");
+                break;
+                
+            case JobEventType.Updated:
+                Console.WriteLine("Job progress updated");
+                break;
+                
+            case JobEventType.Rejected:
+            case JobEventType.LateRejected:
+                Console.WriteLine($"Job rejected by {processingEvent.Provider} - will retry");
+                break;
+                
+            case JobEventType.ClaimExpired:
+                Console.WriteLine($"Worker claim expired on {processingEvent.Provider} - will requeue");
+                break;
+                
+            default:
+                Console.WriteLine($"Status: {processingEvent.Type}");
+                break;
+        }
     }
 }
 ```
@@ -498,6 +564,109 @@ Mark jobs as tainted (for quality control):
 ```csharp
 await sdkClient.Jobs.Query.TaintAsync(jobId);
 await sdkClient.Jobs.Query.TaintAsync(token);
+```
+
+## Enum Reference
+
+### JobEventType
+
+Complete list of job lifecycle events returned by the API:
+
+| Value | Description | Indicates |
+|-------|-------------|----------|
+| `Initialized` | Job was created and queued | Job is waiting to be processed |
+| `Claimed` | Job was claimed by a worker | Processing has started |
+| `Rejected` | Job was rejected before execution | Job failed validation or resource unavailable |
+| `LateRejected` | Job was rejected after being claimed | Worker rejected job after claiming |
+| `ClaimExpired` | Job claim expired before execution | Worker claim timed out |
+| `Updated` | Job progress was updated | Processing continues, check position |
+| `Failed` | Job execution failed | Job completed with error |
+| `Succeeded` | Job execution succeeded | Job completed successfully |
+| `Expired` | Job expired before completion | Job timed out |
+| `Deleted` | Job was deleted/cancelled | Job was cancelled server-side |
+
+```csharp
+// Example: Handling all possible job events
+if (job.LastEvent is JobEvent lastEvent)
+{
+    switch (lastEvent.Type)
+    {
+        case JobEventType.Initialized:
+            Console.WriteLine($"Job queued and waiting on {lastEvent.Provider}");
+            break;
+        case JobEventType.Claimed:
+            Console.WriteLine($"Worker {lastEvent.WorkerId} on {lastEvent.Provider} started processing");
+            break;
+        case JobEventType.Rejected:
+            Console.WriteLine($"Job rejected by {lastEvent.Provider} - check model availability");
+            break;
+        case JobEventType.LateRejected:
+            Console.WriteLine($"Worker on {lastEvent.Provider} rejected job after claiming");
+            break;
+        case JobEventType.ClaimExpired:
+            Console.WriteLine($"Worker claim expired on {lastEvent.Provider} - job will be requeued");
+            break;
+        case JobEventType.Updated:
+            Console.WriteLine($"Progress update - position: {job.Position}");
+            break;
+        case JobEventType.Failed:
+            Console.WriteLine($"Job failed on {lastEvent.Provider}: {job.Result?.ErrorMessage}");
+            break;
+        case JobEventType.Succeeded:
+            Console.WriteLine($"Job succeeded on {lastEvent.Provider}: {job.Result?.BlobUrl}");
+            break;
+        case JobEventType.Expired:
+            Console.WriteLine("Job timed out");
+            break;
+        case JobEventType.Deleted:
+            Console.WriteLine("Job was cancelled");
+            break;
+    }
+}
+```
+
+### Provider
+
+Complete list of infrastructure providers in the Civitai orchestration system:
+
+| Value | Description | Infrastructure |
+|-------|-------------|---------------|
+| `Civitai` | Civitai's first-party infrastructure | Primary Civitai servers |
+| `OctoML` | OctoML provider | OctoML cloud infrastructure |
+| `SaladML` | SaladML provider | SaladCloud distributed computing |
+| `PicFinder` | PicFinder provider | PicFinder infrastructure |
+| `RunPods` | RunPods provider | RunPods cloud GPU infrastructure |
+| `ValdiAI` | ValdiAI provider | ValdiAI infrastructure |
+| `OctoMLNext` | Next-generation OctoML provider | Enhanced OctoML infrastructure |
+| `RunDiffusion` | RunDiffusion provider | RunDiffusion specialized infrastructure |
+| `SaladShared` | SaladShared provider | Shared SaladCloud resources |
+
+### JobSupport
+
+Provider capability levels for job execution:
+
+| Value | Description | Meaning |
+|-------|-------------|--------|
+| `Unsupported` | Provider does not support this job type | Model/resource not available on this provider |
+| `Unavailable` | Provider supports but cannot currently run | Temporarily unavailable (maintenance, capacity) |
+| `Available` | Provider supports and can currently run | Ready to execute jobs |
+
+```csharp
+// Example: Checking provider support for a model
+if (coverage.ProviderSupport is not null)
+{
+    foreach (var (provider, support) in coverage.ProviderSupport)
+    {
+        var message = support switch
+        {
+            JobSupport.Available => $"{provider}: Ready to process jobs",
+            JobSupport.Unavailable => $"{provider}: Temporarily unavailable", 
+            JobSupport.Unsupported => $"{provider}: Model not supported",
+            _ => $"{provider}: Unknown status"
+        };
+        Console.WriteLine(message);
+    }
+}
 ```
 
 ## Jobs Operations API Reference
@@ -736,14 +905,46 @@ if (submitResult is Result<JobStatusCollection>.Success success)
             // Check if job is complete (scheduled = false)
             if (status is not null && !status.Scheduled)
             {
-                if (status.Result?.BlobUrl is string imageUrl)
+                // Job is complete - check event type for detailed status
+                if (status.LastEvent?.Type == JobEventType.Succeeded && status.Result?.BlobUrl is string imageUrl)
                 {
-                    Console.WriteLine($"Job complete! Image URL: {imageUrl}");
+                    Console.WriteLine($"Job succeeded! Image URL: {imageUrl}");
+                }
+                else if (status.LastEvent?.Type == JobEventType.Failed)
+                {
+                    Console.WriteLine("Job failed");
+                }
+                else if (status.Result?.BlobUrl is string fallbackUrl)
+                {
+                    // Fallback for older API responses without LastEvent
+                    Console.WriteLine($"Job complete! Image URL: {fallbackUrl}");
                 }
                 break;
             }
             
-            Console.WriteLine($"Job still processing. Position in queue: {status.Position}");
+            // Job is still processing - show detailed status if available
+            if (status?.LastEvent is JobEvent lastEvent)
+            {
+                switch (lastEvent.Type)
+                {
+                    case JobEventType.Claimed:
+                        Console.WriteLine($"Job claimed by worker on {lastEvent.Provider} infrastructure, processing starting...");
+                        break;
+                    case JobEventType.Updated:
+                        Console.WriteLine($"Job progress updated. Position in queue: {status.Position}");
+                        break;
+                    case JobEventType.Initialized:
+                        Console.WriteLine($"Job initialized and queued on {lastEvent.Provider}");
+                        break;
+                    default:
+                        Console.WriteLine($"Job status: {lastEvent.Type}. Position in queue: {status.Position}");
+                        break;
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Job still processing. Position in queue: {status?.Position}");
+            }
         }
     }
 }
@@ -797,6 +998,179 @@ if (submitResult is Result<JobStatusCollection>.Success success)
 - **Manual polling** requires more code but offers flexibility and control
 - **Webhooks** (recommended for production) eliminate polling entirely - see [Webhook Callbacks Guide](sdk-webhooks.md)
 
+## Understanding Job Status and Lifecycle
+
+### Job Lifecycle States
+
+Every job progresses through lifecycle stages represented by `JobEventType`. The `LastEvent` property on `JobStatus` indicates the most recent state:
+
+| JobEventType | Meaning | Job State |
+|--------------|---------|-----------|
+| `Initialized` | Job created and queued | Processing |
+| `Claimed` | Worker assigned, execution starting | Processing |
+| `Updated` | Progress update (still processing) | Processing |
+| `Succeeded` | Job completed successfully | Complete |
+| `Failed` | Job failed during execution | Complete |
+| `Rejected` | Job rejected before execution | Complete |
+| `LateRejected` | Job rejected after being claimed | Complete |
+| `ClaimExpired` | Worker claim expired | Complete |
+| `Expired` | Job expired before completion | Complete |
+| `Deleted` | Job cancelled server-side | Complete |
+
+### Checking Job Completion
+
+The `Scheduled` property indicates whether a job is still processing:
+
+```csharp
+var statusResult = await sdkClient.Jobs.Query.GetByTokenAsync(token);
+
+if (statusResult is Result<JobStatusCollection>.Success success)
+{
+    var status = success.Data.JobsList.FirstOrDefault();
+    
+    if (status is not null && !status.Scheduled)
+    {
+        // Job is complete (success or failure)
+        Console.WriteLine("Job finished processing");
+    }
+    else
+    {
+        // Job is still processing
+        Console.WriteLine($"Job in progress. Position: {status?.Position}");
+    }
+}
+```
+
+### Detecting Job Success vs Failure
+
+**Always check `LastEvent.Type` to distinguish between success and failure:**
+
+```csharp
+var statusResult = await sdkClient.Jobs.Query.GetByTokenAsync(token);
+
+if (statusResult is Result<JobStatusCollection>.Success success)
+{
+    var status = success.Data.JobsList.FirstOrDefault();
+    
+    if (status is not null && !status.Scheduled)
+    {
+        // Job complete - check LastEvent.Type for outcome
+        switch (status.LastEvent?.Type)
+        {
+            case JobEventType.Succeeded:
+                if (status.Result?.BlobUrl is string imageUrl)
+                {
+                    Console.WriteLine($"✓ Job succeeded! Download: {imageUrl}");
+                    Console.WriteLine($"Expires: {status.Result.BlobUrlExpirationDate}");
+                }
+                break;
+                
+            case JobEventType.Failed:
+                Console.WriteLine("✗ Job failed during execution");
+                
+                // Optional: check LastEvent.Context for error details
+                if (status.LastEvent.Context is not null)
+                {
+                    foreach (var (key, value) in status.LastEvent.Context)
+                    {
+                        Console.WriteLine($"  {key}: {value}");
+                    }
+                }
+                break;
+                
+            case JobEventType.Rejected:
+            case JobEventType.LateRejected:
+                Console.WriteLine("✗ Job rejected by provider");
+                break;
+                
+            case JobEventType.Expired:
+            case JobEventType.ClaimExpired:
+                Console.WriteLine("✗ Job expired before completion");
+                break;
+                
+            case JobEventType.Deleted:
+                Console.WriteLine("✗ Job was cancelled");
+                break;
+                
+            default:
+                Console.WriteLine($"Job completed with status: {status.LastEvent?.Type}");
+                break;
+        }
+    }
+}
+```
+
+### Important: No ErrorMessage Property
+
+**The API does not provide a direct `ErrorMessage` property.** To understand failure reasons:
+
+1. **Check `LastEvent.Type`** - Indicates the failure category (Failed, Rejected, Expired, etc.)
+2. **Inspect `LastEvent.Context`** - May contain provider-specific error details as key-value pairs
+3. **Check `LastEvent.Provider`** - Identifies which infrastructure provider processed the job
+
+```csharp
+if (status.LastEvent?.Type == JobEventType.Failed)
+{
+    Console.WriteLine($"Job failed on provider: {status.LastEvent.Provider}");
+    
+    // Context may contain error details (provider-specific)
+    if (status.LastEvent.Context?.TryGetValue("error", out var errorElement) == true)
+    {
+        Console.WriteLine($"Error details: {errorElement}");
+    }
+}
+```
+
+### Monitoring Job Progress
+
+Track job progress during execution using `LastEvent` updates:
+
+```csharp
+while (true)
+{
+    await Task.Delay(5000); // Poll every 5 seconds
+    
+    var statusResult = await sdkClient.Jobs.Query.GetByTokenAsync(token);
+    
+    if (statusResult is Result<JobStatusCollection>.Success success)
+    {
+        var status = success.Data.JobsList.FirstOrDefault();
+        
+        if (status is null)
+            continue;
+            
+        if (!status.Scheduled)
+        {
+            // Job complete
+            if (status.LastEvent?.Type == JobEventType.Succeeded)
+            {
+                Console.WriteLine("✓ Job succeeded!");
+                break;
+            }
+            else
+            {
+                Console.WriteLine($"✗ Job ended: {status.LastEvent?.Type}");
+                break;
+            }
+        }
+        
+        // Show progress
+        switch (status.LastEvent?.Type)
+        {
+            case JobEventType.Initialized:
+                Console.WriteLine($"Queued. Position: {status.Position}");
+                break;
+            case JobEventType.Claimed:
+                Console.WriteLine($"Processing started on {status.LastEvent.Provider}");
+                break;
+            case JobEventType.Updated:
+                Console.WriteLine($"Processing... (Position: {status.Position})");
+                break;
+        }
+    }
+}
+```
+
 ## Error Handling
 
 All methods return `Result<T>` for consistent error handling:
@@ -814,12 +1188,8 @@ switch (result)
         Console.WriteLine($"Submitted: {success.Data.Token}");
         break;
         
-    case Result<JobStatusCollection>.ApiError apiError:
-        Console.WriteLine($"API Error: {apiError.Message}");
-        break;
-        
-    case Result<JobStatusCollection>.NetworkError networkError:
-        Console.WriteLine($"Network Error: {networkError.Exception.Message}");
+    case Result<JobStatusCollection>.Failure failure:
+        Console.WriteLine($"Error: {failure.Error.Message}");
         break;
 }
 ```

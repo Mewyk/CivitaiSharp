@@ -146,7 +146,7 @@ if (result.IsSuccess)
 }
 else
 {
-    Console.WriteLine($"Error: {result.ErrorInfo.Message}");
+    Console.WriteLine($"Error: {result.Error.Message}");
 }
 ```
 
@@ -803,7 +803,7 @@ if (result.IsSuccess)
 }
 else
 {
-    Console.WriteLine($"Failed: {result.ErrorInfo.Message}");
+    Console.WriteLine($"Failed: {result.Error.Message}");
 }
 ```
 
@@ -879,7 +879,7 @@ var result = await client.Creators.ExecuteAsync(resultsLimit: 10);
 if (!result.IsSuccess)
 {
     // Log the error but continue with degraded functionality
-    logger.LogWarning("Creator data unavailable: {Error}", result.ErrorInfo.Message);
+    logger.LogWarning("Creator data unavailable: {Error}", result.Error.Message);
     return GetCachedCreators(); // Fallback to cached data
 }
 ```

@@ -189,7 +189,7 @@ CivitaiSharp automatically handles all URL encoding.
 
 ## Testing Results Summary
 
-Based on comprehensive testing on November 30, 2025:
+Based on comprehensive testing:
 
 | Test Category | Tests Run | Pass Rate | Notes |
 |---------------|-----------|-----------|-------|

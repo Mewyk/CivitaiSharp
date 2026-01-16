@@ -151,7 +151,7 @@ var result = await client.Creators.ExecuteAsync(resultsLimit: 10);
 if (!result.IsSuccess)
 {
     // Log the error but continue with degraded functionality
-    logger.LogWarning("Creator data unavailable: {Error}", result.ErrorInfo.Message);
+    logger.LogWarning("Creator data unavailable: {Error}", result.Error.Message);
     return GetCachedCreators(); // Fallback to cached data
 }
 ```

@@ -149,7 +149,7 @@ if (result.IsSuccess)
 }
 else
 {
-    Console.WriteLine($"Error: {result.ErrorInfo.Message}");
+    Console.WriteLine($"Error: {result.Error.Message}");
 }
 ```
 
@@ -815,7 +815,7 @@ if (result.IsSuccess)
 }
 else
 {
-    Console.WriteLine($"Fallo: {result.ErrorInfo.Message}");
+    Console.WriteLine($"Fallo: {result.Error.Message}");
 }
 ```
 
@@ -895,7 +895,7 @@ var result = await client.Creators.ExecuteAsync(resultsLimit: 10);
 if (!result.IsSuccess)
 {
     // Registrar el error pero continuar con funcionalidad degradada
-    logger.LogWarning("Datos de creadores no disponibles: {Error}", result.ErrorInfo.Message);
+    logger.LogWarning("Datos de creadores no disponibles: {Error}", result.Error.Message);
     return GetCachedCreators(); // Fallback a datos cacheados
 }
 ```

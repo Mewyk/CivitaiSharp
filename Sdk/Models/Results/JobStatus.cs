@@ -57,7 +57,8 @@ public sealed record JobStatus(
     /// </summary>
     /// <remarks>
     /// The official OpenAPI schema models <c>serviceProviders</c> as a mapping of provider name to provider-specific status.
-    /// This helper returns an empty dictionary when the payload is missing, not an object, or cannot be parsed.
+    /// This helper returns an empty dictionary when the payload is missing or not an object.
+    /// If the payload is present but cannot be parsed, a <see cref="JsonException"/> is thrown.
     /// </remarks>
     [JsonIgnore]
     public IReadOnlyDictionary<string, ProviderJobStatus> ServiceProviderStatuses

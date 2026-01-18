@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 /// </summary>
 /// <param name="Token">
 /// The batch token for polling or bulk operations. Maps to JSON property "token".
-/// This is a Base64-encoded identifier that can be used with GetByToken, CancelByToken, or TaintByToken.
+/// This is a Base64-encoded identifier that can be used with GetByTokenAsync, CancelAsync, or TaintAsync.
 /// </param>
 /// <param name="Jobs">The list of job statuses. Maps to JSON property "jobs".</param>
 public sealed record JobStatusCollection(

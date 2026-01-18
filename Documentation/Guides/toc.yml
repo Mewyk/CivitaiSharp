@@ -5,64 +5,58 @@ items:
     - name: Installation
       href: installation.md
     - name: Getting an API Key
-      href: getting-api-key.md
+      href: core/getting-api-key.md
     - name: Quick Start
-      href: quick-start.md
+      href: core/quick-start.md
     - name: Configuration
-      href: configuration.md
-
-- name: AI Resource Identifier (AIR)
-  expanded: true
-  items:
-    - name: AIR Overview
-      href: air-identifier.md
-    - name: AIR Builder
-      href: air-builder.md
+      href: core/configuration.md
 
 - name: Core Library
   expanded: true
   items:
     - name: Introduction
-      href: introduction.md
+      href: core/introduction.md
     - name: Request Builders
-      href: request-builders.md
+      href: core/request-builders.md
     - name: Models
-      href: models.md
-    - name: Tags
-      href: tags.md
-    - name: Creators
-      href: creators.md
+      href: core/models.md
     - name: Images
-      href: images.md
+      href: core/images.md
+    - name: Tags
+      href: core/tags.md
+    - name: Creators
+      href: core/creators.md
     - name: Error Handling
-      href: error-handling.md
+      href: core/error-handling.md
     - name: Pagination
-      href: pagination.md
+      href: core/pagination.md
     - name: API Behavior and Quirks
-      href: api-quirks.md
+      href: core/api-quirks.md
 
 - name: SDK Library
   expanded: true
   items:
     - name: Introduction
-      href: sdk-introduction.md
+      href: sdk/introduction.md
+    - name: AIR Overview
+      href: sdk/air-identifier.md
+    - name: AIR Builder
+      href: sdk/air-builder.md
     - name: Jobs Service
-      href: sdk-jobs.md
-    - name: Webhook Callbacks
-      href: sdk-webhooks.md
+      href: sdk/jobs.md
     - name: Coverage Service
-      href: sdk-coverage.md
+      href: sdk/coverage.md
     - name: Usage Service
-      href: sdk-usage.md
+      href: sdk/usage.md
 
 - name: Tools Library
   expanded: true
   items:
     - name: Introduction
-      href: tools-introduction.md
+      href: tools/introduction.md
     - name: File Hashing
-      href: file-hashing.md
+      href: tools/file-hashing.md
     - name: Downloading Files
-      href: downloading-files.md
+      href: tools/downloading-files.md
     - name: HTML Parsing
-      href: html-parsing.md
+      href: tools/html-parsing.md

@@ -24,7 +24,7 @@ public sealed class ImageGenerationJobRequest
     /// Gets the job type discriminator. Always <see cref="JobType"/>.
     /// </summary>
     [JsonPropertyName("$type")]
-    public static string Type => JobType;
+    public string Type { get; init; } = JobType;
 
     /// <summary>
     /// Gets or sets the base AIR identifier. Required.

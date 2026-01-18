@@ -30,7 +30,7 @@ using CivitaiSharp.Sdk.Models.Usage;
         typeof(ControlNetPreprocessorConverter),
         typeof(NullableControlNetPreprocessorConverter),
         typeof(AvailabilityStatusConverter),
-        typeof(ProviderAssetAvailabilityDictionaryConverter),
+        typeof(ProviderAssetAvailabilityConverter),
         typeof(JobEventTypeConverter),
         typeof(JobSupportConverter),
         typeof(ProviderConverter),

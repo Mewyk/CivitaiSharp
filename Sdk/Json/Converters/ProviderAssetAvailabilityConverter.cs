@@ -10,7 +10,7 @@ using CivitaiSharp.Sdk.Models.Coverage;
 /// <summary>
 /// AOT-compatible JSON converter for <see cref="IReadOnlyDictionary{TKey, TValue}"/> where TKey is <see cref="AirIdentifier"/> and TValue is <see cref="ProviderAssetAvailability"/>.
 /// </summary>
-internal sealed class ProviderAssetAvailabilityDictionaryConverter : JsonConverter<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>
+internal sealed class ProviderAssetAvailabilityConverter : JsonConverter<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>
 {
     /// <inheritdoc />
     public override IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability> Read(

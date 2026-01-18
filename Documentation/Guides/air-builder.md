@@ -32,22 +32,7 @@ dotnet add package CivitaiSharp.Sdk --prerelease
 
 ### Basic Usage
 
-```csharp
-using CivitaiSharp.Sdk.Air;
-
-// Build an AIR identifier using the fluent API
-var builder = new AirBuilder();
-
-var airId = builder
-    .WithEcosystem(AirEcosystem.StableDiffusionXl)
-    .WithAssetType(AirAssetType.Lora)
-    .WithModelId(328553)
-    .WithVersionId(368189)
-    .Build();
-
-Console.WriteLine(airId.ToString());
-// Output: urn:air:sdxl:lora:civitai:328553@368189
-```
+[!code-csharp[Program.cs](AirBuilder/Program.cs#basic-usage)]
 
 ## Builder Methods
 
@@ -55,11 +40,7 @@ Console.WriteLine(airId.ToString());
 
 Sets the model ecosystem (required):
 
-```csharp
-builder.WithEcosystem(AirEcosystem.StableDiffusionXl);
-builder.WithEcosystem(AirEcosystem.Flux1);
-builder.WithEcosystem(AirEcosystem.Pony);
-```
+[!code-csharp[Program.cs](AirBuilder/Program.cs#with-ecosystem)]
 
 Available ecosystems:
 - `StableDiffusion1` - Stable Diffusion 1.x (sd1)
@@ -72,11 +53,7 @@ Available ecosystems:
 
 Sets the asset type (required):
 
-```csharp
-builder.WithAssetType(AirAssetType.Lora);
-builder.WithAssetType(AirAssetType.Checkpoint);
-builder.WithAssetType(AirAssetType.Vae);
-```
+[!code-csharp[Program.cs](AirBuilder/Program.cs#with-asset-type)]
 
 Available asset types:
 - `Checkpoint` - Full model checkpoint
@@ -90,69 +67,31 @@ Available asset types:
 
 Sets the source platform (optional, defaults to `AirSource.Civitai`):
 
-```csharp
-// Explicitly set source (usually not needed)
-builder.WithSource(AirSource.Civitai);
-```
+[!code-csharp[Program.cs](AirBuilder/Program.cs#with-source)]
 
 ### WithModelId
 
 Sets the model ID (required):
 
-```csharp
-builder.WithModelId(328553);
-
-// Must be greater than 0
-```
+[!code-csharp[Program.cs](AirBuilder/Program.cs#with-model-id)]
 
 ### WithVersionId
 
 Sets the version ID (required):
 
-```csharp
-builder.WithVersionId(368189);
-
-// Must be greater than 0
-```
+[!code-csharp[Program.cs](AirBuilder/Program.cs#with-version-id)]
 
 ### Reset / Reuse
 
 The `AirBuilder` is immutable and thread-safe: each `With*` method returns a new builder instance. There is no instance `Reset()` method. To "reset" or reuse a base configuration, either create a new `AirBuilder()` or keep a reusable base instance and call the fluent methods which return new instances.
 
-```csharp
-// Start from a base builder and derive per-item builders (recommended)
-var baseBuilder = new AirBuilder()
-    .WithEcosystem(AirEcosystem.Flux1)
-    .WithAssetType(AirAssetType.Lora);
-
-// For a new identifier, derive from the base and set IDs
-var air1 = baseBuilder
-    .WithModelId(123)
-    .WithVersionId(456)
-    .Build();
-
-// To "reset", simply start from a fresh builder or reuse baseBuilder
-var air2 = new AirBuilder()
-    .WithEcosystem(AirEcosystem.StableDiffusionXl)
-    .WithAssetType(AirAssetType.Checkpoint)
-    .WithModelId(789)
-    .WithVersionId(101)
-    .Build();
-```
+[!code-csharp[Program.cs](AirBuilder/Program.cs#reset-reuse)]
 
 ### Build
 
 Constructs the `AirIdentifier` (validates all required properties are set):
 
-```csharp
-var airId = builder.Build();
-
-// Throws InvalidOperationException if:
-// - Ecosystem is not set
-// - AssetType is not set
-// - ModelId is not set
-// - VersionId is not set
-```
+[!code-csharp[Program.cs](AirBuilder/Program.cs#build)]
 
 ## Validation
 
@@ -162,153 +101,27 @@ The builder performs validation at two stages:
 
 Each property setter validates its input:
 
-```csharp
-// ModelId must be > 0
-builder.WithModelId(0); // Throws ArgumentOutOfRangeException
-
-// VersionId must be > 0
-builder.WithVersionId(-1); // Throws ArgumentOutOfRangeException
-
-```
+[!code-csharp[Program.cs](AirBuilder/Program.cs#input-validation)]
 
 ### Build Validation
 
 The `Build()` method ensures all required properties are set:
 
-```csharp
-var builder = new AirBuilder()
-    .WithEcosystem(AirEcosystem.Flux1)
-    .WithModelId(123);
-
-// Missing AssetType and VersionId
-var airId = builder.Build(); // Throws InvalidOperationException
-```
+[!code-csharp[Program.cs](AirBuilder/Program.cs#build-validation)]
 
 ## Complete Examples
 
 ### Building from Civitai Model
 
-```csharp
-using CivitaiSharp.Core;
-using CivitaiSharp.Sdk.Air;
-
-public class ModelService(IApiClient apiClient)
-{
-    public async Task<AirIdentifier?> GetAirIdAsync(int modelId)
-    {
-        // Fetch model from Civitai
-        var result = await apiClient.Models.GetByIdAsync(modelId);
-        if (result is not Result<Model>.Success success)
-            return null;
-        
-        var model = success.Data;
-        var version = model.ModelVersions?.FirstOrDefault();
-        
-        if (version is null)
-            return null;
-        
-        // Build AIR identifier
-        var builder = new AirBuilder();
-        return builder
-            .WithEcosystem(GetEcosystem(version.BaseModel))
-            .WithAssetType(GetAssetType(model.Type))
-            .WithModelId(model.Id)
-            .WithVersionId(version.Id)
-            .Build();
-    }
-    
-    private AirEcosystem GetEcosystem(string baseModel) => baseModel switch
-    {
-        "SD 1.5" => AirEcosystem.StableDiffusion1,
-        "SDXL 1.0" => AirEcosystem.StableDiffusionXl,
-        "Flux.1" => AirEcosystem.Flux1,
-        "Pony" => AirEcosystem.Pony,
-        _ => AirEcosystem.StableDiffusion1
-    };
-    
-    private AirAssetType GetAssetType(ModelType type) => type switch
-    {
-        ModelType.Checkpoint => AirAssetType.Checkpoint,
-        ModelType.Lora => AirAssetType.Lora,
-        ModelType.Vae => AirAssetType.Vae,
-        ModelType.TextualInversion => AirAssetType.Embedding,
-        ModelType.Hypernetwork => AirAssetType.Hypernetwork,
-        _ => AirAssetType.Checkpoint
-    };
-}
-```
+[!code-csharp[Program.cs](AirBuilder/Program.cs#build-from-model)]
 
 ### Batch Building
 
-```csharp
-using CivitaiSharp.Sdk.Air;
-
-public class BatchProcessor
-{
-    public List<AirIdentifier> BuildMultipleIdentifiers()
-    {
-        var builder = new AirBuilder();
-        var identifiers = new List<AirIdentifier>();
-        
-        // Build multiple identifiers efficiently
-        foreach (var (ecosystem, assetType, modelId, versionId) in GetModelData())
-        {
-            var airId = builder
-                .WithEcosystem(ecosystem)
-                .WithAssetType(assetType)
-                .WithModelId(modelId)
-                .WithVersionId(versionId)
-                .Build();
-            
-            identifiers.Add(airId);
-            
-        }
-        
-        return identifiers;
-    }
-    
-    private IEnumerable<(AirEcosystem, AirAssetType, long, long)> GetModelData()
-    {
-        yield return (AirEcosystem.StableDiffusionXl, AirAssetType.Lora, 328553, 368189);
-        yield return (AirEcosystem.Flux1, AirAssetType.Checkpoint, 123456, 789012);
-        yield return (AirEcosystem.Pony, AirAssetType.Lora, 111111, 222222);
-    }
-}
-```
+[!code-csharp[Program.cs](AirBuilder/Program.cs#batch-building)]
 
 ### Builder with Error Handling
 
-```csharp
-using CivitaiSharp.Sdk.Air;
-
-public AirIdentifier? TryBuildAirId(
-    AirEcosystem ecosystem,
-    AirAssetType assetType,
-    long modelId,
-    long versionId)
-{
-    try
-    {
-        var builder = new AirBuilder();
-        return builder
-            .WithEcosystem(ecosystem)
-            .WithAssetType(assetType)
-            .WithModelId(modelId)
-            .WithVersionId(versionId)
-            .Build();
-    }
-    catch (ArgumentOutOfRangeException ex)
-    {
-        Console.WriteLine($"Invalid ID: {ex.Message}");
-        return null;
-    }
-    catch (InvalidOperationException ex)
-    {
-        Console.WriteLine($"Missing required property: {ex.Message}");
-        return null;
-    }
-}
-```
+[!code-csharp[Program.cs](AirBuilder/Program.cs#builder-error-handling)]
 
 ## Best Practices
 
@@ -316,67 +129,19 @@ public AirIdentifier? TryBuildAirId(
 
 Reuse builder instances when creating multiple identifiers:
 
-```csharp
-// Good - derive per-item builders from a reusable base configuration
-var baseBuilder = new AirBuilder()
-    .WithEcosystem(AirEcosystem.StableDiffusionXl);
-
-foreach (var data in modelData)
-{
-    var airId = baseBuilder
-        .WithAssetType(data.AssetType)
-        .WithModelId(data.ModelId)
-        .WithVersionId(data.VersionId)
-        .Build();
-
-    ProcessAirId(airId);
-}
-```
+[!code-csharp[Program.cs](AirBuilder/Program.cs#reuse-builders)]
 
 ### Validate Early
 
 Validate input before passing to builder methods:
 
-```csharp
-public AirIdentifier BuildFromUserInput(long modelId, long versionId)
-{
-    // Validate before building
-    if (modelId <= 0)
-        throw new ArgumentException("Model ID must be positive", nameof(modelId));
-    
-    if (versionId <= 0)
-        throw new ArgumentException("Version ID must be positive", nameof(versionId));
-    
-    return new AirBuilder()
-        .WithEcosystem(AirEcosystem.StableDiffusionXl)
-        .WithAssetType(AirAssetType.Lora)
-        .WithModelId(modelId)
-        .WithVersionId(versionId)
-        .Build();
-}
-```
+[!code-csharp[Program.cs](AirBuilder/Program.cs#validate-early)]
 
 ### Use Method Chaining
 
 Take advantage of the fluent API for concise code:
 
-```csharp
-// Preferred - fluent style
-var airId = new AirBuilder()
-    .WithEcosystem(AirEcosystem.Flux1)
-    .WithAssetType(AirAssetType.Lora)
-    .WithModelId(123)
-    .WithVersionId(456)
-    .Build();
-
-// Avoid - verbose style
-var builder = new AirBuilder();
-builder.WithEcosystem(AirEcosystem.Flux1);
-builder.WithAssetType(AirAssetType.Lora);
-builder.WithModelId(123);
-builder.WithVersionId(456);
-var airId = builder.Build();
-```
+[!code-csharp[Program.cs](AirBuilder/Program.cs#method-chaining)]
 
 ## Related Resources
 

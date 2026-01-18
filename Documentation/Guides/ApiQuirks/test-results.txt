@@ -1,0 +1,4 @@
+[PASS] Models endpoint: 100% success rate
+[PASS] Images endpoint: 100% success rate
+[PASS] Tags endpoint: 100% success rate
+[FAIL] Creators endpoint: ~50% success rate (timeouts/500 errors)

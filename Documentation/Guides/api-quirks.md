@@ -23,9 +23,7 @@ When passing multiple values for the same parameter, the API supports different 
 
 **This format works for all array parameters:**
 
-```
-?ids=122359&ids=58390&ids=42567
-```
+[!code-text[repeated-params.txt](ApiQuirks/repeated-params.txt)]
 
 CivitaiSharp uses this format by default as it's the most reliable.
 
@@ -33,15 +31,11 @@ CivitaiSharp uses this format by default as it's the most reliable.
 
 **Some** parameters accept comma-separated values:
 
-```
-?ids=122359,58390,42567
-```
+[!code-text[comma-params.txt](ApiQuirks/comma-params.txt)]
 
 However, **other parameters return 400 Bad Request** with comma-separated values:
 
-```
-?baseModels=SD 1.5,SDXL 1.0  -- 400 Bad Request
-```
+[!code-text[bad-comma-params.txt](ApiQuirks/bad-comma-params.txt)]
 
 **Recommendation:** Always use the repeated parameter format, which CivitaiSharp does automatically.
 
@@ -49,10 +43,7 @@ However, **other parameters return 400 Bad Request** with comma-separated values
 
 Parameters containing spaces (like "Highest Rated", "SD 1.5") are automatically URL-encoded by CivitaiSharp:
 
-```
-?sort=Highest%20Rated
-?baseModels=SD%201.5
-```
+[!code-text[encoded-params.txt](ApiQuirks/encoded-params.txt)]
 
 The API accepts both encoded and unencoded spaces, but encoding is safer for reliability.
 
@@ -68,12 +59,7 @@ Some filters require authentication via an API key configured in `ApiClientOptio
 
 ### Configuring Authentication
 
-```csharp
-services.AddCivitaiApi(options =>
-{
-    options.ApiKey = "your-api-key-here";
-});
-```
+[!code-csharp[Program.cs](ApiQuirks/Program.cs#configure-auth)]
 
 Without authentication:
 - You can still query all public models, images, tags, and creators
@@ -86,19 +72,7 @@ Without authentication:
 
 The `WhereCommercialUse()` filter exhibits unusual behavior:
 
-```csharp
-// Single value typically returns 0 results
-var result = await apiClient.Models
-    .WhereCommercialUse(CommercialUsePermission.None)
-    .ExecuteAsync();
-
-// Multiple values work correctly
-var result = await apiClient.Models
-    .WhereCommercialUse(
-        CommercialUsePermission.Image, 
-        CommercialUsePermission.Sell)
-    .ExecuteAsync();
-```
+[!code-csharp[Program.cs](ApiQuirks/Program.cs#commercial-use)]
 
 **Behavior:** The API requires at least two permission values to return results. This may reflect the API's data model or filtering logic.
 
@@ -142,24 +116,15 @@ The `/api/v1/creators` endpoint has shown reliability issues:
 - Higher failure rate compared to other endpoints
 
 **Example Test Results:**
-```
-[PASS] Models endpoint: 100% success rate
-[PASS] Images endpoint: 100% success rate
-[PASS] Tags endpoint: 100% success rate
-[FAIL] Creators endpoint: ~50% success rate (timeouts/500 errors)
-```
+
+[!code-text[test-results.txt](ApiQuirks/test-results.txt)]
 
 **Mitigation:**
 - CivitaiSharp includes automatic retry via resilience policies
 - Default timeout is 30 seconds
 - Consider increasing timeout for this endpoint if needed
 
-```csharp
-services.AddCivitaiApi(options =>
-{
-    options.TimeoutSeconds = 60; // Increase for problematic endpoints
-});
-```
+[!code-csharp[Program.cs](ApiQuirks/Program.cs#timeout-configuration)]
 
 ## Enum Sort Values
 
@@ -167,12 +132,7 @@ services.AddCivitaiApi(options =>
 
 Sort enum values that map to strings with spaces work correctly when URL-encoded:
 
-```csharp
-// "Highest Rated" → URL-encoded as "Highest%20Rated"
-var result = await apiClient.Models
-    .OrderBy(ModelSort.HighestRated)
-    .ExecuteAsync();
-```
+[!code-csharp[Program.cs](ApiQuirks/Program.cs#sort-values)]
 
 **Supported Sort Values:**
 
@@ -206,60 +166,19 @@ Based on comprehensive testing:
 
 Build filters incrementally and test each addition:
 
-```csharp
-var builder = apiClient.Models
-    .WhereType(ModelType.Lora)
-    .OrderBy(ModelSort.HighestRated);
-
-// Test base filter
-var baseResult = await builder.ExecuteAsync();
-
-// Add more filters after confirming base works
-var refinedResult = await builder
-    .WherePeriod(TimePeriod.Month)
-    .ExecuteAsync(resultsLimit: 10);
-```
+[!code-csharp[Program.cs](ApiQuirks/Program.cs#filter-composition)]
 
 ### Error Handling
 
 Always handle potential errors, especially for the creators endpoint:
 
-```csharp
-var result = await apiClient.Creators
-    .WhereName("artist")
-    .ExecuteAsync();
-
-if (result is Result<PagedResult<Creator>>.Failure failure)
-{
-    if (failure.Error.Code == ErrorCode.Timeout)
-    {
-        // Retry with longer timeout or different approach
-    }
-    else if (failure.Error.Code == ErrorCode.ServerError)
-    {
-        // Log and handle server errors
-    }
-}
-```
+[!code-csharp[Program.cs](ApiQuirks/Program.cs#error-handling)]
 
 ### Verify Results
 
 For filters with known quirks, verify results match expectations:
 
-```csharp
-var result = await apiClient.Models
-    .WhereCommercialUse(CommercialUsePermission.Image)
-    .ExecuteAsync();
-
-if (result is Result<PagedResult<Model>>.Success success)
-{
-    if (success.Data.Items.Count == 0)
-    {
-        // May indicate the single-value quirk
-        // Retry with multiple values
-    }
-}
-```
+[!code-csharp[Program.cs](ApiQuirks/Program.cs#verify-results)]
 
 ## Reporting Issues
 

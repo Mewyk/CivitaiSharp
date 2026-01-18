@@ -71,75 +71,21 @@ The CivitaiSharp.Sdk library provides strongly-typed utilities for working with 
 
 ### Parsing an AIR
 
-```csharp
-using CivitaiSharp.Sdk.Air;
-
-var air = AirIdentifier.Parse("urn:air:sdxl:lora:civitai:328553@368189");
-
-Console.WriteLine($"Ecosystem: {air.Ecosystem}");  // StableDiffusionXl
-Console.WriteLine($"Asset Type: {air.AssetType}"); // Lora
-Console.WriteLine($"Source: {air.Source}");        // Civitai
-Console.WriteLine($"Model ID: {air.ModelId}");     // 328553
-Console.WriteLine($"Version ID: {air.VersionId}"); // 368189
-```
+[!code-csharp[](AirIdentifier/Program.cs#parse-air)]
 
 ### Creating an AIR
 
-```csharp
-using CivitaiSharp.Sdk.Air;
-
-// Using the constructor
-var air = new AirIdentifier(
-    AirEcosystem.StableDiffusionXl,
-    AirAssetType.Lora,
-    AirSource.Civitai,
-    328553,
-    368189);
-
-Console.WriteLine(air.ToString());
-// Output: urn:air:sdxl:lora:civitai:328553@368189
-
-// Using the factory method (defaults to Civitai source)
-var air2 = AirIdentifier.Create(
-    AirEcosystem.StableDiffusionXl,
-    AirAssetType.Lora,
-    328553,
-    368189);
-```
+[!code-csharp[](AirIdentifier/Program.cs#create-air)]
 
 ### Using the Builder Pattern
 
 For more complex scenarios, use the fluent builder:
 
-```csharp
-using CivitaiSharp.Sdk.Air;
-
-var air = new AirBuilder()
-    .WithEcosystem(AirEcosystem.StableDiffusionXl)
-    .WithAssetType(AirAssetType.Lora)
-    .WithSource(AirSource.HuggingFace)
-    .WithModelId(328553)
-    .WithVersionId(368189)
-    .Build();
-
-Console.WriteLine(air.ToString());
-// Output: urn:air:sdxl:lora:huggingface:328553@368189
-```
+[!code-csharp[](AirIdentifier/Program.cs#builder-pattern)]
 
 ### Validating an AIR
 
-```csharp
-using CivitaiSharp.Sdk.Air;
-
-if (AirIdentifier.TryParse("urn:air:sdxl:lora:civitai:328553@368189", out var air))
-{
-    Console.WriteLine($"Valid AIR: {air}");
-}
-else
-{
-    Console.WriteLine("Invalid AIR format");
-}
-```
+[!code-csharp[](AirIdentifier/Program.cs#validate-air)]
 
 ### Supported Sources
 
@@ -160,46 +106,13 @@ All sources are strongly typed as enums, providing compile-time safety and IDE i
 
 AIR provides a standardized way to reference models in your application configuration:
 
-```json
-{
-  "models": {
-    "checkpoint": "urn:air:sdxl:checkpoint:civitai:101055@128078",
-    "lora": "urn:air:sdxl:lora:civitai:328553@368189"
-  }
-}
-```
+[!code-json[](AirIdentifier/config-sample.json)]
 
 ### Multi-Provider Resource References
 
 Since AIR is a universal identifier, it can be used to reference resources across different AI model providers:
 
-```csharp
-// Civitai resource
-var civitaiCheckpoint = new AirIdentifier(
-    AirEcosystem.StableDiffusionXl,
-    AirAssetType.Checkpoint,
-    AirSource.Civitai,
-    101055,
-    128078);
-
-// Hugging Face resource
-var huggingFaceCheckpoint = new AirIdentifier(
-    AirEcosystem.StableDiffusionXl,
-    AirAssetType.Checkpoint,
-    AirSource.HuggingFace,
-    100,
-    200);
-
-// Switching sources programmatically
-var airBuilder = new AirBuilder()
-    .WithEcosystem(AirEcosystem.StableDiffusionXl)
-    .WithAssetType(AirAssetType.Checkpoint)
-    .WithModelId(101055)
-    .WithVersionId(128078);
-
-var civitaiAir = airBuilder.WithSource(AirSource.Civitai).Build();
-var leonardo = builder.WithSource(AirSource.Leonardo).Build();
-```
+[!code-csharp[](AirIdentifier/Program.cs#multi-provider)]
 
 ## Next Steps
 

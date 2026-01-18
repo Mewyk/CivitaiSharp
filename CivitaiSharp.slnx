@@ -3,10 +3,15 @@
     <File Path="Documentation/docfx.json" />
   </Folder>
   <Folder Name="/Documentation/Guides/">
+    <Project Path="Documentation/Guides/AirBuilder/AirBuilder.csproj" />
+    <Project Path="Documentation/Guides/AirIdentifier/AirIdentifier.csproj" />
+    <Project Path="Documentation/Guides/ApiQuirks/ApiQuirks.csproj" />
     <Project Path="Documentation/Guides/Configuration/Configuration.csproj" />
     <Project Path="Documentation/Guides/Creators/Creators.csproj" />
     <Project Path="Documentation/Guides/ErrorHandling/ErrorHandling.csproj" />
+    <Project Path="Documentation/Guides/GettingApiKey/GettingApiKey.csproj" />
     <Project Path="Documentation/Guides/Images/Images.csproj" />
+    <Project Path="Documentation/Guides/Introduction/Introduction.csproj" />
     <Project Path="Documentation/Guides/Models/Models.csproj" />
     <Project Path="Documentation/Guides/Pagination/Pagination.csproj" />
     <Project Path="Documentation/Guides/QuickStart/QuickStart.csproj" />

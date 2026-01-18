@@ -1,0 +1,6 @@
+{
+  "models": {
+    "checkpoint": "urn:air:sdxl:checkpoint:civitai:101055@128078",
+    "lora": "urn:air:sdxl:lora:civitai:328553@368189"
+  }
+}

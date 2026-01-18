@@ -19,46 +19,20 @@ CivitaiSharp.Core provides a low-level, typed client for the [Civitai public API
 
 ### Installation
 
-```bash
-dotnet add package CivitaiSharp.Core --prerelease
-```
+[!code-bash[install.sh](Introduction/install.sh)]
 
 ### Registration
 
 Register the API client using dependency injection:
 
-```csharp
-services.AddCivitaiApi(options =>
-{
-    options.ApiKey = "your-api-key"; // Optional - public endpoints work without a key
-});
-```
+[!code-csharp[Program.cs](Introduction/Program.cs#registration)]
 
 > [!NOTE]
 > The Core library can query public endpoints (models, images, tags, creators) without an API key. An API key is only needed for authenticated features like favorites, hidden models, higher rate limits, and accessing NSFW content (e.g., `WhereNsfw(true)` or `ImageNsfwLevel.Mature`/`X`). Note: Images use cursor-based pagination while Models, Tags, and Creators use page-based pagination.
 
 ### Basic Usage
 
-```csharp
-public class MyService(IApiClient apiClient)
-{
-    public async Task QueryModelsAsync()
-    {
-        var result = await apiClient.Models
-            .WhereType(ModelType.Lora)
-            .WhereTag("anime")
-            .ExecuteAsync(resultsLimit: 10);
-
-        if (result is Result<PagedResult<Model>>.Success success)
-        {
-            foreach (var model in success.Data.Items)
-            {
-                Console.WriteLine($"{model.Id}: {model.Name}");
-            }
-        }
-    }
-}
-```
+[!code-csharp[Program.cs](Introduction/Program.cs#basic-usage)]
 
 ## Architecture
 
@@ -79,13 +53,7 @@ The `IApiClient` interface is the entry point. It exposes cached, immutable buil
 
 Each builder provides fluent methods for filtering, sorting, and pagination. Builders are immutable records where each method returns a new instance:
 
-```csharp
-var baseQuery = apiClient.Models.WhereType(ModelType.Lora);
-
-// These create separate queries, baseQuery is unchanged
-var animeQuery = baseQuery.WhereTag("anime");
-var realisticQuery = baseQuery.WhereTag("realistic");
-```
+[!code-csharp[Program.cs](Introduction/Program.cs#request-builders)]
 
 ### 3. Response Models
 

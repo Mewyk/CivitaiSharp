@@ -37,60 +37,39 @@ Once you have your API key, you can configure CivitaiSharp to use it:
 
 ### Using Options Configuration
 
-```csharp
-services.AddCivitaiApi(options =>
-{
-    options.ApiKey = "your-api-key";
-});
-```
+[!code-csharp[Program.cs](GettingApiKey/Program.cs#options-configuration)]
 
 ### Using Configuration File
 
 Add to your `appsettings.json`:
 
-```json
-{
-  "CivitaiApi": {
-    "ApiKey": "your-api-key"
-  }
-}
-```
+[!code-json[appsettings.json](GettingApiKey/appsettings.json)]
 
 Then register with configuration:
 
-```csharp
-builder.Services.AddCivitaiApi(builder.Configuration);
-```
+[!code-csharp[Program.cs](GettingApiKey/Program.cs#configuration-file)]
 
 ### Using Environment Variables
 
 For better security, store your API key in an environment variable:
 
-```bash
-# Windows PowerShell
-$env:CIVITAI_API_KEY = "your-api-key"
+**Windows PowerShell**
 
-# Linux/macOS
-export CIVITAI_API_KEY="your-api-key"
-```
+[!code-powershell[set-api-key.ps1](GettingApiKey/set-api-key.ps1)]
+
+**Linux/macOS**
+
+[!code-bash[set-api-key.sh](GettingApiKey/set-api-key.sh)]
 
 Then load it in your configuration:
 
-```csharp
-services.AddCivitaiApi(options =>
-{
-    options.ApiKey = Environment.GetEnvironmentVariable("CIVITAI_API_KEY");
-});
-```
+[!code-csharp[Program.cs](GettingApiKey/Program.cs#environment-variable)]
 
 ### Using User Secrets (Development)
 
 For development, use .NET User Secrets to keep your API key out of source control:
 
-```bash
-dotnet user-secrets init
-dotnet user-secrets set "CivitaiApi:ApiKey" "your-api-key"
-```
+[!code-bash[user-secrets.sh](GettingApiKey/user-secrets.sh)]
 
 ## Managing API Keys
 

@@ -16,21 +16,21 @@ builder.Services.AddCivitaiApi(options =>
 });
 
 var host = builder.Build();
-// #endregion action-delegate
+// #endregion
+
+await host.StartAsync();
 
 // #region iconfiguration
-var builderWithConfig = Host.CreateApplicationBuilder(args);
-
 // Configuration is read from the "CivitaiApi" section by default
-builderWithConfig.Services.AddCivitaiApi(builderWithConfig.Configuration);
+// builder.Services.AddCivitaiApi(builder.Configuration);
 
 // Or specify a custom section name
-builderWithConfig.Services.AddCivitaiApi(
-    builderWithConfig.Configuration,
-    sectionName: "MyCivitaiSettings");
-
-var hostWithConfig = builderWithConfig.Build();
-// #endregion iconfiguration
+// builder.Services.AddCivitaiApi(
+//     builder.Configuration,
+//     sectionName: "MyCivitaiSettings");
+// #endregion
 
 var apiClient = host.Services.GetRequiredService<IApiClient>();
 Console.WriteLine("Configuration example completed.");
+
+await host.StopAsync();

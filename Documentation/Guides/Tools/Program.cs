@@ -28,6 +28,8 @@ builder.Services.AddCivitaiDownloads(options =>
 
 var host = builder.Build();
 
+await host.StartAsync();
+
 var apiClient = host.Services.GetRequiredService<IApiClient>();
 var hashingService = host.Services.GetRequiredService<IFileHashingService>();
 var downloadService = host.Services.GetRequiredService<IDownloadService>();
@@ -284,3 +286,5 @@ if (extModelResult is Result<Model>.Success extSuccess)
     }
 }
 // #endregion html-extensions
+
+await host.StopAsync();

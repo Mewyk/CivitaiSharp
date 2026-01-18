@@ -1,3 +1,5 @@
+using System;
+using System.Threading;
 using CivitaiSharp.Core;
 using CivitaiSharp.Core.Extensions;
 using CivitaiSharp.Core.Models;
@@ -7,9 +9,20 @@ using Microsoft.Extensions.Hosting;
 
 public static class Program
 {
-    public static Task Main()
+    public static async Task<int> Main(string[] args)
     {
-        return Task.CompletedTask;
+        var builder = Host.CreateApplicationBuilder(args);
+
+        ConfigureAuthentication(builder.Services);
+
+        using var host = builder.Build();
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
+
+        await host.StartAsync(cts.Token);
+        await host.StopAsync(cts.Token);
+
+        Console.WriteLine("ApiQuirks samples are intended for documentation snippets.");
+        return 0;
     }
 
     public static void ConfigureAuthentication(IServiceCollection services)

@@ -8,6 +8,9 @@ using Microsoft.Extensions.Hosting;
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddCivitaiApi();
 var host = builder.Build();
+
+await host.StartAsync();
+
 var apiClient = host.Services.GetRequiredService<IApiClient>();
 
 // #region page-size
@@ -70,24 +73,26 @@ Console.WriteLine($"Collected {allModels.Count} models total.");
 
 // #region page-index
 // For models, tags, and creators, you can use page index-based pagination
-var modelsPage1 = await apiClient.Models
+var firstPageResult = await apiClient.Models
     .WhereType(ModelType.Lora)
     .WithPageIndex(1)
     .ExecuteAsync(resultsLimit: 20);
 
-if (modelsPage1 is Result<PagedResult<Model>>.Success modelSuccess)
+if (firstPageResult is Result<PagedResult<Model>>.Success firstSuccess)
 {
-    Console.WriteLine($"Page 1: {modelSuccess.Data.Items.Count} models");
+    Console.WriteLine($"Page 1: {firstSuccess.Data.Items.Count} models");
 
     // Fetch page 2
-    var modelsPage2 = await apiClient.Models
+    var secondPageResult = await apiClient.Models
         .WhereType(ModelType.Lora)
         .WithPageIndex(2)
         .ExecuteAsync(resultsLimit: 20);
 
-    if (modelsPage2 is Result<PagedResult<Model>>.Success page2Success)
+    if (secondPageResult is Result<PagedResult<Model>>.Success secondSuccess)
     {
-        Console.WriteLine($"Page 2: {page2Success.Data.Items.Count} models");
+        Console.WriteLine($"Page 2: {secondSuccess.Data.Items.Count} models");
     }
 }
-// #endregion page-index
+// #endregion
+
+await host.StopAsync();

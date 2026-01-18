@@ -8,6 +8,9 @@ using Microsoft.Extensions.Hosting;
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddCivitaiApi();
 var host = builder.Build();
+
+await host.StartAsync();
+
 var apiClient = host.Services.GetRequiredService<IApiClient>();
 
 // #region by-model
@@ -88,3 +91,5 @@ while (!string.IsNullOrEmpty(cursor));
 
 Console.WriteLine($"Collected {allImages.Count} images total.");
 // #endregion pagination
+
+await host.StopAsync();

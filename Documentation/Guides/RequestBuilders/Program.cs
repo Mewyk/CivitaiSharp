@@ -8,6 +8,9 @@ using Microsoft.Extensions.Hosting;
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddCivitaiApi();
 var host = builder.Build();
+
+await host.StartAsync();
+
 var apiClient = host.Services.GetRequiredService<IApiClient>();
 
 // #region filtering
@@ -64,3 +67,5 @@ if (firstMatch is Result<Model?>.Success { Data: { } model })
     Console.WriteLine($"Found: {model.Name}");
 }
 // #endregion single-item
+
+await host.StopAsync();

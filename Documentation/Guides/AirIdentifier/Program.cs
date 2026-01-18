@@ -1,13 +1,12 @@
-namespace Guides.AirIdentifier;
-
 using System;
 using CivitaiSharp.Sdk.Air;
 
-public static class AirIdentifierSamples
+AirIdentifierSamples.ParseExample();
+AirIdentifierSamples.CreateExample();
+AirIdentifierSamples.ValidationExample();
+
+static class AirIdentifierSamples
 {
-    public static void Main()
-    {
-    }
 
     public static void ParseExample()
     {
@@ -25,24 +24,16 @@ public static class AirIdentifierSamples
     public static void CreateExample()
     {
         #region create-air
-        // Using the constructor
-        var air = new AirIdentifier(
+        var airIdentifier = new AirIdentifier(
             AirEcosystem.StableDiffusionXl,
             AirAssetType.Lora,
             AirSource.Civitai,
             328553,
             368189);
 
-        Console.WriteLine(air.ToString());
+        Console.WriteLine(airIdentifier.ToString());
         // Output: urn:air:sdxl:lora:civitai:328553@368189
-
-        // Using the factory method (defaults to Civitai source)
-        var air2 = AirIdentifier.Create(
-            AirEcosystem.StableDiffusionXl,
-            AirAssetType.Lora,
-            328553,
-            368189);
-        #endregion create-air
+        #endregion
     }
 
     public static void BuilderExample()

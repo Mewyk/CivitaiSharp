@@ -15,7 +15,9 @@ builder.Services.AddCivitaiApi(options =>
 });
 
 var host = builder.Build();
-// #endregion setup
+// #endregion
+
+await host.StartAsync();
 
 // #region query
 var apiClient = host.Services.GetRequiredService<IApiClient>();
@@ -25,7 +27,7 @@ var result = await apiClient.Models
     .WhereType(ModelType.Lora)
     .WhereTag("anime")
     .ExecuteAsync(resultsLimit: 10);
-// #endregion query
+// #endregion
 
 // The result is always checked with pattern matching
 // because API calls can fail for various reasons
@@ -43,6 +45,6 @@ else if (result is Result<PagedResult<Model>>.Failure failure)
 {
     Console.WriteLine($"Error: {failure.Error.Code} - {failure.Error.Message}");
 }
-// #endregion handling
+// #endregion
 
-await host.RunAsync();
+await host.StopAsync();

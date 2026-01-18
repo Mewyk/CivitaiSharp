@@ -8,6 +8,9 @@ using Microsoft.Extensions.Hosting;
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddCivitaiApi();
 var host = builder.Build();
+
+await host.StartAsync();
+
 var apiClient = host.Services.GetRequiredService<IApiClient>();
 
 // #region by-type
@@ -149,3 +152,5 @@ if (commercialFriendly is Result<PagedResult<Model>>.Success permSuccess)
     }
 }
 // #endregion permissions
+
+await host.StopAsync();

@@ -1,5 +1,3 @@
-namespace Guides.AirBuilder;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +7,11 @@ using CivitaiSharp.Core.Models;
 using CivitaiSharp.Core.Response;
 using CivitaiSharp.Sdk.Air;
 
-public static class AirBuilderSamples
-{
-    public static void Main()
-    {
-    }
+AirBuilderSamples.BasicUsage();
+AirBuilderSamples.MethodChainingExample();
 
+static class AirBuilderSamples
+{
     public static void BasicUsage()
     {
         #region basic-usage
@@ -30,7 +27,7 @@ public static class AirBuilderSamples
 
         Console.WriteLine(airId.ToString());
         // Output: urn:air:sdxl:lora:civitai:328553@368189
-        #endregion basic-usage
+        #endregion
     }
 
     public static void WithEcosystemExamples()
@@ -41,7 +38,7 @@ public static class AirBuilderSamples
         builder.WithEcosystem(AirEcosystem.StableDiffusionXl);
         builder.WithEcosystem(AirEcosystem.Flux1);
         builder.WithEcosystem(AirEcosystem.Pony);
-        #endregion with-ecosystem
+        #endregion
     }
 
     public static void WithAssetTypeExamples()
@@ -52,7 +49,7 @@ public static class AirBuilderSamples
         builder.WithAssetType(AirAssetType.Lora);
         builder.WithAssetType(AirAssetType.Checkpoint);
         builder.WithAssetType(AirAssetType.Vae);
-        #endregion with-asset-type
+        #endregion
     }
 
     public static void WithSourceExample()
@@ -62,7 +59,7 @@ public static class AirBuilderSamples
         #region with-source
         // Explicitly set source (usually not needed)
         builder.WithSource(AirSource.Civitai);
-        #endregion with-source
+        #endregion
     }
 
     public static void WithModelIdExample()
@@ -73,7 +70,7 @@ public static class AirBuilderSamples
         builder.WithModelId(328553);
 
         // Must be greater than 0
-        #endregion with-model-id
+        #endregion
     }
 
     public static void WithVersionIdExample()
@@ -84,7 +81,7 @@ public static class AirBuilderSamples
         builder.WithVersionId(368189);
 
         // Must be greater than 0
-        #endregion with-version-id
+        #endregion
     }
 
     public static void ResetReuseExample()
@@ -95,20 +92,20 @@ public static class AirBuilderSamples
             .WithEcosystem(AirEcosystem.Flux1)
             .WithAssetType(AirAssetType.Lora);
 
-        // For a new identifier, derive from the base and set IDs
-        var air1 = baseBuilder
+        // Derive from base and set specific IDs
+        var fluxLora = baseBuilder
             .WithModelId(123)
             .WithVersionId(456)
             .Build();
 
-        // To "reset", simply start from a fresh builder or reuse baseBuilder
-        var air2 = new AirBuilder()
+        // Create a completely different identifier
+        var sdxlCheckpoint = new AirBuilder()
             .WithEcosystem(AirEcosystem.StableDiffusionXl)
             .WithAssetType(AirAssetType.Checkpoint)
             .WithModelId(789)
             .WithVersionId(101)
             .Build();
-        #endregion reset-reuse
+        #endregion
     }
 
     public static void BuildExample()
@@ -153,6 +150,7 @@ public static class AirBuilderSamples
 
     public static async Task<AirIdentifier?> BuildFromModelAsync(IApiClient apiClient, int modelId)
     {
+        ArgumentNullException.ThrowIfNull(apiClient);
         #region build-from-model
         // Fetch model from Civitai
         var result = await apiClient.Models.GetByIdAsync(modelId);
@@ -235,6 +233,7 @@ public static class AirBuilderSamples
 
     public static void ReuseBuildersExample(IEnumerable<(AirAssetType AssetType, long ModelId, long VersionId)> modelData)
     {
+        ArgumentNullException.ThrowIfNull(modelData);
         #region reuse-builders
         // Good - derive per-item builders from a reusable base configuration
         var baseBuilder = new AirBuilder()
@@ -279,22 +278,14 @@ public static class AirBuilderSamples
     public static void MethodChainingExample()
     {
         #region method-chaining
-        // Preferred - fluent style
-        var airId = new AirBuilder()
+        // Fluent method chaining (recommended)
+        var airIdentifier = new AirBuilder()
             .WithEcosystem(AirEcosystem.Flux1)
             .WithAssetType(AirAssetType.Lora)
             .WithModelId(123)
             .WithVersionId(456)
             .Build();
-
-        // Avoid - verbose style
-        var builder = new AirBuilder();
-        builder.WithEcosystem(AirEcosystem.Flux1);
-        builder.WithAssetType(AirAssetType.Lora);
-        builder.WithModelId(123);
-        builder.WithVersionId(456);
-        var verboseAirId = builder.Build();
-        #endregion method-chaining
+        #endregion
     }
 
     private static AirEcosystem GetEcosystem(string baseModel) => baseModel switch

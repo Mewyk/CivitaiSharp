@@ -8,6 +8,9 @@ using Microsoft.Extensions.Hosting;
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddCivitaiApi();
 var host = builder.Build();
+
+await host.StartAsync();
+
 var apiClient = host.Services.GetRequiredService<IApiClient>();
 
 // #region pattern-matching
@@ -52,9 +55,9 @@ else if (queryResult.IsFailure)
 var tryResult = await apiClient.Models.GetByIdAsync(123456);
 
 // Using TryGet methods
-if (tryResult.TryGetValue(out var model2))
+if (tryResult.TryGetValue(out var model))
 {
-    Console.WriteLine($"Model: {model2.Name}");
+    Console.WriteLine($"Model: {model.Name}");
 }
 else if (tryResult.TryGetError(out var error))
 {
@@ -64,7 +67,7 @@ else if (tryResult.TryGetError(out var error))
         Console.WriteLine($"Cause: {error.InnerException.Message}");
     }
 }
-// #endregion tryget
+// #endregion
 
 // #region match
 var matchResult = await apiClient.Models
@@ -108,3 +111,5 @@ if (errorResult is Result<Model>.Failure { Error: var err })
     }
 }
 // #endregion specific-errors
+
+await host.StopAsync();

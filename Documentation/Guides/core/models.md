@@ -65,7 +65,7 @@ Filter models by their usage permissions:
 
 Some queries require authentication with an API key. Configure your API key in the service registration:
 
-[!code-csharp[Program.cs](../examples/Common/Program.cs#CoreSetupWithApiKey)]
+[!code-csharp[Program.cs](examples/Introduction/Program.cs#Registration)]
 
 ### Favorites
 
@@ -97,7 +97,7 @@ Some filters require authentication via an API key:
 
 Configure your API key in the service registration:
 
-[!code-csharp[Program.cs](examples/Configuration/Program.cs#ActionDelegate)]
+[!code-csharp[Program.cs](examples/Introduction/Program.cs#Registration)]
 
 ### Known Parameter Quirks
 

@@ -61,4 +61,3 @@ After installation, continue with:
 
 - [Getting an API Key](core/getting-api-key.md)
 - [Quick Start](core/quick-start.md)
-- [Configuration](core/configuration.md)

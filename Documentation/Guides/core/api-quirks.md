@@ -66,14 +66,13 @@ Some filters require authentication via an API key configured in `ApiClientOptio
 | `WhereHidden()` | Yes | Returns 0 results |
 | All other filters | No | Works normally |
 
-### Configuring Authentication
-
-[!code-csharp[Program.cs](../examples/Common/Program.cs#CoreSetupWithApiKey)]
+### Authentication
 
 Without authentication:
 - You can still query all public models, images, tags, and creators
 - Rate limits are lower (more restrictive)
 - Favorites and hidden model filters return empty results
+- All NSFW content is hidden
 
 ## Known Parameter Quirks
 
@@ -194,17 +193,7 @@ For filters with known quirks, verify results match expectations:
 
 [!code-csharp[Program.cs](examples/ApiQuirks/Program.cs#VerifyResults)]
 
-## Reporting Issues
-
-If you discover additional API quirks or inconsistencies:
-
-1. Test against the live Civitai API directly to confirm behavior
-2. Document test conditions (authentication, parameters, date/time)
-3. Report findings via GitHub Issues with test results
-4. Include API response examples when possible
-
 ## Next Steps
 
 - [Error Handling](error-handling.md) - Handle API errors gracefully
-- [Configuration](configuration.md) - Configure timeout and authentication
 - [Working with Models](models.md) - Model query examples

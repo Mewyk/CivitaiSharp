@@ -78,6 +78,5 @@ Monitor API consumption:
 - [Jobs Service](jobs.md) - Comprehensive guide to creating and querying jobs
 - [Coverage Service](coverage.md) - Check model and resource availability
 - [Usage Service](usage.md) - Monitor API consumption and credits
-- [Configuration](../core/configuration.md) - Configure SDK client options
 - [Quick Start](../core/quick-start.md) - Step-by-step guide to your first image generation
 - [AIR Identifiers](air-identifier.md) - Learn about model resource identifiers

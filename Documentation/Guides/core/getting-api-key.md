@@ -35,12 +35,10 @@ After creating the key, it will be displayed once. **Copy it immediately** and s
 
 Once you have your API key, configure CivitaiSharp using one of these methods:
 
-- **Options configuration** - Directly in code
-- **Configuration file** - From appsettings.json or appsettings.Development.json
+- **Options configuration** - Directly in code via `AddCivitaiApi(options => { options.ApiKey = "your-key"; })`
+- **Configuration file** - From appsettings.json
 - **Environment variables**
 - **User secrets** - For development
-
-See the [Configuration Guide](configuration.md) for detailed examples of each approach.
 
 ## Managing API Keys
 

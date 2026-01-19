@@ -27,14 +27,14 @@ dotnet add package CivitaiSharp.Core --prerelease
 
 Register the API client using dependency injection:
 
-[!code-csharp[Program.cs](../examples/Common/Program.cs#CoreBasicSetup)]
+[!code-csharp[Program.cs](examples/Introduction/Program.cs#Registration)]
 
 > [!NOTE]
 > The Core library can query public endpoints (models, images, tags, creators) without an API key. An API key is only needed for authenticated features like favorites, hidden models, higher rate limits, and accessing NSFW content (e.g., `WhereNsfw(true)` or `ImageNsfwLevel.Mature`/`X`). See [Pagination](pagination.md) for endpoint-specific pagination methods.
 
 ### Basic Usage
 
-[!code-csharp[Program.cs](../examples/Common/Program.cs#ResultPatternMatching)]
+[!code-csharp[Program.cs](examples/ErrorHandling/Program.cs#PatternMatching)]
 
 ## Architecture
 

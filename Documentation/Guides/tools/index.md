@@ -14,7 +14,7 @@ The Tools library offers practical utilities for:
 
 ### File Hashing
 
-- Support for multiple hash algorithms (SHA256, BLAKE3, CRC32, AutoV1, AutoV2, AutoV3)
+- Support for multiple hash algorithms (SHA256, SHA512, BLAKE3, CRC32)
 - Stream-based hashing for large files
 - Hash verification against Civitai metadata
 - Performance metrics (computation time, file size)

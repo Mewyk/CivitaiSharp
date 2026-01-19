@@ -91,10 +91,6 @@ Provider capability levels:
 
 [!code-csharp[Program.cs](examples/Coverage/Program.cs#CheckAllResourcesBeforeComplexJob)]
 
-### Select Provider Based on Queue Depth
-
-[!code-csharp[Program.cs](examples/Coverage/Program.cs#SelectProviderBasedOnQueueDepth)]
-
 ## Error Handling
 
 Handle coverage check failures gracefully:
@@ -103,38 +99,10 @@ Handle coverage check failures gracefully:
 
 ## Best Practices
 
-### 1. Cache Coverage Results
-
-Coverage rarely changes rapidly - cache results to reduce API calls:
-
-[!code-csharp[Program.cs](examples/Coverage/Program.cs#CacheCoverageResults)]
-
-### 2. Batch Checks When Possible
-
-Check multiple resources in one call:
-
-[!code-csharp[Program.cs](examples/Coverage/Program.cs#BatchChecksWhenPossible)]
-
-### 3. Make Coverage Optional
-
-Coverage checks add latency - make them optional based on context:
-
-[!code-csharp[Program.cs](examples/Coverage/Program.cs#MakeCoverageOptional)]
-
-### 4. Use for Resource Discovery
-
-Identify which resources are consistently available:
-
-[!code-csharp[Program.cs](examples/Coverage/Program.cs#UseForResourceDiscovery)]
-
-## API Reference
-
-### Methods
-
-| Method | Parameters | Returns | Description |
-|--------|------------|---------|-------------|
-| `GetAsync` | `IEnumerable<AirIdentifier> models, CancellationToken` | `Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>` | Check availability of multiple models |
-| `GetAsync` | `AirIdentifier model, CancellationToken` | `Result<ProviderAssetAvailability>` | Check availability of a single model |
+1. **Cache coverage results** - Coverage rarely changes rapidly, cache to reduce API calls
+2. **Batch checks** - Check multiple resources in one call when possible
+3. **Make coverage optional** - Add latency only when needed based on context
+4. **Resource discovery** - Identify consistently available resources
 
 ## Next Steps
 

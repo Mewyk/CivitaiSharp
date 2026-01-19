@@ -240,10 +240,10 @@ if (htmlModelResult is Result<Model>.Success htmlModelSuccess)
     var model = htmlModelSuccess.Data;
     
     // Using the static parser directly
-    var markdown = HtmlParser.ToMarkdown(model.Description);
+    var htmlMarkdown = HtmlParser.ToMarkdown(model.Description);
     
     Console.WriteLine("# Model Description (Markdown)");
-    Console.WriteLine(markdown);
+    Console.WriteLine(htmlMarkdown);
 }
 #endregion
 
@@ -256,10 +256,10 @@ if (plainModelResult is Result<Model>.Success plainTextSuccess)
     var model = plainTextSuccess.Data;
     
     // Using the static parser
-    var plainText = HtmlParser.ToPlainText(model.Description);
+    var htmlPlainText = HtmlParser.ToPlainText(model.Description);
     
     Console.WriteLine("Model Description (Plain Text):");
-    Console.WriteLine(plainText);
+    Console.WriteLine(htmlPlainText);
 }
 #endregion
 
@@ -320,17 +320,27 @@ builder.Services.AddCivitaiDownloads(options =>
 #endregion
 
 #region VerificationResult
-var verifyResult = await downloadService.DownloadAsync(file, version);
-
-if (verifyResult is Result<DownloadedFile>.Success verifySuccess)
+var verifyModelResult = await apiClient.Models.GetByIdAsync(4201);
+if (verifyModelResult is Result<Model>.Success verifyModelSuccess)
 {
-    if (verifySuccess.Data.IsVerified)
+    var version = verifyModelSuccess.Data.ModelVersions?.FirstOrDefault();
+    var file = version?.Files?.FirstOrDefault(f => f.Primary == true);
+    
+    if (file is not null && version is not null)
     {
-        Console.WriteLine($"Verified hash: {verifySuccess.Data.ComputedHash}");
-    }
-    else
-    {
-        Console.WriteLine("Hash verification was not performed");
+        var verifyResult = await downloadService.DownloadAsync(file, version);
+
+        if (verifyResult is Result<DownloadedFile>.Success verifySuccess)
+        {
+            if (verifySuccess.Data.IsVerified)
+            {
+                Console.WriteLine($"Verified hash: {verifySuccess.Data.ComputedHash}");
+            }
+            else
+            {
+                Console.WriteLine("Hash verification was not performed");
+            }
+        }
     }
 }
 #endregion
@@ -346,30 +356,40 @@ var formatFromStream = await FileFormatDetector.DetectFormatAsync(formatStream);
 
 // Detect from bytes
 var header = new byte[16];
-await formatStream.ReadAsync(header);
-var formatFromBytes = FileFormatDetector.DetectFormat(header.AsSpan());
+var bytesRead = await formatStream.ReadAsync(header.AsMemory());
+var formatFromBytes = FileFormatDetector.DetectFormat(header.AsSpan(0, bytesRead));
 #endregion
 
 #region ErrorHandling
-var errorResult = await downloadService.DownloadAsync(file, version);
-
-switch (errorResult)
+var errorModelResult = await apiClient.Models.GetByIdAsync(4201);
+if (errorModelResult is Result<Model>.Success errorModelSuccess)
 {
-    case Result<DownloadedFile>.Success success:
-        Console.WriteLine($"Downloaded: {success.Data.FilePath}");
-        break;
-        
-    case Result<DownloadedFile>.Failure { Error.Code: ErrorCode.HashVerificationFailed } failure:
-        Console.WriteLine($"Corrupted download: {failure.Error.Message}");
-        break;
-        
-    case Result<DownloadedFile>.Failure { Error.Code: ErrorCode.IoError } failure:
-        Console.WriteLine($"File exists: {failure.Error.Message}");
-        break;
-        
-    case Result<DownloadedFile>.Failure failure:
-        Console.WriteLine($"Download failed: {failure.Error.Message}");
-        break;
+    var version = errorModelSuccess.Data.ModelVersions?.FirstOrDefault();
+    var file = version?.Files?.FirstOrDefault(f => f.Primary == true);
+    
+    if (file is not null && version is not null)
+    {
+        var errorResult = await downloadService.DownloadAsync(file, version);
+
+        switch (errorResult)
+        {
+            case Result<DownloadedFile>.Success success:
+                Console.WriteLine($"Downloaded: {success.Data.FilePath}");
+                break;
+                
+            case Result<DownloadedFile>.Failure { Error.Code: ErrorCode.HashVerificationFailed } failure:
+                Console.WriteLine($"Corrupted download: {failure.Error.Message}");
+                break;
+                
+            case Result<DownloadedFile>.Failure { Error.Code: ErrorCode.IoError } failure:
+                Console.WriteLine($"File exists: {failure.Error.Message}");
+                break;
+                
+            case Result<DownloadedFile>.Failure failure:
+                Console.WriteLine($"Download failed: {failure.Error.Message}");
+                break;
+        }
+    }
 }
 #endregion
 
@@ -476,49 +496,18 @@ async Task DownloadWithReadmeAsync(long modelId, string outputDirectory)
 await DownloadWithReadmeAsync(123456, @"C:\Downloads\Models");
 #endregion
 
-#region FileHashingServiceUsage
-// Inject IFileHashingService to compute file hashes
-public class MyHashingService(IFileHashingService hashingService)
-{
-    public async Task VerifyFileAsync(string filePath)
-    {
-        var result = await hashingService.ComputeHashAsync(filePath, HashAlgorithm.Sha256);
-        
-        if (result is Result<HashedFile>.Success success)
-        {
-            Console.WriteLine($"Hash: {success.Data.Hash}");
-            Console.WriteLine($"Size: {success.Data.FileSize} bytes");
-            Console.WriteLine($"Time: {success.Data.ComputationTime.TotalMilliseconds}ms");
-        }
-    }
-}
-#endregion
-
 #region DownloadServiceUsage
-// Inject IDownloadService and IApiClient to download model files
-public class MyDownloadService(IDownloadService downloadService, IApiClient apiClient)
+// Download service is injected via DI
+var usageResult = await apiClient.Models.GetByIdAsync(4201);
+if (usageResult is Result<Model>.Success { Data.ModelVersions: [var firstVersion, ..] })
 {
-    public async Task DownloadModelAsync()
+    var primaryFile = firstVersion.Files?.FirstOrDefault(file => file.Primary == true);
+    if (primaryFile is not null)
     {
-        // Get a model version
-        var modelResult = await apiClient.Models.GetByIdAsync(123456);
-        if (modelResult is not Result<Model>.Success modelSuccess)
-            return;
-            
-        var model = modelSuccess.Data;
-        var version = model.ModelVersions?.FirstOrDefault();
-        var file = version?.Files?.FirstOrDefault(f => f.Primary == true);
-        
-        if (file is null || version is null)
-            return;
-        
-        // Download with hash verification
-        var result = await downloadService.DownloadAsync(file, version);
-        
-        if (result is Result<DownloadedFile>.Success success)
+        var download = await downloadService.DownloadAsync(primaryFile, firstVersion);
+        if (download is Result<DownloadedFile>.Success { Data: var downloaded })
         {
-            Console.WriteLine($"Downloaded to: {success.Data.FilePath}");
-            Console.WriteLine($"Verified: {success.Data.IsVerified}");
+            Console.WriteLine($"Downloaded: {downloaded.FilePath}");
         }
     }
 }
@@ -526,16 +515,22 @@ public class MyDownloadService(IDownloadService downloadService, IApiClient apiC
 
 #region HtmlParserUsage
 // Use HtmlParser to convert model descriptions
-var markdown = HtmlParser.ToMarkdown(model.Description);
-var plainText = HtmlParser.ToPlainText(model.Description);
+var usageModelResult = await apiClient.Models.GetByIdAsync(4201);
+if (usageModelResult is Result<Model>.Success usageSuccess)
+{
+    var model = usageSuccess.Data;
+    var markdown = HtmlParser.ToMarkdown(model.Description);
+    var plainText = HtmlParser.ToPlainText(model.Description);
 
-// Or using extension methods
-var markdown2 = model.GetDescriptionAsMarkdown();
-var plainText2 = model.GetDescriptionAsPlainText();
+    // Or using extension methods
+    var markdown2 = model.GetDescriptionAsMarkdown();
+    var plainText2 = model.GetDescriptionAsPlainText();
+}
 #endregion
 
 #region AsyncCancellationExample
 // Hash a file with cancellation support
+var largeFilePath = @"C:\Models\large_model.safetensors";
 using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
 
 var cancellationResult = await hashingService.ComputeHashAsync(
@@ -572,3 +567,55 @@ builder.Services.AddCivitaiDownloads(options =>
 #endregion
 
 await host.StopAsync();
+
+#region FileHashingServiceUsage
+// File hashing service is injected via DI
+var hashingUsageResult = await hashingService.ComputeHashAsync(
+    @"C:\Models\model.safetensors",
+    HashAlgorithm.Sha256);
+
+if (hashingUsageResult is Result<HashedFile>.Success hashingUsageSuccess)
+{
+    Console.WriteLine($"Hash: {hashingUsageSuccess.Data.Hash}");
+    Console.WriteLine($"Algorithm: {hashingUsageSuccess.Data.Algorithm}");
+    Console.WriteLine($"Size: {hashingUsageSuccess.Data.FileSize:N0} bytes");
+}
+#endregion
+
+#region DownloadServiceUsage
+// Download service is injected via DI
+var downloadUsageResult = await apiClient.Models.GetByIdAsync(4201);
+if (downloadUsageResult is Result<Model>.Success downloadUsageSuccess)
+{
+    var version = downloadUsageSuccess.Data.ModelVersions?.FirstOrDefault();
+    var file = version?.Files?.FirstOrDefault(f => f.Primary == true);
+    
+    if (file is not null && version is not null)
+    {
+        var downloadResult = await downloadService.DownloadAsync(file, version);
+        
+        if (downloadResult is Result<DownloadedFile>.Success downloadSuccess)
+        {
+            Console.WriteLine($"Downloaded: {downloadSuccess.Data.FilePath}");
+            Console.WriteLine($"Verified: {downloadSuccess.Data.IsVerified}");
+        }
+    }
+}
+#endregion
+
+#region HtmlParserUsage
+// Use HtmlParser to convert model descriptions
+var parserUsageResult = await apiClient.Models.GetByIdAsync(4201);
+if (parserUsageResult is Result<Model>.Success parserUsageSuccess)
+{
+    var model = parserUsageSuccess.Data;
+    var markdown = HtmlParser.ToMarkdown(model.Description);
+    var plainText = HtmlParser.ToPlainText(model.Description);
+    
+    Console.WriteLine("Markdown:");
+    Console.WriteLine(markdown);
+    Console.WriteLine();
+    Console.WriteLine("Plain Text:");
+    Console.WriteLine(plainText);
+}
+#endregion

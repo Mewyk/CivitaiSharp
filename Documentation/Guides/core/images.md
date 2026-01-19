@@ -13,19 +13,19 @@ The `ImageBuilder` allows you to query generated images from the Civitai gallery
 
 Find images generated with a specific model:
 
-[!code-csharp[Program.cs](examples/Images/Program.cs#by-model)]
+[!code-csharp[Program.cs](examples/Images/Program.cs#ByModel)]
 
 ### By Model Version
 
 Find images generated with a specific model version:
 
-[!code-csharp[Program.cs](examples/Images/Program.cs#by-version)]
+[!code-csharp[Program.cs](examples/Images/Program.cs#ByVersion)]
 
 ### By Creator
 
 Find images posted by a specific user:
 
-[!code-csharp[Program.cs](examples/Images/Program.cs#by-creator)]
+[!code-csharp[Program.cs](examples/Images/Program.cs#ByCreator)]
 
 ### By Post
 
@@ -35,24 +35,7 @@ Find all images in a specific post:
 
 ## The Image Record
 
-The `Image` record contains:
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `Id` | `long` | Unique identifier |
-| `Url` | `string` | Image URL at source resolution |
-| `Hash` | `string?` | Blurhash for placeholder generation |
-| `Width` | `int` | Image width in pixels |
-| `Height` | `int` | Image height in pixels |
-| `NsfwLevel` | `ImageNsfwLevel?` | NSFW classification |
-| `Type` | `MediaType?` | Media type (image/video) |
-| `CreatedAt` | `DateTime?` | When the image was posted |
-| `PostId` | `long?` | Parent post ID |
-| `Stats` | `ImageStats?` | Reaction statistics |
-| `Meta` | `ImageMeta?` | Generation metadata |
-| `Username` | `string?` | Creator's username |
-| `BaseModel` | `string?` | Base model used |
-| `ModelVersionIds` | `IReadOnlyList<long>?` | Model versions used |
+The `Image` record contains image URL, dimensions, NSFW level, creation timestamp, creator username, and generation metadata. See the API reference for complete property details.
 
 ## Generation Metadata
 
@@ -60,19 +43,7 @@ Images often include generation metadata in the `Meta` property:
 
 [!code-csharp[Program.cs](examples/Images/Program.cs#GenerationMetadata)]
 
-The `ImageMeta` record includes:
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `Prompt` | `string?` | The positive prompt |
-| `NegativePrompt` | `string?` | The negative prompt |
-| `Steps` | `int?` | Number of sampling steps |
-| `Sampler` | `string?` | Sampler name |
-| `CfgScale` | `decimal?` | Classifier-Free Guidance scale |
-| `Seed` | `long?` | Generation seed |
-| `Model` | `string?` | Model name used |
-| `Size` | `string?` | Image dimensions as string |
-| `ClipSkip` | `int?` | CLIP skip value |
+The `ImageMeta` record includes prompt, steps, sampler, CFG scale, seed, and model information. See the API reference for complete details.
 
 ## NSFW Filtering
 
@@ -92,25 +63,13 @@ Available NSFW levels:
 
 [!code-csharp[Program.cs](examples/Images/Program.cs#SortingImages)]
 
-Available sort options:
-- `MostReactions` - Sort by reaction count (descending)
-- `MostComments` - Sort by comment count (descending)
-- `MostCollected` - Sort by collection count (descending)
-- `Newest` - Sort by creation date, newest first
-- `Oldest` - Sort by creation date, oldest first
-- `Random` - Random order
+Available sort options: `MostReactions`, `MostComments`, `MostCollected`, `Newest`, `Oldest`, `Random`
 
 ## Image Statistics
 
 Access reaction counts:
 
 [!code-csharp[Program.cs](examples/Images/Program.cs#ImageStatistics)]
-
-## Pagination
-
-Images use cursor-based pagination:
-
-[!code-csharp[Program.cs](examples/Images/Program.cs#pagination)]
 
 ## Downloading Images
 

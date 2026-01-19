@@ -2,35 +2,36 @@
   <Folder Name="/Documentation/">
     <File Path="Documentation/docfx.json" />
   </Folder>
-  <Folder Name="/Documentation/Guides/">
-    <Project Path="Documentation/Guides/AirBuilder/AirBuilder.csproj" />
-    <Project Path="Documentation/Guides/AirIdentifier/AirIdentifier.csproj" />
-    <Project Path="Documentation/Guides/ApiQuirks/ApiQuirks.csproj" />
-    <Project Path="Documentation/Guides/Configuration/Configuration.csproj" />
-    <Project Path="Documentation/Guides/Creators/Creators.csproj" />
-    <Project Path="Documentation/Guides/ErrorHandling/ErrorHandling.csproj" />
-    <Project Path="Documentation/Guides/GettingApiKey/GettingApiKey.csproj" />
-    <Project Path="Documentation/Guides/Images/Images.csproj" />
-    <Project Path="Documentation/Guides/Introduction/Introduction.csproj" />
-    <Project Path="Documentation/Guides/Models/Models.csproj" />
-    <Project Path="Documentation/Guides/Pagination/Pagination.csproj" />
-    <Project Path="Documentation/Guides/QuickStart/QuickStart.csproj" />
-    <Project Path="Documentation/Guides/RequestBuilders/RequestBuilders.csproj" />
-    <Project Path="Documentation/Guides/Tags/Tags.csproj" />
-    <Project Path="Documentation/Guides/Tools/Tools.csproj" />
-  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
     <File Path=".gitignore" />
     <File Path="Directory.Build.props" />
     <File Path="README.md" />
   </Folder>
-  <Folder Name="/Tests/">
-    <Project Path="Tests/CivitaiSharp.Core.Tests/CivitaiSharp.Core.Tests.csproj" />
-    <Project Path="Tests/CivitaiSharp.Sdk.Tests/CivitaiSharp.Sdk.Tests.csproj" />
-    <Project Path="Tests/CivitaiSharp.Tools.Tests/CivitaiSharp.Tools.Tests.csproj" />
-  </Folder>
   <Project Path="Core/CivitaiSharp.Core.csproj" />
   <Project Path="Sdk/CivitaiSharp.Sdk.csproj" />
   <Project Path="Tools/CivitaiSharp.Tools.csproj" />
+  <Project Path="Tests/CivitaiSharp.Core.Tests/CivitaiSharp.Core.Tests.csproj" />
+  <Project Path="Tests/CivitaiSharp.Sdk.Tests/CivitaiSharp.Sdk.Tests.csproj" />
+  <Project Path="Tests/CivitaiSharp.Tools.Tests/CivitaiSharp.Tools.Tests.csproj" />
+  <Project Path="Documentation/Guides/examples/Common/CivitaiSharp.Guides.Common.csproj" />
+  <Project Path="Documentation/Guides/core/examples/ApiQuirks/CivitaiSharp.Guides.Core.ApiQuirks.csproj" />
+  <Project Path="Documentation/Guides/core/examples/Configuration/CivitaiSharp.Guides.Core.Configuration.csproj" />
+  <Project Path="Documentation/Guides/core/examples/Creators/CivitaiSharp.Guides.Core.Creators.csproj" />
+  <Project Path="Documentation/Guides/core/examples/ErrorHandling/CivitaiSharp.Guides.Core.ErrorHandling.csproj" />
+  <Project Path="Documentation/Guides/core/examples/GettingApiKey/CivitaiSharp.Guides.Core.GettingApiKey.csproj" />
+  <Project Path="Documentation/Guides/core/examples/Images/CivitaiSharp.Guides.Core.Images.csproj" />
+  <Project Path="Documentation/Guides/core/examples/Introduction/CivitaiSharp.Guides.Core.Introduction.csproj" />
+  <Project Path="Documentation/Guides/core/examples/Models/CivitaiSharp.Guides.Core.Models.csproj" />
+  <Project Path="Documentation/Guides/core/examples/Pagination/CivitaiSharp.Guides.Core.Pagination.csproj" />
+  <Project Path="Documentation/Guides/core/examples/QuickStart/CivitaiSharp.Guides.Core.QuickStart.csproj" />
+  <Project Path="Documentation/Guides/core/examples/RequestBuilders/CivitaiSharp.Guides.Core.RequestBuilders.csproj" />
+  <Project Path="Documentation/Guides/core/examples/Tags/CivitaiSharp.Guides.Core.Tags.csproj" />
+  <Project Path="Documentation/Guides/sdk/examples/AirBuilder/CivitaiSharp.Guides.Sdk.AirBuilder.csproj" />
+  <Project Path="Documentation/Guides/sdk/examples/AirIdentifier/CivitaiSharp.Guides.Sdk.AirIdentifier.csproj" />
+  <Project Path="Documentation/Guides/sdk/examples/Configuration/CivitaiSharp.Guides.Sdk.Configuration.csproj" />
+  <Project Path="Documentation/Guides/sdk/examples/Coverage/CivitaiSharp.Guides.Sdk.Coverage.csproj" />
+  <Project Path="Documentation/Guides/sdk/examples/Jobs/CivitaiSharp.Guides.Sdk.Jobs.csproj" />
+  <Project Path="Documentation/Guides/sdk/examples/Usage/CivitaiSharp.Guides.Sdk.Usage.csproj" />
+  <Project Path="Documentation/Guides/tools/examples/Tools/CivitaiSharp.Guides.Tools.csproj" />
 </Solution>

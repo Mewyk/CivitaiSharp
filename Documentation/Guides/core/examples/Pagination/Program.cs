@@ -1,9 +1,13 @@
 using CivitaiSharp.Core;
 using CivitaiSharp.Core.Extensions;
 using CivitaiSharp.Core.Models;
+using CivitaiSharp.Core.Request;
 using CivitaiSharp.Core.Response;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Runtime.CompilerServices;
+
+// See Common/Program.cs for setup patterns: #CoreBasicSetup, #CoreSetupWithApiKey, #ResultPatternMatching
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddCivitaiApi();
@@ -102,21 +106,12 @@ var metadataResult = await apiClient.Models
 
 if (metadataResult is Result<PagedResult<Model>>.Success metadataSuccess)
 {
-    var paged = metadataSuccess.Data;
-
-    // The items in this page
-    var models = paged.Items;
-
-    // Pagination metadata
-    var metadata = paged.Metadata;
+    var metadata = metadataSuccess.Data.Metadata;
 
     if (metadata is not null)
     {
-        Console.WriteLine($"Current Page: {metadata.CurrentPage}");
+        Console.WriteLine($"Page {metadata.CurrentPage} of {metadata.TotalPages}");
         Console.WriteLine($"Total Items: {metadata.TotalItems}");
-        Console.WriteLine($"Page Size: {metadata.PageSize}");
-        Console.WriteLine($"Total Pages: {metadata.TotalPages}");
-        Console.WriteLine($"Has Next: {!string.IsNullOrEmpty(metadata.NextCursor)}");
     }
 }
 #endregion
@@ -136,11 +131,23 @@ else
 }
 #endregion
 
+#region AsyncEnumerationUsage
+// Usage example for async enumeration extension
+async Task DemonstrateAsyncEnumeration()
+{
+    await foreach (var model in apiClient.Models.WhereType(ModelType.Lora).AsAsyncEnumerable<Model>())
+    {
+        Console.WriteLine(model.Name);
+    }
+}
+
+await DemonstrateAsyncEnumeration();
+#endregion
+
 await host.StopAsync();
 
 #region AsyncEnumerationExtension
 // Extension method example for async enumeration
-using System.Runtime.CompilerServices;
 
 public static class PaginationExtensions
 {
@@ -168,15 +175,6 @@ public static class PaginationExtensions
             cursor = success.Data.Metadata?.NextCursor;
         }
         while (!string.IsNullOrEmpty(cursor));
-    }
-}
-
-// Usage example
-async Task DemonstrateAsyncEnumeration()
-{
-    await foreach (var model in apiClient.Models.WhereType(ModelType.Lora).AsAsyncEnumerable<Model>())
-    {
-        Console.WriteLine(model.Name);
     }
 }
 #endregion

@@ -2,6 +2,8 @@ using CivitaiSharp.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+// See Common/Program.cs for setup patterns: #CoreBasicSetup, #CoreSetupWithApiKey, #CoreSetupFromConfiguration
+
 var builder = Host.CreateApplicationBuilder(args);
 
 #region OptionsConfiguration

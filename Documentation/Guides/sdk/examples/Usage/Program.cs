@@ -4,18 +4,13 @@ using CivitaiSharp.Sdk.Air;
 using CivitaiSharp.Sdk.Enums;
 using CivitaiSharp.Sdk.Extensions;
 using CivitaiSharp.Sdk.Models.Results;
-using Microsoft.Extensions.Caching.Distributed;
+using CivitaiSharp.Sdk.Models.Usage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var builder = Host.CreateApplicationBuilder(args);
-
-builder.Services.AddCivitaiSdk(options =>
-{
-    options.ApiToken = builder.Configuration["Civitai:ApiToken"]!;
-});
-
+builder.Services.AddCivitaiSdk(builder.Configuration);
 var host = builder.Build();
 await host.StartAsync();
 
@@ -43,64 +38,6 @@ if (periodResult is Result<ConsumptionDetails>.Success periodSuccess)
     Console.WriteLine($"January 2026 Usage:");
     Console.WriteLine($"  Images: {periodSuccess.Data.Images}");
     Console.WriteLine($"  Total Cost: {periodSuccess.Data.TotalCost:F2} Buzz");
-}
-#endregion
-
-#region MonitorDailyUsage
-async Task<ConsumptionDetails?> GetTodayUsageAsync()
-{
-    var today = DateTime.UtcNow.Date;
-    var tomorrow = today.AddDays(1);
-    
-    var dailyResult = await sdkClient.Usage.GetConsumptionAsync(today, tomorrow);
-    
-    if (dailyResult is Result<ConsumptionDetails>.Success success)
-    {
-        return success.Data;
-    }
-    
-    Console.WriteLine("Failed to retrieve usage data");
-    return null;
-}
-#endregion
-
-#region TrackMonthlyTrends
-async Task ShowMonthlyTrendsAsync()
-{
-    var currentMonth = DateTime.UtcNow.Date.AddDays(1 - DateTime.UtcNow.Day);
-    
-    for (int i = 0; i < 6; i++)
-    {
-        var month = currentMonth.AddMonths(-i);
-        var nextMonth = month.AddMonths(1);
-        
-        var monthlyResult = await sdkClient.Usage.GetConsumptionAsync(month, nextMonth);
-        
-        if (monthlyResult is Result<ConsumptionDetails>.Success success)
-        {
-            Console.WriteLine($"{month:yyyy-MM}:");
-            Console.WriteLine($"  Images: {success.Data.Images,6}");
-            Console.WriteLine($"  Total Cost: {success.Data.TotalCost,8:F2} Buzz");
-        }
-    }
-}
-#endregion
-
-#region CalculateAverageCostPerJob
-async Task<decimal?> GetAverageCostPerImageAsync(DateTime start, DateTime end)
-{
-    var avgResult = await sdkClient.Usage.GetConsumptionAsync(start, end);
-    
-    if (avgResult is Result<ConsumptionDetails>.Success success)
-    {
-        var images = success.Data.Images ?? 0;
-        var totalCost = success.Data.TotalCost ?? 0;
-        var avgCost = images > 0 ? totalCost / images : 0;
-        Console.WriteLine($"Average cost per image: {avgCost:F3} Buzz");
-        return avgCost;
-    }
-    
-    return null;
 }
 #endregion
 
@@ -137,24 +74,6 @@ async Task<bool> CheckBudgetAsync(decimal monthlyBudget)
     }
     
     return true;
-}
-#endregion
-
-#region UsageSummaryReport
-async Task ShowUsageSummaryAsync(DateTime start, DateTime end)
-{
-    var summaryResult = await sdkClient.Usage.GetConsumptionAsync(start, end);
-    
-    if (summaryResult is not Result<ConsumptionDetails>.Success success)
-    {
-        Console.WriteLine("Failed to retrieve usage data");
-        return;
-    }
-    
-    var data = success.Data;
-    Console.WriteLine($"Usage Summary ({data.StartDate:yyyy-MM-dd} to {data.EndDate:yyyy-MM-dd}):");
-    Console.WriteLine($"  Total Images: {data.Images}");
-    Console.WriteLine($"  Total Cost: {data.TotalCost:F2} Buzz");
 }
 #endregion
 
@@ -204,8 +123,8 @@ var errorResult = await sdkClient.Usage.GetConsumptionAsync();
 
 switch (errorResult)
 {
-    case Result<ConsumptionDetails>.Success success:
-        Console.WriteLine($"Current usage: {success.Data.TotalCost:F2} Buzz ({success.Data.Images} images)");
+    case Result<ConsumptionDetails>.Success usageSuccess:
+        Console.WriteLine($"Current usage: {usageSuccess.Data.TotalCost:F2} Buzz ({usageSuccess.Data.Images} images)");
         break;
         
     case Result<ConsumptionDetails>.Failure failure:
@@ -215,39 +134,23 @@ switch (errorResult)
 }
 #endregion
 
-#region UseUtcForDateRanges
-// Good - explicit UTC
-var utcStart = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-var utcEnd = new DateTime(2026, 1, 31, 23, 59, 59, DateTimeKind.Utc);
-await sdkClient.Usage.GetConsumptionAsync(utcStart, utcEnd);
-
-// Bad - local time can cause issues
-var localStart = new DateTime(2026, 1, 1);
-await sdkClient.Usage.GetConsumptionAsync(localStart, localStart.AddMonths(1));
-#endregion
-
 #region SeparateMonitoringFromBusinessLogic
-// Usage monitoring shouldn't block job submission
 async Task<Result<JobStatusCollection>> GenerateAsync(string prompt)
 {
-    var model = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
+    var model = new AirIdentifier(AirEcosystem.StableDiffusionXl, AirAssetType.Checkpoint, AirSource.Civitai, 4201, 130072);
     
-    // Monitor usage asynchronously (fire and forget)
-    _ = Task.Run(async () =>
+    var monitoringTask = Task.Run(async () =>
     {
         try
         {
             var usage = await sdkClient.Usage.GetConsumptionAsync();
-            // Log, alert, or update dashboard
         }
         catch (Exception ex)
         {
-            // Log error but don't propagate
             Console.WriteLine($"Usage monitoring failed: {ex.Message}");
         }
     });
     
-    // Continue with job submission
     return await sdkClient.Jobs
         .CreateImage()
         .WithAir(model)
@@ -301,27 +204,33 @@ async Task<ConsumptionDetails?> GetCachedUsageAsync()
     
     var cacheResult = await sdkClient.Usage.GetConsumptionAsync();
     
-    if (cacheResult is Result<ConsumptionDetails>.Success success)
+    if (cacheResult is Result<ConsumptionDetails>.Success cacheSuccess)
     {
         _usageCache = new UsageCache
         {
-            Data = success.Data,
+            Data = cacheSuccess.Data,
             LastUpdate = DateTime.UtcNow
         };
-        return success.Data;
+        return cacheSuccess.Data;
     }
     
     return null;
 }
 #endregion
 
+// Demonstrate the examples
+await CheckBudgetAsync(5000m);
+await CanSubmitJobAsync(10m);
+await GenerateAsync("example prompt");
+await CheckUsageAlertsAsync(3000m, 4500m);
+await GetCachedUsageAsync();
+
 Console.WriteLine("Usage examples completed successfully.");
 
 await host.StopAsync();
 
-// Classes and helper methods for regions
 class UsageCache
 {
-    public ConsumptionDetails Data { get; set; } = null!;
+    public required ConsumptionDetails Data { get; set; }
     public DateTime LastUpdate { get; set; }
 }

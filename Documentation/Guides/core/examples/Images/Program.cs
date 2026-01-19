@@ -5,6 +5,8 @@ using CivitaiSharp.Core.Response;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+// See Common/Program.cs for setup patterns: #CoreBasicSetup, #CoreSetupWithApiKey, #ResultPatternMatching
+
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddCivitaiApi();
 var host = builder.Build();
@@ -61,37 +63,6 @@ if (imagesByCreator is Result<PagedResult<Image>>.Success creatorSuccess)
 }
 #endregion
 
-#region Pagination
-// Paginate through image results using cursor-based pagination
-string? cursor = null;
-var allImages = new List<Image>();
-const int maxImages = 40;
-
-do
-{
-    var result = await apiClient.Images
-        .WhereModelId(123456)
-        .ExecuteAsync(resultsLimit: 20, cursor: cursor);
-
-    if (result is Result<PagedResult<Image>>.Success pageSuccess)
-    {
-        allImages.AddRange(pageSuccess.Data.Items);
-        cursor = pageSuccess.Data.Metadata?.NextCursor;
-        Console.WriteLine($"Fetched {pageSuccess.Data.Items.Count} images. Total: {allImages.Count}");
-
-        if (allImages.Count >= maxImages)
-            break;
-    }
-    else
-    {
-        break;
-    }
-}
-while (!string.IsNullOrEmpty(cursor));
-
-Console.WriteLine($"Collected {allImages.Count} images total.");
-#endregion
-
 #region ByPost
 // Find all images in a specific post
 var imagesByPost = await apiClient.Images
@@ -114,19 +85,14 @@ if (imagesWithMeta is Result<PagedResult<Image>>.Success metaSuccess && metaSucc
     var image = metaSuccess.Data.Items[0];
     if (image.Meta is { } meta)
     {
-        Console.WriteLine($"Prompt: {meta.Prompt}");
-        Console.WriteLine($"Negative Prompt: {meta.NegativePrompt}");
-        Console.WriteLine($"Steps: {meta.Steps}");
-        Console.WriteLine($"Sampler: {meta.Sampler}");
-        Console.WriteLine($"CFG Scale: {meta.CfgScale}");
-        Console.WriteLine($"Seed: {meta.Seed}");
-        Console.WriteLine($"Model: {meta.Model}");
+        Console.WriteLine($"Prompt: {meta.PositivePrompt}");
+        Console.WriteLine($"Steps: {meta.Steps}, CFG: {meta.ConfigurationScale}, Seed: {meta.Seed}");
+        Console.WriteLine($"Sampler: {meta.Sampler}, Model: {meta.ModelName}");
     }
 }
 #endregion
 
 #region NsfwFiltering
-// Only safe-for-work images
 var safeImages = await apiClient.Images
     .WhereNsfwLevel(ImageNsfwLevel.None)
     .ExecuteAsync(resultsLimit: 10);
@@ -134,16 +100,6 @@ var safeImages = await apiClient.Images
 if (safeImages is Result<PagedResult<Image>>.Success safeSuccess)
 {
     Console.WriteLine($"Found {safeSuccess.Data.Items.Count} safe images");
-}
-
-// Allow soft NSFW
-var softImages = await apiClient.Images
-    .WhereNsfwLevel(ImageNsfwLevel.Soft)
-    .ExecuteAsync(resultsLimit: 10);
-
-if (softImages is Result<PagedResult<Image>>.Success softSuccess)
-{
-    Console.WriteLine($"Found {softSuccess.Data.Items.Count} soft NSFW images");
 }
 #endregion
 
@@ -169,10 +125,7 @@ if (imagesWithStats is Result<PagedResult<Image>>.Success statsSuccess && statsS
     var image = statsSuccess.Data.Items[0];
     if (image.Stats is { } stats)
     {
-        Console.WriteLine($"Likes: {stats.LikeCount}");
-        Console.WriteLine($"Hearts: {stats.HeartCount}");
-        Console.WriteLine($"Laughs: {stats.LaughCount}");
-        Console.WriteLine($"Cries: {stats.CryCount}");
+        Console.WriteLine($"Reactions - Likes: {stats.LikeCount}, Hearts: {stats.HeartCount}");
         Console.WriteLine($"Comments: {stats.CommentCount}");
     }
 }

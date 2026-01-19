@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+// See Common/Program.cs for setup patterns: #CoreBasicSetup, #CoreSetupWithApiKey, #CoreSetupFromConfiguration
+
 #region ActionDelegate
 var builder = Host.CreateApplicationBuilder(args);
 

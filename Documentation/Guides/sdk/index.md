@@ -8,33 +8,20 @@ The SDK library provides tools for working with AIR identifiers, which are URN-b
 
 ## Key Features
 
-- **AIR Identifiers**: Parse and construct standardized AI resource identifiers
-- **AIR Builder**: Fluent API for creating AIR identifiers
-- **Resource Identification**: Unique identification across platforms
-- **Ecosystem Support**: SDXL, Flux, Pony, and more
-- **Version Tracking**: Link models to specific versions
-
-## AIR Format
-
-AIR identifiers follow this format:
-
-```
-urn:air:{ecosystem}:{type}:{source}:{id}@{version}
-```
-
-Example:
-```
-urn:air:sdxl:lora:civitai:328553@368189
-```
+- **AIR Identifiers** - Standardized URN-based resource identification
+- **AIR Builder** - Fluent API for creating identifiers
+- **Image Generation** - Submit and track image generation jobs
+- **Coverage Service** - Check model and resource availability
+- **Usage Tracking** - Monitor API consumption and credits
 
 ## Quick Links
 
 - [Introduction](introduction.md) - Getting started with the SDK
 - [AIR Identifier](air-identifier.md) - Parsing and using AIR identifiers
 - [AIR Builder](air-builder.md) - Creating AIR identifiers programmatically
-- [Jobs](jobs.md) - Background job management
-- [Coverage](coverage.md) - API coverage and supported features
-- [Usage](usage.md) - Common usage patterns and examples
+- [Jobs](jobs.md) - Image generation job management
+- [Coverage](coverage.md) - Check model and resource availability
+- [Usage](usage.md) - Monitor API consumption and credits
 
 ## Installation
 
@@ -44,32 +31,7 @@ dotnet add package CivitaiSharp.Sdk
 
 Note: The SDK package includes the Core library as a dependency.
 
-## Basic Example
-
-```csharp
-using CivitaiSharp.Sdk.Air;
-
-// Parse an existing AIR identifier
-var air = AirIdentifier.Parse("urn:air:sdxl:lora:civitai:328553@368189");
-
-Console.WriteLine($"Ecosystem: {air.Ecosystem}");  // StableDiffusionXl
-Console.WriteLine($"Type: {air.AssetType}");       // Lora
-Console.WriteLine($"Source: {air.Source}");        // Civitai
-Console.WriteLine($"Model ID: {air.ModelId}");     // 328553
-Console.WriteLine($"Version ID: {air.VersionId}"); // 368189
-
-// Build a new AIR identifier
-var builder = new AirBuilder();
-var newAir = builder
-    .WithEcosystem(AirEcosystem.Flux1)
-    .WithAssetType(AirAssetType.Checkpoint)
-    .WithModelId(12345)
-    .WithVersionId(67890)
-    .Build();
-
-Console.WriteLine(newAir.ToString());
-// Output: urn:air:flux1:checkpoint:civitai:12345@67890
-```
+For complete examples, see [Introduction](introduction.md).
 
 ## Next Steps
 

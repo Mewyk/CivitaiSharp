@@ -22,7 +22,7 @@ CivitaiSharp uses dependency injection. Register the API client in your `IServic
 
 Use the fluent builder pattern to construct queries:
 
-[!code-csharp[Program.cs](examples/QuickStart/Program.cs#Query)]
+[!code-csharp[Program.cs](examples/QuickStart/Program.cs#query)]
 
 ## Handling Results
 

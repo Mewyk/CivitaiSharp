@@ -9,22 +9,7 @@ The `ModelBuilder` allows you to query AI models from the Civitai database. Mode
 
 ## Model Types
 
-Civitai hosts many types of AI models:
-
-| Type | Description |
-|------|-------------|
-| `Checkpoint` | Full Stable Diffusion models |
-| `Lora` | Low-Rank Adaptation models for fine-tuning |
-| `TextualInversion` | Embeddings for textual inversion |
-| `Controlnet` | ControlNet models for image guidance |
-| `Hypernetwork` | Hypernetwork models |
-| `AestheticGradient` | Aesthetic gradient models |
-| `Vae` | Variational Auto-Encoder models |
-| `Poses` | Pose reference files |
-| `Wildcards` | Wildcard text files |
-| `MotionModule` | AnimateDiff motion modules |
-| `Upscaler` | Image upscaling models |
-| `Workflows` | ComfyUI/InvokeAI workflows |
+Civitai hosts various AI model types including: `Checkpoint`, `Lora`, `TextualInversion`, `Controlnet`, `Hypernetwork`, `AestheticGradient`, `Vae`, `Poses`, `Wildcards`, `MotionModule`, `Upscaler`, and `Workflows`.
 
 ## Querying Models
 
@@ -58,62 +43,17 @@ Civitai hosts many types of AI models:
 
 ## The Model Record
 
-The `Model` record contains comprehensive information:
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `Id` | `long` | Unique identifier |
-| `Name` | `string` | Model name |
-| `Description` | `string?` | HTML description |
-| `Type` | `ModelType` | Model type enum |
-| `IsNsfw` | `bool` | Whether model is NSFW |
-| `NsfwLevel` | `int` | Numeric NSFW level |
-| `Tags` | `IReadOnlyList<string>?` | Associated tags |
-| `Creator` | `Creator?` | Creator information |
-| `Stats` | `ModelStats?` | Download/rating statistics |
-| `ModelVersions` | `IReadOnlyList<ModelVersion>?` | All versions |
-| `SupportsGeneration` | `bool` | Whether it supports generation |
-| `DownloadUrl` | `string?` | Direct download URL |
+The `Model` record contains comprehensive information including ID, name, type, NSFW classification, tags, creator details, statistics, versions, and download URLs. See the API reference for complete property details.
 
 ### Model Versions
 
-Each model can have multiple versions. The `ModelVersion` record contains detailed information about a specific model version:
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `Id` | `long` | Unique version identifier |
-| `Name` | `string` | Version name |
-| `BaseModel` | `string` | Base model (e.g., "SDXL 1.0", "SD 1.5") |
-| `BaseModelType` | `string?` | Base model type classification |
-| `Description` | `string?` | Version changelog/description |
-| `CreatedAt` | `DateTime` | Creation timestamp |
-| `PublishedAt` | `DateTime?` | Publication timestamp |
-| `Status` | `string?` | Publication status |
-| `Availability` | `Availability?` | Availability status |
-| `NsfwLevel` | `int` | NSFW content level |
-| `DownloadUrl` | `string?` | Direct download URL |
-| `SupportsGeneration` | `bool` | Whether it supports generation |
-| `TrainedWords` | `IReadOnlyList<string>?` | Trigger words for generation |
-| `Files` | `IReadOnlyList<ModelFile>?` | Associated files |
-| `Images` | `IReadOnlyList<ModelVersionImage>?` | Gallery images |
-| `Stats` | `ModelVersionStats?` | Download/rating statistics |
-| `AirIdentifier` | `string?` | AIR artifact identifier |
-
-#### Working with Versions
-
-[!code-csharp[Program.cs](examples/Models/Program.cs#WorkingWithVersions)]
+Each model can have multiple versions. The `ModelVersion` record includes version ID, name, base model, timestamps, NSFW level, download URL, trained words, files, images, statistics, and the AIR identifier.
 
 #### Version-Specific Information
 
 Access detailed version metadata:
 
 [!code-csharp[Program.cs](examples/Models/Program.cs#VersionSpecificInformation)]
-
-### Model Statistics
-
-Access download counts and user feedback:
-
-[!code-csharp[Program.cs](examples/Models/Program.cs#ModelStatistics)]
 
 ## Filtering by Permissions
 
@@ -141,20 +81,9 @@ Some queries require authentication with an API key. Configure your API key in t
 
 [!code-csharp[Program.cs](examples/Models/Program.cs#Sorting)]
 
-Available sort options:
-- `HighestRated`
-- `MostDownloaded`
-- `Newest`
+Available sort options: `HighestRated`, `MostDownloaded`, `Newest`
 
-### Time Periods
-
-| Period | Description |
-|--------|-------------|
-| `Day` | Last 24 hours |
-| `Week` | Last 7 days |
-| `Month` | Last 30 days |
-| `Year` | Last 365 days |
-| `AllTime` | All time |
+Time periods: `Day`, `Week`, `Month`, `Year`, `AllTime`
 
 ## API Parameter Behavior Notes
 

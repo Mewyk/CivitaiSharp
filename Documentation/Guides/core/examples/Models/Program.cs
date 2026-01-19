@@ -5,6 +5,8 @@ using CivitaiSharp.Core.Response;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+// See Common/Program.cs for setup patterns: #CoreBasicSetup, #CoreSetupWithApiKey, #ResultPatternMatching
+
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddCivitaiApi();
 var host = builder.Build();
@@ -133,7 +135,6 @@ else if (hashResult is Result<ModelVersion>.Failure hashFailure)
 #endregion
 
 #region Permissions
-// Filter by usage permissions
 var commercialFriendly = await apiClient.Models
     .WhereType(ModelType.Lora)
     .WhereAllowNoCredit(true)
@@ -145,43 +146,6 @@ var commercialFriendly = await apiClient.Models
 if (commercialFriendly is Result<PagedResult<Model>>.Success permSuccess)
 {
     Console.WriteLine($"Found {permSuccess.Data.Items.Count} commercially-friendly LoRAs");
-    foreach (var model in permSuccess.Data.Items)
-    {
-        var perms = model.AllowCommercialUse ?? [];
-        Console.WriteLine($"  - {model.Name}: {string.Join(", ", perms)}");
-    }
-}
-#endregion
-
-#region WorkingWithVersions
-var modelForVersions = await apiClient.Models.GetByIdAsync(123456);
-
-if (modelForVersions is Result<Model>.Success successVersions)
-{
-    var modelWithVersions = successVersions.Data;
-
-    foreach (var version in modelWithVersions.ModelVersions ?? [])
-    {
-        Console.WriteLine($"Version: {version.Name} (ID: {version.Id})");
-        Console.WriteLine($"  Base Model: {version.BaseModel}");
-        Console.WriteLine($"  Published: {version.PublishedAt}");
-        Console.WriteLine($"  Status: {version.Status}");
-        Console.WriteLine($"  Downloads: {version.Stats?.DownloadCount}");
-
-        // Trigger words for generation
-        if (version.TrainedWords is { } words && words.Count > 0)
-        {
-            Console.WriteLine($"  Trigger Words: {string.Join(", ", words)}");
-        }
-
-        // Files included in this version
-        foreach (var file in version.Files ?? [])
-        {
-            Console.WriteLine($"  File: {file.Name} ({file.SizeKilobytes} KB)");
-            Console.WriteLine($"    Type: {file.Type}");
-            Console.WriteLine($"    Primary: {file.Primary}");
-        }
-    }
 }
 #endregion
 
@@ -190,52 +154,18 @@ var modelForVersionInfo = await apiClient.Models.GetByIdAsync(123456);
 
 if (modelForVersionInfo is Result<Model>.Success successVersionInfo)
 {
-    var modelWithVersionInfo = successVersionInfo.Data;
-    var version = modelWithVersionInfo.ModelVersions?.FirstOrDefault();
+    var version = successVersionInfo.Data.ModelVersions?.FirstOrDefault();
     if (version is not null)
     {
-        // Training information
-        if (version.TrainingStatus is { } status)
+        Console.WriteLine($"Version: {version.Name}");
+        Console.WriteLine($"AIR: {version.AirIdentifier}");
+        Console.WriteLine($"Base Model: {version.BaseModel}");
+        Console.WriteLine($"Downloads: {version.Stats?.DownloadCount}");
+        
+        if (version.TrainedWords is { } words && words.Count > 0)
         {
-            Console.WriteLine($"Training Status: {status}");
+            Console.WriteLine($"Trigger Words: {string.Join(", ", words)}");
         }
-
-        // Early access restrictions
-        if (version.EarlyAccessEndsAt is { } earlyAccess)
-        {
-            Console.WriteLine($"Early Access Until: {earlyAccess}");
-        }
-
-        // AIR identifier for generation
-        if (version.AirIdentifier is { } air)
-        {
-            Console.WriteLine($"AIR: {air}");
-        }
-
-        // Version statistics
-        if (version.Stats is { } stats)
-        {
-            Console.WriteLine($"Downloads: {stats.DownloadCount}");
-            Console.WriteLine($"Thumbs Up: {stats.ThumbsUpCount}");
-            Console.WriteLine($"Thumbs Down: {stats.ThumbsDownCount}");
-        }
-    }
-}
-#endregion
-
-#region ModelStatistics
-var modelForStats = await apiClient.Models.GetByIdAsync(123456);
-
-if (modelForStats is Result<Model>.Success successStats)
-{
-    var modelWithStats = successStats.Data;
-    if (modelWithStats.Stats is { } stats)
-    {
-        Console.WriteLine($"Downloads: {stats.DownloadCount}");
-        Console.WriteLine($"Thumbs Up: {stats.ThumbsUpCount}");
-        Console.WriteLine($"Thumbs Down: {stats.ThumbsDownCount}");
-        Console.WriteLine($"Comments: {stats.CommentCount}");
-        Console.WriteLine($"Tips Amount: {stats.TippedAmountCount}");
     }
 }
 #endregion

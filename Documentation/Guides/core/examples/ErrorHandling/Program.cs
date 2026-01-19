@@ -5,6 +5,8 @@ using CivitaiSharp.Core.Response;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+// See Common/Program.cs for setup patterns: #CoreBasicSetup, #ResultPatternMatching, #ResultTryGetPattern
+
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddCivitaiApi();
 var host = builder.Build();
@@ -33,53 +35,22 @@ switch (result)
 }
 #endregion
 
-#region Properties
-var queryResult = await apiClient.Models
-    .WhereType(ModelType.Checkpoint)
-    .ExecuteAsync();
-
-// Using IsSuccess/IsFailure properties
-if (queryResult.IsSuccess)
-{
-    var models = queryResult.ValueOrDefault!.Items;
-    Console.WriteLine($"Found {models.Count} models");
-}
-else if (queryResult.IsFailure)
-{
-    var error = queryResult.ErrorOrDefault!;
-    Console.WriteLine($"Error {error.Code}: {error.Message}");
-}
-#endregion
-
 #region TryGet
 var tryResult = await apiClient.Models.GetByIdAsync(123456);
 
 // Using TryGet methods
-if (tryResult.TryGetValue(out var model))
+if (tryResult.TryGetValue(out var foundModel))
 {
-    Console.WriteLine($"Model: {model.Name}");
+    Console.WriteLine($"Model: {foundModel.Name}");
 }
-else if (tryResult.TryGetError(out var error))
+else if (tryResult.TryGetError(out var tryError))
 {
-    Console.WriteLine($"Failed: {error.Message}");
-    if (error.InnerException is not null)
+    Console.WriteLine($"Failed: {tryError.Message}");
+    if (tryError.InnerException is not null)
     {
-        Console.WriteLine($"Cause: {error.InnerException.Message}");
+        Console.WriteLine($"Cause: {tryError.InnerException.Message}");
     }
 }
-#endregion
-
-#region Match
-var matchResult = await apiClient.Models
-    .WhereName("example")
-    .FirstOrDefaultAsync();
-
-// Using the Match method for exhaustive handling
-var message = matchResult.Match(
-    onSuccess: m => m is not null ? $"Found: {m.Name}" : "Not found",
-    onFailure: e => $"Error: {e.Message}"
-);
-Console.WriteLine(message);
 #endregion
 
 #region SpecificErrors
@@ -112,7 +83,7 @@ if (errorResult is Result<Model>.Failure { Error: var err })
 }
 #endregion
 
-#region ChainingSelect
+#region ChainingOperations
 var modelsForSelect = await apiClient.Models
     .WhereType(ModelType.Lora)
     .ExecuteAsync(resultsLimit: 10);
@@ -125,32 +96,17 @@ if (modelNames.IsSuccess && modelNames.ValueOrDefault is { } names)
 }
 #endregion
 
-#region ChainingSelectMany
-var firstModelResult = await apiClient.Models
-    .FirstOrDefaultAsync();
-
-var modelDetails = await firstModelResult.SelectManyAsync(async model =>
-    model is not null
-        ? await apiClient.Images.WhereModelId(model.Id).FirstOrDefaultAsync()
-        : new Result<Image?>.Success(null));
-
-if (modelDetails is Result<Image?>.Success { Data: { } image })
-{
-    Console.WriteLine($"Found image {image.Id} for model");
-}
-#endregion
-
 #region RateLimiting
 var rateLimitResult = await apiClient.Models
     .WhereType(ModelType.Lora)
     .ExecuteAsync();
 
-if (rateLimitResult is Result<PagedResult<Model>>.Failure { Error: { Code: ErrorCode.RateLimited } error })
+if (rateLimitResult is Result<PagedResult<Model>>.Failure { Error: { Code: ErrorCode.RateLimited } rateLimitError })
 {
-    if (error.RetryAfter.HasValue)
+    if (rateLimitError.RetryAfter.HasValue)
     {
-        Console.WriteLine($"Rate limited. Retry after: {error.RetryAfter.Value.TotalSeconds} seconds");
-        await Task.Delay(error.RetryAfter.Value);
+        Console.WriteLine($"Rate limited. Retry after: {rateLimitError.RetryAfter.Value.TotalSeconds} seconds");
+        await Task.Delay(rateLimitError.RetryAfter.Value);
         // Retry the request
         var retryResult = await apiClient.Models.WhereType(ModelType.Lora).ExecuteAsync();
         Console.WriteLine($"Retry result: {(retryResult.IsSuccess ? "Success" : "Failure")}");

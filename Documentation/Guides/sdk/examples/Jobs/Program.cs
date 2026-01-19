@@ -3,18 +3,15 @@ using CivitaiSharp.Sdk;
 using CivitaiSharp.Sdk.Air;
 using CivitaiSharp.Sdk.Enums;
 using CivitaiSharp.Sdk.Extensions;
+using CivitaiSharp.Sdk.Models.Jobs;
 using CivitaiSharp.Sdk.Models.Results;
+using CivitaiSharp.Sdk.Request;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var builder = Host.CreateApplicationBuilder(args);
-
-builder.Services.AddCivitaiSdk(options =>
-{
-    options.ApiToken = builder.Configuration["Civitai:ApiToken"]!;
-});
-
+builder.Services.AddCivitaiSdk(builder.Configuration);
 var host = builder.Build();
 await host.StartAsync();
 
@@ -23,7 +20,7 @@ var sdkClient = host.Services.GetRequiredService<ISdkClient>();
 #region BasicImageGeneration
 var result = await sdkClient.Jobs
     .CreateImage()
-    .WithAir(new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072))
+    .WithAir(new AirIdentifier(AirEcosystem.StableDiffusionXl, AirAssetType.Checkpoint, AirSource.Civitai, 4201, 130072))
     .WithPositivePrompt("a beautiful sunset over mountains")
     .WithNegativePrompt("blurry, low quality")
     .WithScheduler(Scheduler.EulerAncestral)
@@ -43,13 +40,13 @@ if (result is Result<JobStatusCollection>.Success success)
 #endregion
 
 #region AdvancedConfiguration
-var advancedModel = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
+var advancedModel = new AirIdentifier(AirEcosystem.StableDiffusionXl, AirAssetType.Checkpoint, AirSource.Civitai, 4201, 130072);
 
 var advancedResult = await sdkClient.Jobs
     .CreateImage()
     .WithAir(advancedModel)
     .WithPositivePrompt("detailed portrait")
-    .WithScheduler(Scheduler.DpmPlusPlus2MKarras)
+    .WithScheduler(Scheduler.DpmPlusPlus2MSdeKarras)
     .WithSeed(12345)
     .WithSteps(50)
     .WithConfigurationScale(8.5m)
@@ -61,9 +58,9 @@ var advancedResult = await sdkClient.Jobs
 #endregion
 
 #region UsingAdditionalNetworks
-var baseModel = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
-var lora = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 123456, 789);
-var anotherLora = new AirIdentifier("sdxl", AirAssetType.Lora, "civitai", 234567, 890);
+var baseModel = new AirIdentifier(AirEcosystem.StableDiffusionXl, AirAssetType.Checkpoint, AirSource.Civitai, 4201, 130072);
+var lora = new AirIdentifier(AirEcosystem.StableDiffusionXl, AirAssetType.Lora, AirSource.Civitai, 123456, 789);
+var anotherLora = new AirIdentifier(AirEcosystem.StableDiffusionXl, AirAssetType.Lora, AirSource.Civitai, 234567, 890);
 
 var loraResult = await sdkClient.Jobs
     .CreateImage()
@@ -80,7 +77,7 @@ var loraResult = await sdkClient.Jobs
 #endregion
 
 #region UsingControlNet
-var controlNetModel = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
+var controlNetModel = new AirIdentifier(AirEcosystem.StableDiffusionXl, AirAssetType.Checkpoint, AirSource.Civitai, 4201, 130072);
 
 var controlNetResult = await sdkClient.Jobs
     .CreateImage()
@@ -97,8 +94,8 @@ var controlNetResult = await sdkClient.Jobs
 #endregion
 
 #region BatchJobSubmission
-var firstCheckpoint = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
-var secondCheckpoint = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 101055, 128078);
+var firstCheckpoint = new AirIdentifier(AirEcosystem.StableDiffusionXl, AirAssetType.Checkpoint, AirSource.Civitai, 4201, 130072);
+var secondCheckpoint = new AirIdentifier(AirEcosystem.StableDiffusionXl, AirAssetType.Checkpoint, AirSource.Civitai, 101055, 128078);
 
 var landscapeJob = sdkClient.Jobs
     .CreateImage()
@@ -119,14 +116,14 @@ if (batchResult is Result<JobStatusCollection>.Success batchSuccess)
 #endregion
 
 #region CompleteParameterExample
-var baseCheckpoint = new AirIdentifier("sdxl", AirAssetType.Checkpoint, "civitai", 4201, 130072);
+var baseCheckpoint = new AirIdentifier(AirEcosystem.StableDiffusionXl, AirAssetType.Checkpoint, AirSource.Civitai, 4201, 130072);
 
 var fullParameterJob = await sdkClient.Jobs
     .CreateImage()
     .WithAir(baseCheckpoint)
     .WithPositivePrompt("masterpiece, best quality, professional photograph, cyberpunk street scene, neon lights, rain, reflections, highly detailed, 8k uhd")
     .WithNegativePrompt("blurry, low quality, bad anatomy, deformed, watermark, signature, text, jpeg artifacts, worst quality, low resolution")
-    .WithScheduler(Scheduler.DpmPlusPlus2MKarras)
+    .WithScheduler(Scheduler.DpmPlusPlus2MSdeKarras)
     .WithDimensions(1024, 1536) // Portrait orientation
     .WithSteps(40) // Higher steps for quality
     .WithConfigurationScale(8.5m) // Strong prompt adherence

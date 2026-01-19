@@ -3,23 +3,29 @@ using CivitaiSharp.Sdk.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-#region SdkConfiguration
-var builder = Host.CreateApplicationBuilder(args);
 
-// Note: Unlike CivitaiSharp.Core, the SDK always requires authentication.
-// All Generator API operations require a valid API token.
-builder.Services.AddCivitaiSdk(options =>
-{
-    options.ApiToken = "your-api-token";  // Required - SDK cannot operate without a token
-    options.TimeoutSeconds = 600;  // 10 minutes for long-running jobs
-});
 
-var host = builder.Build();
+#region AutomaticConfiguration
+// API token is automatically loaded from appsettings.json CivitaiSdk section
+var autoBuilder = Host.CreateApplicationBuilder(args);
+autoBuilder.Services.AddCivitaiSdk(autoBuilder.Configuration);
+var autoHost = autoBuilder.Build();
 #endregion
 
-await host.StartAsync();
+#region ConfigurationWithOverrides
+// Load from appsettings.json but override specific options
+var overrideBuilder = Host.CreateApplicationBuilder(args);
+overrideBuilder.Services.AddCivitaiSdk(overrideBuilder.Configuration);
+overrideBuilder.Services.Configure<SdkClientOptions>(options =>
+{
+    options.TimeoutSeconds = 1200;  // Override timeout to 20 minutes
+});
+var overrideHost = overrideBuilder.Build();
+#endregion
 
-var sdkClient = host.Services.GetRequiredService<ISdkClient>();
+await autoHost.StartAsync();
+
+var sdkClient = autoHost.Services.GetRequiredService<ISdkClient>();
 Console.WriteLine("SDK configuration example completed.");
 
-await host.StopAsync();
+await autoHost.StopAsync();

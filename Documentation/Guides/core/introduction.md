@@ -42,14 +42,7 @@ The Core library is organized around four main concepts:
 
 ### 1. API Client
 
-The `IApiClient` interface is the entry point. It exposes cached, immutable builder instances:
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `Models` | `ModelBuilder` | Query AI models (checkpoints, LoRAs, embeddings, etc.) |
-| `Images` | `ImageBuilder` | Query generated images |
-| `Tags` | `TagBuilder` | Query available tags |
-| `Creators` | `CreatorBuilder` | Query content creators |
+The `IApiClient` interface exposes cached builder instances for `Models`, `Images`, `Tags`, and `Creators`.
 
 ### 2. Request Builders
 
@@ -65,10 +58,10 @@ All entities are modeled as immutable records with proper JSON serialization att
 
 Operations return `Result<T>` which can be either `Success` or `Failure`, enabling explicit error handling without exceptions. See the [Error Handling guide](error-handling.md).
 
-## Guides
+## Next Steps
 
-- [Request Builders](request-builders.md) - Master the fluent API pattern
-- [Working with Models](models.md) - Query and filter models
-- [Working with Images](images.md) - Query generated images
-- [Error Handling](error-handling.md) - Handle errors gracefully
-- [Pagination](pagination.md) - Navigate large result sets
+- [Quick Start](quick-start.md) - Get up and running in minutes
+- [Request Builders](request-builders.md) - Master the fluent builder pattern
+- [Models Guide](models.md) - Query and filter AI models
+- [Error Handling](error-handling.md) - Work with the Result pattern
+- [Configuration](configuration.md) - Configure the API client

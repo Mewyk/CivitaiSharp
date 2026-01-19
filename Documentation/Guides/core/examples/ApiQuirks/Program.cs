@@ -7,6 +7,8 @@ using CivitaiSharp.Core.Response;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+// See Common/Program.cs for setup patterns: #CoreBasicSetup, #CoreSetupWithApiKey
+
 public static class Program
 {
     public static async Task<int> Main(string[] args)

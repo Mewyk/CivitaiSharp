@@ -5,6 +5,8 @@ using CivitaiSharp.Core.Response;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+// See Common/Program.cs for setup patterns: #CoreBasicSetup, #CoreSetupWithApiKey, #ResultPatternMatching
+
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddCivitaiApi();
 var host = builder.Build();
@@ -38,7 +40,6 @@ if (allCreators is Result<PagedResult<Creator>>.Success allSuccess)
 #endregion
 
 #region PageBasedPagination
-// Get first page
 var firstPage = await apiClient.Creators
     .WithPageIndex(1)
     .ExecuteAsync(resultsLimit: 50);
@@ -46,21 +47,6 @@ var firstPage = await apiClient.Creators
 if (firstPage is Result<PagedResult<Creator>>.Success firstPageSuccess)
 {
     Console.WriteLine($"Page 1: {firstPageSuccess.Data.Items.Count} creators");
-    
-    // Get second page
-    var secondPage = await apiClient.Creators
-        .WithPageIndex(2)
-        .ExecuteAsync(resultsLimit: 50);
-    
-    if (secondPage is Result<PagedResult<Creator>>.Success secondPageSuccess)
-    {
-        Console.WriteLine($"Page 2: {secondPageSuccess.Data.Items.Count} creators");
-    }
-    
-    // Navigate to specific page
-    var specificPage = await apiClient.Creators
-        .WithPageIndex(5)
-        .ExecuteAsync(resultsLimit: 50);
 }
 #endregion
 
@@ -69,10 +55,7 @@ if (allCreators is Result<PagedResult<Creator>>.Success creatorInfoSuccess)
 {
     foreach (var creator in creatorInfoSuccess.Data.Items)
     {
-        Console.WriteLine($"Creator: {creator.Username}");
-        Console.WriteLine($"  Models: {creator.ModelCount ?? 0}");
-        Console.WriteLine($"  Avatar: {creator.Image ?? "None"}");
-        Console.WriteLine($"  Profile: {creator.Link ?? "None"}");
+        Console.WriteLine($"{creator.Username}: {creator.ModelCount ?? 0} models");
     }
 }
 #endregion
@@ -100,7 +83,8 @@ var topCreators = await apiClient.Creators
     .ExecuteAsync(resultsLimit: 50);
 
 if (topCreators is Result<PagedResult<Creator>>.Success topSuccess)
-{    Console.WriteLine("First 50 Creators:");    foreach (var creator in topSuccess.Data.Items)
+{
+    foreach (var creator in topSuccess.Data.Items)
     {
         Console.WriteLine($"{creator.Username}: {creator.ModelCount ?? 0} models");
     }
@@ -132,14 +116,11 @@ if (creatorModels is Result<PagedResult<Model>>.Success creatorModelSuccess)
 #endregion
 
 #region HandleCreatorEndpointUnreliability
-// Example: Handling Creator endpoint unreliability
 var unreliableResult = await apiClient.Creators.ExecuteAsync(resultsLimit: 10);
 
 if (!unreliableResult.IsSuccess)
 {
-    // Log the error but continue with degraded functionality
-    Console.WriteLine($"Creator data unavailable: {(unreliableResult as Result<PagedResult<Creator>>.Failure)?.Error.Message}");
-    // Fallback logic here
+    Console.WriteLine("Creator data unavailable, using fallback");
 }
 #endregion
 

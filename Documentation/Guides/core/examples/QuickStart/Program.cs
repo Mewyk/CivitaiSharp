@@ -5,22 +5,16 @@ using CivitaiSharp.Core.Response;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-#region Setup
+// See Common/Program.cs for setup patterns: #CoreBasicSetup, #CoreSetupWithApiKey
+
 var builder = Host.CreateApplicationBuilder(args);
-
-builder.Services.AddCivitaiApi(options =>
-{
-    // API key is optional for public queries
-    // options.ApiKey = "your-api-key";
-});
-
+builder.Services.AddCivitaiApi();
 var host = builder.Build();
-#endregion
-
 await host.StartAsync();
 
-#region query
 var apiClient = host.Services.GetRequiredService<IApiClient>();
+
+#region query
 
 // Build a query for LoRA models tagged with "anime"
 var result = await apiClient.Models
@@ -28,9 +22,6 @@ var result = await apiClient.Models
     .WhereTag("anime")
     .ExecuteAsync(resultsLimit: 10);
 #endregion
-
-// The result is always checked with pattern matching
-// because API calls can fail for various reasons
 
 #region Handling
 if (result is Result<PagedResult<Model>>.Success success)

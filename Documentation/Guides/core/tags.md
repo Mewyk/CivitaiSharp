@@ -27,12 +27,7 @@ Tags support pagination. See [Pagination](pagination.md) for details on page-bas
 
 ## The Tag Record
 
-The `Tag` record contains basic information about a tag:
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `Name` | `string` | The tag name |
-| `Link` | `string` | URL to retrieve models with this tag |
+The `Tag` record contains the tag name and a link to retrieve models with that tag.
 
 ### Using Tags with Models
 
@@ -57,14 +52,6 @@ Models include a `Tags` property containing all associated tags:
 ### Search Related Tags
 
 [!code-csharp[Program.cs](examples/Tags/Program.cs#SearchRelatedTags)]
-
-## Best Practices
-
-**Tag Matching**: The `WhereName` filter performs partial matching, so searching for "anime" will match "anime", "anime-style", "anime-character", etc.
-
-**Link Property**: The `Link` property provides a convenience URL to retrieve models. However, using `Models.WhereTag(tagName)` is the recommended approach in code.
-
-**Case Sensitivity**: Tag matching is case-insensitive on the API side.
 
 ## Next Steps
 

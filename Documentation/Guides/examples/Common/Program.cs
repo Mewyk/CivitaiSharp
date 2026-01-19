@@ -36,45 +36,10 @@ var authenticatedHost = authenticatedBuilder.Build();
 #endregion
 
 #region SdkBasicSetup
-// SDK setup (always requires API token)
+// SDK setup - API token automatically loaded from appsettings.json CivitaiSdk section
 var sdkBuilder = Host.CreateApplicationBuilder(args);
-sdkBuilder.Services.AddCivitaiSdk(options =>
-{
-    options.ApiToken = "your-api-token";
-});
+sdkBuilder.Services.AddCivitaiSdk(sdkBuilder.Configuration);
 var sdkHost = sdkBuilder.Build();
-#endregion
-
-#region ResultPatternMatching
-var result = await apiClient.Models
-    .WhereType(ModelType.Lora)
-    .ExecuteAsync(resultsLimit: 10);
-
-if (result is Result<PagedResult<Model>>.Success success)
-{
-    foreach (var model in success.Data.Items)
-    {
-        Console.WriteLine($"{model.Name} - {model.Type}");
-    }
-}
-else if (result is Result<PagedResult<Model>>.Failure failure)
-{
-    Console.WriteLine($"Error: {failure.Error.Code} - {failure.Error.Message}");
-}
-#endregion
-
-#region ResultSwitchPattern
-var switchResult = await apiClient.Models.GetByIdAsync(123456);
-
-switch (switchResult)
-{
-    case Result<Model>.Success s:
-        Console.WriteLine($"Found: {s.Data.Name}");
-        break;
-    case Result<Model>.Failure f:
-        Console.WriteLine($"Error: {f.Error.Message}");
-        break;
-}
 #endregion
 
 #region CommonAirIdentifiers
@@ -95,3 +60,11 @@ var sdxlLora = new AirIdentifier(
 #endregion
 
 await host.StopAsync();
+
+#region UsageCache
+public class UsageCache
+{
+    public required CivitaiSharp.Sdk.Models.Usage.ConsumptionDetails Data { get; set; }
+    public DateTime LastUpdate { get; set; }
+}
+#endregion

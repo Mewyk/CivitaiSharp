@@ -28,12 +28,12 @@ dotnet add package CivitaiSharp.Sdk --prerelease
 > [!IMPORTANT]
 > Unlike CivitaiSharp.Core which can access public endpoints anonymously, the SDK **always requires authentication**. All Generator API operations require a valid API token.
 
-Register the SDK client using dependency injection:
+> [!TIP]
+> **Use automatic configuration** - it's the cleanest and most secure approach. Place your API token in `appsettings.json` under the `CivitaiSdk` section, then register with one line:
 
 [!code-csharp[Program.cs](../examples/Common/Program.cs#SdkBasicSetup)]
 
-> [!IMPORTANT]
-> The SDK always requires an API token. All Generator API operations require authentication.
+See [Configuration](configuration.md) for complete setup including secure token storage.
 
 ### Basic Usage
 

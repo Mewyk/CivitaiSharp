@@ -27,46 +27,27 @@ The Usage service allows you to:
 
 ## Understanding Results
 
-### ConsumptionDetails
-
-The main result type containing consumption statistics:
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `Images` | `int?` | Total number of images generated in the period |
-| `TotalCost` | `decimal?` | Total Buzz spent in the period |
-| `StartDate` | `DateTime?` | Start of the reporting period (UTC) |
-| `EndDate` | `DateTime?` | End of the reporting period (UTC) |
+The service returns `ConsumptionDetails` containing images generated, total cost, and period dates. All dates are in UTC.
 
 ## Common Use Cases
 
-[View the full SDK coverage documentation for detailed use cases including Simple Consumption Check, Budget Tracking, Cost Analysis and Reporting, Rate Limiting and Throttling, and Multi-Project Cost Tracking examples]
-
 ## Practical Examples
-
-### Monitor Daily Usage
-
-[!code-csharp[Program.cs](examples/Usage/Program.cs#MonitorDailyUsage)]
-
-### Track Monthly Trends
-
-[!code-csharp[Program.cs](examples/Usage/Program.cs#TrackMonthlyTrends)]
-
-### Calculate Average Cost Per Job
-
-[!code-csharp[Program.cs](examples/Usage/Program.cs#CalculateAverageCostPerJob)]
 
 ### Budget Monitoring
 
 [!code-csharp[Program.cs](examples/Usage/Program.cs#BudgetMonitoring)]
 
-### Usage Summary Report
-
-[!code-csharp[Program.cs](examples/Usage/Program.cs#UsageSummaryReport)]
-
 ### Rate Limiting Protection
 
 [!code-csharp[Program.cs](examples/Usage/Program.cs#RateLimitingProtection)]
+
+### Set Up Usage Alerts
+
+[!code-csharp[Program.cs](examples/Usage/Program.cs#SetUpUsageAlerts)]
+
+### Cache Usage Data
+
+[!code-csharp[Program.cs](examples/Usage/Program.cs#CacheUsageData)]
 
 ## Error Handling
 
@@ -76,44 +57,10 @@ Handle usage query failures gracefully:
 
 ## Best Practices
 
-### 1. Cache Usage Data
-
-Usage changes slowly - cache results to reduce API calls:
-
-[!code-csharp[Program.cs](examples/Usage/Program.cs#CacheUsageData)]
-
-### 2. Use UTC for Date Ranges
-
-Always use UTC dates to avoid timezone confusion:
-
-[!code-csharp[Program.cs](examples/Usage/Program.cs#UseUtcForDateRanges)]
-
-### 3. Separate Monitoring from Business Logic
-
-Keep usage monitoring decoupled from core functionality:
-
-[!code-csharp[Program.cs](examples/Usage/Program.cs#SeparateMonitoringFromBusinessLogic)]
-
-### 4. Set Up Usage Alerts
-
-Implement proactive alerting:
-
-[!code-csharp[Program.cs](examples/Usage/Program.cs#SetUpUsageAlerts)]
-
-## API Reference
-
-### Methods
-
-| Method | Parameters | Returns | Description |
-|--------|------------|---------|-------------|
-| `GetConsumptionAsync` | `DateTime? startDate, DateTime? endDate, CancellationToken` | `Result<ConsumptionDetails>` | Get consumption statistics for specified period (defaults to all-time if dates not provided) |
-
-### Notes
-
-- All dates should be in UTC
-- If `startDate` is null, uses beginning of time
-- If `endDate` is null, uses current time
-- Results may be cached by the API for a few minutes
+1. **Cache usage data** - Usage changes slowly, cache results to reduce API calls
+2. **Use UTC dates** - Always use UTC to avoid timezone confusion  
+3. **Separate monitoring** - Keep usage monitoring decoupled from core functionality
+4. **Set up alerts** - Implement proactive alerting for budget thresholds
 
 ## Next Steps
 

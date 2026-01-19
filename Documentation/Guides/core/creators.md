@@ -27,14 +27,7 @@ The creators endpoint uses traditional page-based pagination. See [Pagination](p
 
 ## The Creator Record
 
-The `Creator` record contains profile information:
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `Username` | `string` | The creator's username |
-| `ModelCount` | `int?` | Total number of published models |
-| `Link` | `string?` | URL to retrieve the creator's models |
-| `Image` | `string?` | Avatar image URL |
+The `Creator` record contains username, model count, profile link, and avatar image URL. See the API reference for complete details.
 
 ### Accessing Creator Information
 
@@ -75,18 +68,7 @@ Models include a `Creator` property with basic profile information:
 ## Endpoint Reliability Warning
 
 > [!WARNING]
-> The `/api/v1/creators` endpoint is known to experience intermittent reliability issues:
-> 
-> - **HTTP 500 errors**: The endpoint frequently returns server errors, especially under load
-> - **Slow response times**: Requests may take significantly longer than other endpoints (10-30+ seconds)
-> - **Timeout failures**: Long response times can exceed client timeout thresholds
-
-### Recommendations
-
-1. **Implement generous timeouts**: Set timeouts of 60-120 seconds for Creator endpoint requests
-2. **Use retry logic**: The built-in resilience handler will retry on 500 errors, but success is not guaranteed
-3. **Handle failures gracefully**: Your application should degrade gracefully when Creator data is unavailable
-4. **Cache results aggressively**: When requests succeed, cache the results to reduce API load
+> The `/api/v1/creators` endpoint experiences reliability issues including HTTP 500 errors, slow response times (10-30+ seconds), and timeouts. Use generous timeouts (60-120s), implement retry logic, handle failures gracefully, and cache results when successful.
 
 [!code-csharp[Program.cs](examples/Creators/Program.cs#HandleCreatorEndpointUnreliability)]
 

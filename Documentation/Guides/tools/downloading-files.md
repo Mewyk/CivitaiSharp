@@ -49,33 +49,10 @@ Path patterns for images support these tokens. These are **template tokens** rep
 | `{Date}` | Creation date | `2026-01-15` |
 | `{Extension}` | File extension | `png`, `jpg`, `webp` |
 
-### Pattern Examples
+### Pattern Example
 
-```json
-{
-  "Images": {
-    "PathPattern": "{Id}.{Extension}"
-  }
-}
-```
-Result: `12345678.png`
+[!code-json[appsettings.json](examples/Tools/appsettings.json#L6-L10)]
 
-```json
-{
-  "Images": {
-    "PathPattern": "{Username}/{Id}.{Extension}"
-  }
-}
-```
-Result: `ArtistName/12345678.png`
-
-```json
-{
-  "Images": {
-    "PathPattern": "{BaseModel}/{Username}/{Date}_{Id}.{Extension}"
-  }
-}
-```
 Result: `SDXL 1.0/ArtistName/2026-01-15_12345678.png`
 
 ## Downloading Model Files
@@ -120,33 +97,10 @@ Additional tokens when `ModelVersion` is provided:
 | `{ModelName}` | Parent model name | `Realistic Vision` |
 | `{ModelType}` | Model type | `Checkpoint`, `LORA` |
 
-### Pattern Examples
+### Pattern Example
 
-```json
-{
-  "Models": {
-    "PathPattern": "{FileName}"
-  }
-}
-```
-Result: `model_v1.safetensors`
+[!code-json[appsettings.json](examples/Tools/appsettings.json#L11-L17)]
 
-```json
-{
-  "Models": {
-    "PathPattern": "{ModelType}/{FileName}"
-  }
-}
-```
-Result: `Checkpoint/model_v1.safetensors`
-
-```json
-{
-  "Models": {
-    "PathPattern": "{ModelType}/{BaseModel}/{ModelName}/{VersionName}/{FileName}"
-  }
-}
-```
 Result: `Checkpoint/SDXL 1.0/Realistic Vision/v1.0/model_v1.safetensors`
 
 ## Hash Verification

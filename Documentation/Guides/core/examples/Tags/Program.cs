@@ -5,6 +5,8 @@ using CivitaiSharp.Core.Response;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+// See Common/Program.cs for setup patterns: #CoreBasicSetup, #CoreSetupWithApiKey, #ResultPatternMatching
+
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddCivitaiApi();
 var host = builder.Build();
@@ -49,16 +51,6 @@ var firstPage = await apiClient.Tags
 if (firstPage is Result<PagedResult<Tag>>.Success first)
 {
     Console.WriteLine($"Page 1: {first.Data.Items.Count} tags");
-    
-    // Fetch page 2
-    var secondPage = await apiClient.Tags
-        .WithPageIndex(2)
-        .ExecuteAsync(resultsLimit: 100);
-    
-    if (secondPage is Result<PagedResult<Tag>>.Success second)
-    {
-        Console.WriteLine($"Page 2: {second.Data.Items.Count} tags");
-    }
 }
 #endregion
 
@@ -67,9 +59,9 @@ var animeModels = await apiClient.Models
     .WhereTag("anime")
     .ExecuteAsync(resultsLimit: 50);
 
-if (animeModels is Result<PagedResult<Model>>.Success success)
+if (animeModels is Result<PagedResult<Model>>.Success modelsSuccess)
 {
-    foreach (var model in success.Data.Items)
+    foreach (var model in modelsSuccess.Data.Items)
     {
         Console.WriteLine($"{model.Name}");
         
@@ -86,11 +78,11 @@ if (animeModels is Result<PagedResult<Model>>.Success success)
 if (animeModels is Result<PagedResult<Model>>.Success modelSuccess && modelSuccess.Data.Items.Count > 0)
 {
     var model = modelSuccess.Data.Items[0];
-    if (model.Tags is { } tags)
+    if (model.Tags is { } modelTags)
     {
-        foreach (var tag in tags)
+        foreach (var tagName in modelTags)
         {
-            Console.WriteLine($"  - {tag}");
+            Console.WriteLine($"  - {tagName}");
         }
     }
 }
@@ -102,7 +94,6 @@ var popularTags = await apiClient.Tags
 
 if (popularTags is Result<PagedResult<Tag>>.Success popularSuccess)
 {
-    Console.WriteLine("First 100 Tags:");
     foreach (var tag in popularSuccess.Data.Items)
     {
         Console.WriteLine($"  {tag.Name}");

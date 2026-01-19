@@ -72,24 +72,7 @@ The `HtmlParser` converts Civitai's HTML descriptions to readable formats:
 
 Configure download behavior via appsettings.json:
 
-```json
-{
-  "CivitaiDownloads": {
-    "Images": {
-      "BaseDirectory": "C:\\Downloads\\Images",
-      "PathPattern": "{BaseModel}/{Username}/{Id}.{Extension}",
-      "OverwriteExisting": false
-    },
-    "Models": {
-      "BaseDirectory": "C:\\Models",
-      "PathPattern": "{ModelType}/{BaseModel}/{ModelName}/{VersionName}/{FileName}",
-      "OverwriteExisting": true,
-      "VerifyHash": true,
-      "HashAlgorithm": "Sha256"
-    }
-  }
-}
-```
+[!code-json[appsettings.json](examples/Tools/appsettings.json#L5-L18)]
 
 ## Guides
 

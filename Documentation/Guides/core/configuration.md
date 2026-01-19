@@ -11,39 +11,32 @@ This guide covers all configuration options for the CivitaiSharp API clients.
 
 The `ApiClientOptions` class configures the low-level API client.
 
-### Using an Action Delegate
+### Automatic Configuration (Best Practice)
 
-[!code-csharp[Program.cs](../examples/Common/Program.cs#CoreSetupWithApiKey)]
+> [!TIP]
+> Automatic configuration from `appsettings.json` is the recommended approach. It keeps your code clean, secure, and follows .NET configuration standards.
 
-### Using IConfiguration
+Configure options in `appsettings.json`:
 
-You can also configure options from `appsettings.json`:
+[!code-json[appsettings.json](examples/Configuration/appsettings.json)]
 
-```json
-{
-  "CivitaiApi": {
-    "ApiKey": "your-api-key",
-    "TimeoutSeconds": 30
-  }
-}
-```
+Then register the services:
 
 [!code-csharp[Program.cs](examples/Configuration/Program.cs#IConfiguration)]
 
-### Configuration Options
-| Option | Default | Description |
-|--------|---------|-------------|
-| `ApiKey` | `null` | Optional API key for authenticated requests. Required for favorites, hidden models, and higher rate limits. |
-| `TimeoutSeconds` | `30` | HTTP request timeout. Must be between 1 and 300 seconds. |
+Available options: `ApiKey` (optional, for authenticated features), `TimeoutSeconds` (default 30, range 1-300).
 
-> [!NOTE]
-> The Core library can query public endpoints (models, images, tags, creators) without an API key. An API key is only required for authenticated features.
+> [!IMPORTANT]
+> **Never commit API keys to source control.** Use [User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets) for local development or [Azure Key Vault](https://learn.microsoft.com/en-us/azure/key-vault/general/overview) for production.
 
-### Validation
+### Manual Configuration (Not Recommended)
 
-All options are validated on assignment:
-- `ApiVersion` cannot be null or whitespace
-- `TimeoutSeconds` must be between 1 and 300
+> [!WARNING]
+> Manual configuration with hardcoded values is not recommended. Use automatic configuration from `appsettings.json` instead.
+
+If you must configure manually:
+
+[!code-csharp[Program.cs](../examples/Common/Program.cs#CoreSetupWithApiKey)]
 
 ## Next Steps
 

@@ -4,32 +4,7 @@ The **CivitaiSharp.Core** library provides the fundamental API client for intera
 
 ## Overview
 
-The Core library is designed around a fluent request builder pattern that makes it easy to construct and execute API queries. All operations return a `Result<T>` type that handles both successful responses and errors in a type-safe manner.
-
-## Key Features
-
-- **Fluent Request Builders**: Chainable methods for building complex queries
-- **Type-Safe Results**: Pattern matching for handling success and failure cases
-- **Model Queries**: Search and retrieve models by type, tag, creator, and more
-- **Image Queries**: Find images by model, version, or creator
-- **Creator & Tag Management**: List and search creators and tags
-- **Pagination Support**: Both cursor-based and page-index pagination
-- **Error Handling**: Comprehensive error types with detailed information
-
-## Quick Links
-
-- [Introduction](introduction.md) - Getting started with the Core library
-- [Getting API Key](getting-api-key.md) - How to configure authentication
-- [Quick Start](quick-start.md) - Your first query in 5 minutes
-- [Configuration](configuration.md) - Detailed configuration options
-- [Request Builders](request-builders.md) - Building fluent queries
-- [Models](models.md) - Querying and retrieving models
-- [Images](images.md) - Working with image queries
-- [Creators](creators.md) - Finding creators and their content
-- [Tags](tags.md) - Searching and listing tags
-- [Error Handling](error-handling.md) - Best practices for error handling
-- [Pagination](pagination.md) - Navigating large result sets
-- [API Quirks](api-quirks.md) - Important API behavior notes
+The Core library is designed around a fluent request builder pattern with type-safe results for handling both successful responses and errors.
 
 ## Installation
 
@@ -66,9 +41,3 @@ if (result is Result<PagedResult<Model>>.Success success)
 
 await host.StopAsync();
 ```
-
-## Next Steps
-
-- Start with [Introduction](introduction.md) to understand the core concepts
-- Review [Request Builders](request-builders.md) to learn the query system
-- Check [Error Handling](error-handling.md) for production-ready code

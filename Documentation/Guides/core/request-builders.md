@@ -29,12 +29,9 @@ Building a query does not execute it. The request is only sent when you call an 
 
 ## Available Builders
 
-| Builder | Description | Endpoint |
-|---------|-------------|----------|
-| `ModelBuilder` | Query AI models | `/api/v1/models` |
-| `ImageBuilder` | Query generated images | `/api/v1/images` |
-| `TagBuilder` | Query available tags | `/api/v1/tags` |
-| `CreatorBuilder` | Query content creators | `/api/v1/creators` |
+CivitaiSharp provides `ModelBuilder`, `ImageBuilder`, `TagBuilder`, and `CreatorBuilder` for querying their respective endpoints. All builders support filtering, sorting, pagination, and both batch (`ExecuteAsync`) and single-item queries (`FirstOrDefaultAsync`, `GetByIdAsync`).
+
+See the API reference documentation for complete method listings and parameters.
 
 ## Common Operations
 
@@ -61,78 +58,6 @@ Pass `resultsLimit` to `ExecuteAsync` to control page size:
 Use `GetByIdAsync` for direct lookups or `FirstOrDefaultAsync` for the first match:
 
 [!code-csharp[Program.cs](examples/RequestBuilders/Program.cs#SingleItem)]
-
-## ModelBuilder Reference
-
-The `ModelBuilder` provides the most comprehensive set of filters:
-
-### Text Filters
-
-| Method | Description |
-|--------|-------------|
-| `WhereName(string)` | Filter by model name (search query) |
-| `WhereTag(string)` | Filter by a single tag |
-| `WhereUsername(string)` | Filter by creator username |
-
-### Type Filters
-
-| Method | Description |
-|--------|-------------|
-| `WhereType(ModelType)` | Filter by model type (Checkpoint, Lora, TextualInversion, etc.) |
-
-### Boolean Filters
-
-| Method | Description |
-|--------|-------------|
-| `WhereFavorites()` | Only favorited models (requires authentication) |
-| `WhereHidden()` | Only hidden models (requires authentication) |
-| `WherePrimaryFileOnly()` | Only include models with a primary file (excludes models with only config files, VAEs, training data, etc.) |
-| `WhereSupportsGeneration(bool)` | Filter models by generation capability support |
-
-### Permission Filters
-
-| Method | Description |
-|--------|-------------|
-| `WhereAllowNoCredit(bool)` | Filter by no-credit permission |
-| `WhereAllowDerivatives(bool)` | Filter by derivatives permission |
-| `WhereAllowDifferentLicenses(bool)` | Filter by different licenses permission |
-| `WhereCommercialUse(params CommercialUsePermission[])` | Filter by commercial use levels (multiple values = OR logic) |
-
-### Content Filters
-
-| Method | Description |
-|--------|-------------|
-| `WhereNsfw(bool)` | Filter by NSFW status (true = only NSFW, false = exclude NSFW) |
-
-### ID Filters
-
-| Method | Description |
-|--------|-------------|
-| `WhereIds(params long[])` | Filter by specific model IDs |
-| `WhereBaseModel(string)` | Filter by base model type (e.g., "SD 1.5", "SDXL 1.0") |
-| `WhereBaseModels(params string[])` | Filter by multiple base model types |
-
-### Pagination and Sorting
-
-| Method | Description |
-|--------|-------------|
-| `WithPageIndex(int)` | Set page index for pagination |
-| `OrderBy(ModelSort)` | Sort results (HighestRated, MostDownloaded, Newest) |
-| `WherePeriod(TimePeriod)` | Filter by time period |
-| `ExecuteAsync(resultsLimit, cursor)` | Execute query with optional limit (1-100) and cursor |
-
-## ImageBuilder Reference
-
-| Method | Description |
-|--------|-------------|
-| `WhereModelId(long)` | Filter by model ID |
-| `WhereModelVersionId(long)` | Filter by model version ID |
-| `WherePostId(long)` | Filter by post ID |
-| `WhereUsername(string)` | Filter by creator username |
-| `WhereNsfwLevel(ImageNsfwLevel)` | Filter by NSFW level |
-| `OrderBy(ImageSort)` | Sort results (MostReactions, MostComments, MostCollected, Newest, Oldest, Random) |
-| `WherePeriod(TimePeriod)` | Filter by time period |
-| `ExecuteAsync(resultsLimit, cursor)` | Execute query with optional limit (1-200) and cursor |
 
 ## Validation
 

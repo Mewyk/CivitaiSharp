@@ -29,26 +29,6 @@ The Usage service allows you to:
 
 The service returns `ConsumptionDetails` containing images generated, total cost, and period dates. All dates are in UTC.
 
-## Common Use Cases
-
-## Practical Examples
-
-### Budget Monitoring
-
-[!code-csharp[Program.cs](examples/Usage/Program.cs#BudgetMonitoring)]
-
-### Rate Limiting Protection
-
-[!code-csharp[Program.cs](examples/Usage/Program.cs#RateLimitingProtection)]
-
-### Set Up Usage Alerts
-
-[!code-csharp[Program.cs](examples/Usage/Program.cs#SetUpUsageAlerts)]
-
-### Cache Usage Data
-
-[!code-csharp[Program.cs](examples/Usage/Program.cs#CacheUsageData)]
-
 ## Error Handling
 
 Handle usage query failures gracefully:

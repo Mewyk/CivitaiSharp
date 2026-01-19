@@ -131,19 +131,6 @@ else
 }
 #endregion
 
-#region AsyncEnumerationUsage
-// Usage example for async enumeration extension
-async Task DemonstrateAsyncEnumeration()
-{
-    await foreach (var model in apiClient.Models.WhereType(ModelType.Lora).AsAsyncEnumerable<Model>())
-    {
-        Console.WriteLine(model.Name);
-    }
-}
-
-await DemonstrateAsyncEnumeration();
-#endregion
-
 await host.StopAsync();
 
 #region AsyncEnumerationExtension

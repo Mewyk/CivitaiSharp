@@ -77,20 +77,6 @@ Provider capability levels:
 
 [!code-csharp[Program.cs](examples/Coverage/Program.cs#AvailabilityStatusChecking)]
 
-## Common Use Cases
-
-[View the full guide for detailed use cases including Simple Availability Check, Complex Multi-Resource Validation, Load Balancing with Worker Count, Retry with Fallback Models, and Cached Coverage Checker examples]
-
-## Practical Examples
-
-### Pre-flight Check Before Job Submission
-
-[!code-csharp[Program.cs](examples/Coverage/Program.cs#PreflightCheckBeforeJobSubmission)]
-
-### Check All Resources Before Complex Job
-
-[!code-csharp[Program.cs](examples/Coverage/Program.cs#CheckAllResourcesBeforeComplexJob)]
-
 ## Error Handling
 
 Handle coverage check failures gracefully:

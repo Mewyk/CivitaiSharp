@@ -443,58 +443,7 @@ var emptyPlainText = HtmlParser.ToPlainText("");     // Returns ""
 var whitespaceResult = HtmlParser.ToMarkdown("   ");  // Returns ""
 #endregion
 
-#region IntegrationWithDownloads
-// Combine HTML parsing with download services for complete model documentation
-async Task DownloadWithReadmeAsync(long modelId, string outputDirectory)
-{
-    var readmeResult = await apiClient.Models.GetByIdAsync(modelId);
-    
-    if (readmeResult is not Result<Model>.Success readmeSuccess)
-        return;
-        
-    var model = readmeSuccess.Data;
-    var version = model.ModelVersions?.FirstOrDefault();
-    var file = version?.Files?.FirstOrDefault(f => f.Primary == true);
-    
-    if (file is null || version is null)
-        return;
-    
-    // Download the model file
-    var downloadReadmeResult = await downloadService.DownloadAsync(file, version, outputDirectory);
-    
-    if (downloadReadmeResult is Result<DownloadedFile>.Success downloadReadmeSuccess)
-    {
-        // Create README.md alongside the model
-        var directory = Path.GetDirectoryName(downloadReadmeSuccess.Data.FilePath);
-        var readmePath = Path.Combine(directory!, "README.md");
-        
-        var readme = $"""
-            # {model.Name}
-            
-            **Type:** {model.Type}
-            **Creator:** {model.Creator?.Username}
-            **Version:** {version.Name}
-            **Base Model:** {version.BaseModel}
-            
-            ## Description
-            
-            {model.GetDescriptionAsMarkdown()}
-            
-            ## Version Notes
-            
-            {version.GetDescriptionAsMarkdown()}
-            
-            ## Trigger Words
-            
-            {string.Join(", ", version.TrainedWords ?? [])}
-            """;
-        
-        await File.WriteAllTextAsync(readmePath, readme);
-    }
-}
 
-await DownloadWithReadmeAsync(123456, @"C:\Downloads\Models");
-#endregion
 
 #region DownloadServiceUsage
 // Download service is injected via DI

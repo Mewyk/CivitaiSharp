@@ -82,90 +82,6 @@ if (batchCoverageResult is Result<IReadOnlyDictionary<AirIdentifier, ProviderAss
 }
 #endregion
 
-#region PreflightCheckBeforeJobSubmission
-async Task<Result<JobStatusCollection>> GenerateWithValidationAsync(
-    AirIdentifier checkpointModelParam,
-    string promptText)
-{
-    // Check availability first
-    var coverageCheckResult = await sdkClient.Coverage.GetAsync(checkpointModelParam);
-    
-    if (coverageCheckResult is not Result<ProviderAssetAvailability>.Success coverageCheckSuccess)
-    {
-        return new Result<JobStatusCollection>.Failure(
-            new Error(
-                ErrorCode.ResourceUnavailable,
-                "All checkpoint models are currently unavailable"
-            )
-        );
-    }
-    
-    // Model is available, proceed with job submission
-    return await sdkClient.Jobs
-        .CreateImage()
-        .WithAir(checkpointModelParam)
-        .WithPositivePrompt(promptText)
-        .WithDimensions(1024, 1024)
-        .ExecuteAsync();
-}
-#endregion
-
-// Demonstrate pre-flight check
-var preflightResult = await GenerateWithValidationAsync(
-    checkpointModel,
-    "A serene mountain landscape at sunset");
-
-if (preflightResult is Result<JobStatusCollection>.Success preflightSuccess)
-{
-    Console.WriteLine($"Job submitted successfully: {preflightSuccess.Data.JobsList.Count} jobs");
-}
-else if (preflightResult is Result<JobStatusCollection>.Failure preflightFailure)
-{
-    Console.WriteLine($"Failed to submit job: {preflightFailure.Error.Message}");
-}
-
-#region CheckAllResourcesBeforeComplexJob
-async Task<bool> ValidateJobResourcesAsync(
-    AirIdentifier baseCheckpoint,
-    IEnumerable<AirIdentifier> loraModels)
-{
-    // Combine all resources
-    var allResources = loraModels.Prepend(baseCheckpoint).ToArray();
-    
-    // Check coverage
-    var checkResult = await sdkClient.Coverage.GetAsync(allResources);
-    
-    if (checkResult is not Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>.Success success)
-    {
-        Console.WriteLine("Failed to check coverage");
-        return false;
-    }
-    
-    // Verify all resources are available
-    var unavailable = success.Data
-        .Where(kvp => kvp.Value.Availability != AvailabilityStatus.Available)
-        .Select(kvp => kvp.Key)
-        .ToArray();
-    
-    if (unavailable.Length > 0)
-    {
-        Console.WriteLine("Unavailable resources:");
-        foreach (var resource in unavailable)
-        {
-            Console.WriteLine($"  - {resource}");
-        }
-        return false;
-    }
-    
-    return true;
-}
-#endregion
-
-// Demonstrate multi-resource validation
-var loraResources = new[] { loraModel };
-var validationPassed = await ValidateJobResourcesAsync(checkpointModelBatch, loraResources);
-Console.WriteLine($"Resource validation: {(validationPassed ? "Passed" : "Failed")}");
-
 #region ErrorHandling
 var errorHandlingModel = new AirIdentifier(
     AirEcosystem.StableDiffusionXl,
@@ -196,38 +112,6 @@ switch (errorResult)
 }
 #endregion
 
-#region CacheCoverageResults
-var _coverageCache = new Dictionary<AirIdentifier, (DateTime Checked, bool Available)>();
-var _cacheDuration = TimeSpan.FromMinutes(5);
-
-async Task<bool> IsCachedAvailableAsync(AirIdentifier cacheModel)
-{
-    if (_coverageCache.TryGetValue(cacheModel, out var cached))
-    {
-        if (DateTime.UtcNow - cached.Checked < _cacheDuration)
-        {
-            return cached.Available;
-        }
-    }
-    
-    var cacheResult = await sdkClient.Coverage.GetAsync(cacheModel);
-    
-    if (cacheResult is Result<ProviderAssetAvailability>.Success success)
-    {
-        var isAvailable = success.Data.Availability == AvailabilityStatus.Available;
-        _coverageCache[cacheModel] = (DateTime.UtcNow, isAvailable);
-        return isAvailable;
-    }
-    
-    return false;
-}
-#endregion
-
-// Demonstrate cached coverage checking
-var cachedIsAvailable1 = await IsCachedAvailableAsync(checkpointModel);
-var cachedIsAvailable2 = await IsCachedAvailableAsync(checkpointModel); // Uses cache
-Console.WriteLine($"Cached availability check: {cachedIsAvailable1} (second call cached: {cachedIsAvailable2})");
-
 #region BatchChecksWhenPossible
 var baseModel = new AirIdentifier(
     AirEcosystem.StableDiffusionXl,
@@ -250,29 +134,6 @@ foreach (var resource in allResources)
     await sdkClient.Coverage.GetAsync(resource);
 }
 #endregion
-
-#region UseForResourceDiscovery
-async Task<IEnumerable<AirIdentifier>> GetAvailableModelsAsync(
-    IEnumerable<AirIdentifier> candidates)
-{
-    var discoveryResult = await sdkClient.Coverage.GetAsync(candidates);
-    
-    if (discoveryResult is not Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>.Success success)
-    {
-        return Array.Empty<AirIdentifier>();
-    }
-    
-    return success.Data
-        .Where(kvp => kvp.Value.Availability == AvailabilityStatus.Available)
-        .Select(kvp => kvp.Key)
-        .ToArray();
-}
-#endregion
-
-// Demonstrate resource discovery
-var candidateModels = new[] { checkpointModelBatch, loraModel, vaeModel };
-var availableModels = await GetAvailableModelsAsync(candidateModels);
-Console.WriteLine($"Available models: {availableModels.Count()} out of {candidateModels.Length}");
 
 #region AvailabilityStatusChecking
 // Check if a model is available and get status

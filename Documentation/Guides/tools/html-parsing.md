@@ -139,12 +139,6 @@ Both methods safely handle null or empty input:
 
 [!code-csharp[Program.cs](examples/Tools/Program.cs#HandlingEmptyContent)]
 
-## Integration with Downloads
-
-Combine HTML parsing with download services for complete model documentation:
-
-[!code-csharp[Program.cs](examples/Tools/Program.cs#IntegrationWithDownloads)]
-
 ## Performance
 
 The HTML parser:

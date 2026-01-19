@@ -38,11 +38,14 @@ The Models, Tags, and Creators endpoints support page index-based pagination:
 [!code-csharp[Program.cs](examples/Pagination/Program.cs#PageIndex)]
 
 
-## Async Enumeration Pattern
+## Async Enumeration Pattern (Optional)
 
-For a more convenient iteration pattern, you can create an extension method:
+If you prefer a more convenient iteration pattern, you can implement a custom extension method in your application:
 
 [!code-csharp[Program.cs](examples/Pagination/Program.cs#AsyncEnumerationExtension)]
+
+> [!NOTE]
+> This extension is not part of the CivitaiSharp library. It's an example pattern you can implement in your own codebase for convenient async enumeration.
 
 ## Getting the First Result
 

@@ -75,14 +75,6 @@ var anotherFluxLora = baseBuilder
     .Build();
 #endregion
 
-#region Build
-var buildBuilder = new AirBuilder();
-#endregion
-
-#region InputValidation
-var validationBuilder = new AirBuilder();
-#endregion
-
 #region MethodChaining
 var chainedIdentifier = new AirBuilder()
     .WithEcosystem(AirEcosystem.Flux1)
@@ -118,12 +110,11 @@ foreach (var data in modelData)
 var batchBuilder = new AirBuilder();
 var identifiers = new List<AirIdentifier>();
 
-var batchData = new[]
-{
+(AirEcosystem, AirAssetType, long, long)[] batchData = [
     (AirEcosystem.StableDiffusionXl, AirAssetType.Lora, 328553L, 368189L),
     (AirEcosystem.Flux1, AirAssetType.Checkpoint, 123456L, 789012L),
     (AirEcosystem.Pony, AirAssetType.Lora, 111111L, 222222L)
-};
+];
 
 foreach (var (ecosystem, assetType, modelId, versionId) in batchData)
 {

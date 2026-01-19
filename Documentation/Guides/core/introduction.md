@@ -64,4 +64,3 @@ Operations return `Result<T>` which can be either `Success` or `Failure`, enabli
 - [Request Builders](request-builders.md) - Master the fluent builder pattern
 - [Models Guide](models.md) - Query and filter AI models
 - [Error Handling](error-handling.md) - Work with the Result pattern
-- [Configuration](configuration.md) - Configure the API client

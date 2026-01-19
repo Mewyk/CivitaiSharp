@@ -94,5 +94,4 @@ If you're being rate limited even with an API key:
 ## Next Steps
 
 - [Quick Start Guide](quick-start.md) - Get started with CivitaiSharp
-- [Configuration](configuration.md) - Learn more about configuration options
 - [Error Handling](error-handling.md) - Handle API errors gracefully

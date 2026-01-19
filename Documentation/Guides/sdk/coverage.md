@@ -18,8 +18,6 @@ The Coverage service provides methods to:
 
 ### Check Single Model Availability
 
-[!code-csharp[Program.cs](../examples/Common/Program.cs#CommonAirIdentifiers)]
-
 Once you have an AIR identifier, check its availability:
 
 [!code-csharp[Program.cs](examples/Coverage/Program.cs#CheckSingleModelAvailability)]

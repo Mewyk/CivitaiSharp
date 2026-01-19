@@ -31,9 +31,9 @@ var singleValueResult = await apiClient.Models
 
 // Multiple values work correctly
 var multipleValueResult = await apiClient.Models
-    .WhereCommercialUse(
+    .WhereCommercialUse([
         CommercialUsePermission.Image,
-        CommercialUsePermission.Sell)
+        CommercialUsePermission.Sell])
     .ExecuteAsync();
 #endregion
 

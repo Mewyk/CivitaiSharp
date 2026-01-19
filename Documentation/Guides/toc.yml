@@ -8,8 +8,6 @@ items:
       href: core/getting-api-key.md
     - name: Quick Start
       href: core/quick-start.md
-    - name: Configuration
-      href: core/configuration.md
 
 - name: Core Library
   expanded: true

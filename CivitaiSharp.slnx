@@ -3,7 +3,6 @@
     <File Path="Documentation/docfx.json" />
   </Folder>
   <Folder Name="/Solution Items/">
-    <File Path=".editorconfig" />
     <File Path=".gitignore" />
     <File Path="Directory.Build.props" />
     <File Path="README.md" />
@@ -14,9 +13,7 @@
   <Project Path="Tests/CivitaiSharp.Core.Tests/CivitaiSharp.Core.Tests.csproj" />
   <Project Path="Tests/CivitaiSharp.Sdk.Tests/CivitaiSharp.Sdk.Tests.csproj" />
   <Project Path="Tests/CivitaiSharp.Tools.Tests/CivitaiSharp.Tools.Tests.csproj" />
-  <Project Path="Documentation/Guides/examples/Common/CivitaiSharp.Guides.Common.csproj" />
   <Project Path="Documentation/Guides/core/examples/ApiQuirks/CivitaiSharp.Guides.Core.ApiQuirks.csproj" />
-  <Project Path="Documentation/Guides/core/examples/Configuration/CivitaiSharp.Guides.Core.Configuration.csproj" />
   <Project Path="Documentation/Guides/core/examples/Creators/CivitaiSharp.Guides.Core.Creators.csproj" />
   <Project Path="Documentation/Guides/core/examples/ErrorHandling/CivitaiSharp.Guides.Core.ErrorHandling.csproj" />
   <Project Path="Documentation/Guides/core/examples/GettingApiKey/CivitaiSharp.Guides.Core.GettingApiKey.csproj" />
@@ -29,7 +26,6 @@
   <Project Path="Documentation/Guides/core/examples/Tags/CivitaiSharp.Guides.Core.Tags.csproj" />
   <Project Path="Documentation/Guides/sdk/examples/AirBuilder/CivitaiSharp.Guides.Sdk.AirBuilder.csproj" />
   <Project Path="Documentation/Guides/sdk/examples/AirIdentifier/CivitaiSharp.Guides.Sdk.AirIdentifier.csproj" />
-  <Project Path="Documentation/Guides/sdk/examples/Configuration/CivitaiSharp.Guides.Sdk.Configuration.csproj" />
   <Project Path="Documentation/Guides/sdk/examples/Coverage/CivitaiSharp.Guides.Sdk.Coverage.csproj" />
   <Project Path="Documentation/Guides/sdk/examples/Jobs/CivitaiSharp.Guides.Sdk.Jobs.csproj" />
   <Project Path="Documentation/Guides/sdk/examples/Usage/CivitaiSharp.Guides.Sdk.Usage.csproj" />

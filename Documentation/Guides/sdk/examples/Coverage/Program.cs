@@ -69,7 +69,7 @@ var vaeModel = new AirIdentifier(
     modelId: 22354,
     versionId: 123456);
 
-var modelsToCheck = new[] { checkpointModelBatch, loraModel, vaeModel };
+AirIdentifier[] modelsToCheck = [checkpointModelBatch, loraModel, vaeModel];
 
 var batchCoverageResult = await sdkClient.Coverage.GetAsync(modelsToCheck, cancellationToken);
 
@@ -120,13 +120,12 @@ var baseModel = new AirIdentifier(
     modelId: 4201,
     versionId: 130072);
 
-var loras = new[]
-{
+AirIdentifier[] loras = [
     new AirIdentifier(AirEcosystem.StableDiffusionXl, AirAssetType.Lora, AirSource.Civitai, 328553, 368189),
     new AirIdentifier(AirEcosystem.StableDiffusionXl, AirAssetType.Lora, AirSource.Civitai, 123456, 789012)
-};
+];
 
-var allResources = new[] { baseModel }.Concat(loras);
+AirIdentifier[] allResources = [baseModel, .. loras];
 await sdkClient.Coverage.GetAsync(allResources);
 
 foreach (var resource in allResources)

@@ -5,8 +5,6 @@ using CivitaiSharp.Core.Response;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-// See Common/Program.cs for setup patterns: #CoreBasicSetup, #ResultPatternMatching, #ResultTryGetPattern
-
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddCivitaiApi();
 var host = builder.Build();

@@ -16,7 +16,6 @@ New to CivitaiSharp? Start here:
 | [Installation](installation.md) | Install CivitaiSharp via NuGet |
 | [Getting an API Key](core/getting-api-key.md) | Obtain your Civitai API key |
 | [Quick Start](core/quick-start.md) | Get up and running in minutes |
-| [Configuration](core/configuration.md) | Configure the client for your needs |
 
 ## AI Resource Identifier (AIR)
 

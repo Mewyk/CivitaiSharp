@@ -31,10 +31,6 @@ dotnet add package CivitaiSharp.Sdk --prerelease
 > [!TIP]
 > **Use automatic configuration** - it's the cleanest and most secure approach. Place your API token in `appsettings.json` under the `CivitaiSdk` section, then register with one line:
 
-[!code-csharp[Program.cs](../examples/Common/Program.cs#SdkBasicSetup)]
-
-See [Configuration](configuration.md) for complete setup including secure token storage.
-
 ### Basic Usage
 
 For complete working examples, see the [Jobs Service](jobs.md) guide which demonstrates all job creation and management features.

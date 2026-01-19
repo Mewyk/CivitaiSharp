@@ -18,7 +18,7 @@ All API operations return a `Result<T>` type which is a discriminated union that
 
 The recommended way to handle results is with pattern matching:
 
-[!code-csharp[Program.cs](../examples/Common/Program.cs#ResultPatternMatching)]
+[!code-csharp[Program.cs](examples/ErrorHandling/Program.cs#PatternMatching)]
 
 ## TryGet Methods
 

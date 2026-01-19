@@ -189,10 +189,10 @@ public sealed class SdkApiStringRegistryTests : IClassFixture<SdkTestFixture>
     #region ControlNetPreprocessor Tests
 
     [Theory]
-    [InlineData(ControlNetPreprocessor.Canny, "canny")]
-    [InlineData(ControlNetPreprocessor.DepthZoe, "depth_zoe")]
-    [InlineData(ControlNetPreprocessor.SoftEdgePidinet, "softedge_pidinet")]
-    [InlineData(ControlNetPreprocessor.Rembg, "rembg")]
+    [InlineData(ControlNetPreprocessor.Canny, "Canny")]
+    [InlineData(ControlNetPreprocessor.DepthZoe, "DepthZoe")]
+    [InlineData(ControlNetPreprocessor.SoftEdgePidinet, "SoftedgePidinet")]
+    [InlineData(ControlNetPreprocessor.Rembg, "Rembg")]
     public void WhenConvertingControlNetPreprocessorToApiStringThenReturnsCorrectValue(
         ControlNetPreprocessor preprocessor,
         string expected)

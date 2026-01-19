@@ -68,9 +68,8 @@ var fluxLora = baseBuilder
     .WithVersionId(456)
     .Build();
 
-var sdxlCheckpoint = new AirBuilder()
-    .WithEcosystem(AirEcosystem.StableDiffusionXl)
-    .WithAssetType(AirAssetType.Checkpoint)
+// baseBuilder is unchanged, can be reused to build different configurations
+var anotherFluxLora = baseBuilder
     .WithModelId(789)
     .WithVersionId(101)
     .Build();
@@ -84,12 +83,6 @@ var buildBuilder = new AirBuilder();
 var validationBuilder = new AirBuilder();
 #endregion
 
-#region BuildValidation
-var incompleteBuilder = new AirBuilder()
-    .WithEcosystem(AirEcosystem.Flux1)
-    .WithModelId(123);
-#endregion
-
 #region MethodChaining
 var chainedIdentifier = new AirBuilder()
     .WithEcosystem(AirEcosystem.Flux1)
@@ -98,74 +91,6 @@ var chainedIdentifier = new AirBuilder()
     .WithVersionId(456)
     .Build();
 #endregion
-
-#region BuilderErrorHandling
-AirIdentifier? TryBuildAirId(
-    AirEcosystem ecosystem,
-    AirAssetType assetType,
-    long modelId,
-    long versionId)
-{
-    try
-    {
-        var errorBuilder = new AirBuilder();
-        return errorBuilder
-            .WithEcosystem(ecosystem)
-            .WithAssetType(assetType)
-            .WithModelId(modelId)
-            .WithVersionId(versionId)
-            .Build();
-    }
-    catch (ArgumentOutOfRangeException ex)
-    {
-        Console.WriteLine($"Invalid ID: {ex.Message}");
-        return null;
-    }
-    catch (InvalidOperationException ex)
-    {
-        Console.WriteLine($"Missing required property: {ex.Message}");
-        return null;
-    }
-}
-#endregion
-
-// Demonstrate error handling
-var validAirId = TryBuildAirId(AirEcosystem.Flux1, AirAssetType.Lora, 328553, 368189);
-var invalidAirId = TryBuildAirId(AirEcosystem.Flux1, AirAssetType.Lora, -1, 368189);
-Console.WriteLine($"Valid build: {validAirId != null}, Invalid build: {invalidAirId == null}");
-
-#region ValidateEarly
-AirIdentifier BuildFromUserInput(long modelId, long versionId)
-{
-    if (modelId <= 0)
-    {
-        throw new ArgumentException("Model ID must be positive", nameof(modelId));
-    }
-
-    if (versionId <= 0)
-    {
-        throw new ArgumentException("Version ID must be positive", nameof(versionId));
-    }
-
-    return new AirBuilder()
-        .WithEcosystem(AirEcosystem.StableDiffusionXl)
-        .WithAssetType(AirAssetType.Lora)
-        .WithModelId(modelId)
-        .WithVersionId(versionId)
-        .Build();
-}
-#endregion
-
-// Demonstrate early validation
-try
-{
-    var validatedAirId = BuildFromUserInput(328553, 368189);
-    Console.WriteLine($"Successfully built with validation: {validatedAirId}");
-}
-catch (ArgumentException ex)
-{
-    Console.WriteLine($"Validation failed: {ex.Message}");
-}
 
 #region ReuseBuilders
 var reuseBase = new AirBuilder()

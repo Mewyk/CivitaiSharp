@@ -33,21 +33,11 @@ The builder is immutable and thread-safe. Each method returns a new instance:
 
 [!code-csharp[Program.cs](examples/AirBuilder/Program.cs#ResetReuse)]
 
-## Validation
-
-Validation occurs on input and at build time:
-
-[!code-csharp[Program.cs](examples/AirBuilder/Program.cs#BuildValidation)]
-
 ## Complete Examples
 
 ### Building from Civitai Model
 
 [!code-csharp[Program.cs](examples/AirBuilder/Program.cs#BuildFromModel)]
-
-### Builder with Error Handling
-
-[!code-csharp[Program.cs](examples/AirBuilder/Program.cs#BuilderErrorHandling)]
 
 ## Best Practices
 

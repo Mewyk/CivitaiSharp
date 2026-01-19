@@ -137,13 +137,13 @@ public sealed class ControlNetBuilderTests
     {
         var result = ControlNetBuilder.Create()
             .WithImageUrl("https://example.com/control.png")
-            .WithPreprocessor(ControlNetPreprocessor.Depth)
+            .WithPreprocessor(ControlNetPreprocessor.DepthZoe)
             .WithWeight(0.85m)
             .WithStepRange(0.1m, 0.9m)
             .Build();
 
         Assert.Equal("https://example.com/control.png", result.ImageUrl);
-        Assert.Equal(ControlNetPreprocessor.Depth, result.Preprocessor);
+        Assert.Equal(ControlNetPreprocessor.DepthZoe, result.Preprocessor);
         Assert.Equal(0.85m, result.Weight);
         Assert.Equal(0.1m, result.StartStep);
         Assert.Equal(0.9m, result.EndStep);

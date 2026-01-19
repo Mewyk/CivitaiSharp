@@ -23,7 +23,7 @@ internal static class SdkApiStringRegistry
 
     /// <summary>
     /// Ensures the SDK enum mappings are registered with the Core registry.
-    /// This method is idempotent and thread-safe.
+    /// This method is thread-safe.
     /// </summary>
     internal static void EnsureInitialized()
     {
@@ -91,28 +91,10 @@ internal static class SdkApiStringRegistry
         // Register ControlNetPreprocessor mappings
         ApiStringRegistry.Register(new Dictionary<ControlNetPreprocessor, string>
         {
-            [ControlNetPreprocessor.Canny] = "canny",
-            [ControlNetPreprocessor.Depth] = "depth",
-            [ControlNetPreprocessor.DepthLeres] = "depth_leres",
-            [ControlNetPreprocessor.DepthMidas] = "depth_midas",
-            [ControlNetPreprocessor.DepthZoe] = "depth_zoe",
-            [ControlNetPreprocessor.SoftEdgeHed] = "softedge_hed",
-            [ControlNetPreprocessor.SoftEdgePidinet] = "softedge_pidinet",
-            [ControlNetPreprocessor.Lineart] = "lineart",
-            [ControlNetPreprocessor.LineartAnime] = "lineart_anime",
-            [ControlNetPreprocessor.Openpose] = "openpose",
-            [ControlNetPreprocessor.OpenposeFace] = "openpose_face",
-            [ControlNetPreprocessor.OpenposeFull] = "openpose_full",
-            [ControlNetPreprocessor.MediapipeFace] = "mediapipe_face",
-            [ControlNetPreprocessor.NormalBae] = "normal_bae",
-            [ControlNetPreprocessor.Segmentation] = "seg",
-            [ControlNetPreprocessor.Shuffle] = "shuffle",
-            [ControlNetPreprocessor.Tile] = "tile",
-            [ControlNetPreprocessor.Inpaint] = "inpaint",
-            [ControlNetPreprocessor.Mlsd] = "mlsd",
-            [ControlNetPreprocessor.Scribble] = "scribble",
-            [ControlNetPreprocessor.Rembg] = "rembg",
-            [ControlNetPreprocessor.None] = "none",
+            [ControlNetPreprocessor.Canny] = "Canny",
+            [ControlNetPreprocessor.DepthZoe] = "DepthZoe",
+            [ControlNetPreprocessor.SoftEdgePidinet] = "SoftedgePidinet",
+            [ControlNetPreprocessor.Rembg] = "Rembg",
         });
 
         // Register AirAssetType mappings
@@ -143,6 +125,43 @@ internal static class SdkApiStringRegistry
             [AirSource.HuggingFace] = "huggingface",
             [AirSource.OpenAi] = "openai",
             [AirSource.Leonardo] = "leonardo",
+        });
+
+        // Register JobEventType mappings
+        ApiStringRegistry.Register(new Dictionary<JobEventType, string>
+        {
+            [JobEventType.Initialized] = "Initialized",
+            [JobEventType.Claimed] = "Claimed",
+            [JobEventType.Rejected] = "Rejected",
+            [JobEventType.LateRejected] = "LateRejected",
+            [JobEventType.ClaimExpired] = "ClaimExpired",
+            [JobEventType.Updated] = "Updated",
+            [JobEventType.Failed] = "Failed",
+            [JobEventType.Succeeded] = "Succeeded",
+            [JobEventType.Expired] = "Expired",
+            [JobEventType.Deleted] = "Deleted",
+        });
+
+        // Register JobSupport mappings
+        ApiStringRegistry.Register(new Dictionary<JobSupport, string>
+        {
+            [JobSupport.Unsupported] = "Unsupported",
+            [JobSupport.Unavailable] = "Unavailable",
+            [JobSupport.Available] = "Available",
+        });
+
+        // Register Provider mappings
+        ApiStringRegistry.Register(new Dictionary<Provider, string>
+        {
+            [Provider.Civitai] = "Civitai",
+            [Provider.OctoML] = "OctoML",
+            [Provider.SaladML] = "SaladML",
+            [Provider.PicFinder] = "PicFinder",
+            [Provider.RunPods] = "RunPods",
+            [Provider.ValdiAI] = "ValdiAI",
+            [Provider.OctoMLNext] = "OctoMLNext",
+            [Provider.RunDiffusion] = "RunDiffusion",
+            [Provider.SaladShared] = "SaladShared",
         });
     }
 }

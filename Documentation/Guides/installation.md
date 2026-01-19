@@ -55,7 +55,9 @@ dotnet add package CivitaiSharp.Tools --prerelease
 Install-Package CivitaiSharp.Tools -PreRelease
 ```
 
-## Requirements
+## Next Steps
 
-- **.NET 10.0 or later**
-- **C# 14** (for latest language features)
+After installation, continue with:
+
+- [Getting an API Key](core/getting-api-key.md)
+- [Quick Start](core/quick-start.md)

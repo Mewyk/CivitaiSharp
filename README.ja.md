@@ -149,7 +149,7 @@ if (result.IsSuccess)
 }
 else
 {
-    Console.WriteLine($"エラー: {result.ErrorInfo.Message}");
+    Console.WriteLine($"エラー: {result.Error.Message}");
 }
 ```
 
@@ -815,7 +815,7 @@ if (result.IsSuccess)
 }
 else
 {
-    Console.WriteLine($"失敗: {result.ErrorInfo.Message}");
+    Console.WriteLine($"失敗: {result.Error.Message}");
 }
 ```
 
@@ -895,7 +895,7 @@ var result = await client.Creators.ExecuteAsync(resultsLimit: 10);
 if (!result.IsSuccess)
 {
     // エラーをログに記録しつつ機能を縮小して続行
-    logger.LogWarning("クリエイターデータが利用できません: {Error}", result.ErrorInfo.Message);
+    logger.LogWarning("クリエイターデータが利用できません: {Error}", result.Error.Message);
     return GetCachedCreators(); // キャッシュされたデータにフォールバック
 }
 ```

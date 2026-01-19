@@ -189,28 +189,10 @@ public sealed class SdkApiStringRegistryTests : IClassFixture<SdkTestFixture>
     #region ControlNetPreprocessor Tests
 
     [Theory]
-    [InlineData(ControlNetPreprocessor.Canny, "canny")]
-    [InlineData(ControlNetPreprocessor.Depth, "depth")]
-    [InlineData(ControlNetPreprocessor.DepthLeres, "depth_leres")]
-    [InlineData(ControlNetPreprocessor.DepthMidas, "depth_midas")]
-    [InlineData(ControlNetPreprocessor.DepthZoe, "depth_zoe")]
-    [InlineData(ControlNetPreprocessor.SoftEdgeHed, "softedge_hed")]
-    [InlineData(ControlNetPreprocessor.SoftEdgePidinet, "softedge_pidinet")]
-    [InlineData(ControlNetPreprocessor.Lineart, "lineart")]
-    [InlineData(ControlNetPreprocessor.LineartAnime, "lineart_anime")]
-    [InlineData(ControlNetPreprocessor.Openpose, "openpose")]
-    [InlineData(ControlNetPreprocessor.OpenposeFace, "openpose_face")]
-    [InlineData(ControlNetPreprocessor.OpenposeFull, "openpose_full")]
-    [InlineData(ControlNetPreprocessor.MediapipeFace, "mediapipe_face")]
-    [InlineData(ControlNetPreprocessor.NormalBae, "normal_bae")]
-    [InlineData(ControlNetPreprocessor.Segmentation, "seg")]
-    [InlineData(ControlNetPreprocessor.Shuffle, "shuffle")]
-    [InlineData(ControlNetPreprocessor.Tile, "tile")]
-    [InlineData(ControlNetPreprocessor.Inpaint, "inpaint")]
-    [InlineData(ControlNetPreprocessor.Mlsd, "mlsd")]
-    [InlineData(ControlNetPreprocessor.Scribble, "scribble")]
-    [InlineData(ControlNetPreprocessor.Rembg, "rembg")]
-    [InlineData(ControlNetPreprocessor.None, "none")]
+    [InlineData(ControlNetPreprocessor.Canny, "Canny")]
+    [InlineData(ControlNetPreprocessor.DepthZoe, "DepthZoe")]
+    [InlineData(ControlNetPreprocessor.SoftEdgePidinet, "SoftedgePidinet")]
+    [InlineData(ControlNetPreprocessor.Rembg, "Rembg")]
     public void WhenConvertingControlNetPreprocessorToApiStringThenReturnsCorrectValue(
         ControlNetPreprocessor preprocessor,
         string expected)

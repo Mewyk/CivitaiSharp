@@ -114,7 +114,32 @@
         "branch": "development"
       },
       "_lang": "en",
-      "pdf": false
+      "pdf": false,
+      "_exampleUsername": "Mewyk",
+      "_exampleUserId": "123456",
+      "_exampleCheckpointModelId": "4201",
+      "_exampleLoraModelId": "328553",
+      "_exampleVersionId": "368189",
+      "_exampleCheckpointVersionId": "368189",
+      "_exampleLoraVersionId": "130072",
+      "_civitaiBaseUrl": "https://civitai.com",
+      "_civitaiApiBaseUrl": "https://civitai.com/api",
+      "_exampleBaseModelDir": "C:\\Models",
+      "_exampleDownloadsDir": "C:\\Downloads",
+      "_exampleCustomDir": "D:\\CustomImages",
+      "_exampleModelFileName": "model.safetensors",
+      "_exampleDownloadedFileName": "downloaded_model.safetensors",
+      "_exampleHashSha256": "abc123def456789",
+      "_exampleHashBlake3": "xyz789ghi012345",
+      "_exampleHashCrc32": "12345678",
+      "_defaultPageSize": "20",
+      "_largePageSize": "100",
+      "_smallPageSize": "10",
+      "_maxExampleResults": "50",
+      "_exampleAirStreamUrl": "https://civitai.com/api/air/v1/stream",
+      "_exampleAirProfileId": "default",
+      "_exampleAirMaxConcurrent": "3",
+      "_exampleAirRetryAttempts": "3"
     }
   }
 }

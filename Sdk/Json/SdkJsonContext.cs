@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CivitaiSharp.Sdk.Air;
+using CivitaiSharp.Sdk.Enums;
 using CivitaiSharp.Sdk.Json.Converters;
 using CivitaiSharp.Sdk.Models.Coverage;
 using CivitaiSharp.Sdk.Models.Jobs;
@@ -29,7 +30,11 @@ using CivitaiSharp.Sdk.Models.Usage;
         typeof(ControlNetPreprocessorConverter),
         typeof(NullableControlNetPreprocessorConverter),
         typeof(AvailabilityStatusConverter),
-        typeof(ProviderAssetAvailabilityDictionaryConverter)
+        typeof(ProviderAssetAvailabilityConverter),
+        typeof(JobEventTypeConverter),
+        typeof(JobSupportConverter),
+        typeof(ProviderConverter),
+        typeof(JobResultConverter)
     ])]
 // Job request types
 [JsonSerializable(typeof(ImageGenerationJobRequest))]
@@ -43,6 +48,12 @@ using CivitaiSharp.Sdk.Models.Usage;
 [JsonSerializable(typeof(JobStatus))]
 [JsonSerializable(typeof(JobStatusCollection))]
 [JsonSerializable(typeof(JobResult))]
+[JsonSerializable(typeof(JobEvent))]
+[JsonSerializable(typeof(TimeSpanDetails))]
+[JsonSerializable(typeof(ProviderJobStatus))]
+[JsonSerializable(typeof(ProviderJobQueuePosition))]
+[JsonSerializable(typeof(IReadOnlyDictionary<string, ProviderJobStatus>))]
+[JsonSerializable(typeof(Dictionary<string, ProviderJobStatus>))]
 // Coverage types
 [JsonSerializable(typeof(ProviderAssetAvailability))]
 [JsonSerializable(typeof(IReadOnlyDictionary<string, ProviderAssetAvailability>))]

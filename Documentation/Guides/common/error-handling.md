@@ -18,25 +18,25 @@ All API operations return a `Result<T>` type which is a discriminated union that
 
 The recommended way to handle results is with pattern matching:
 
-[!code-csharp[Program.cs](examples/ErrorHandling/Program.cs#PatternMatching)]
+[!code-csharp[Program.cs](../core/examples/ErrorHandling/Program.cs#PatternMatching)]
 
 ## TryGet Methods
 
 For a more traditional approach:
 
-[!code-csharp[Program.cs](examples/ErrorHandling/Program.cs#TryGet)]
+[!code-csharp[Program.cs](../core/examples/ErrorHandling/Program.cs#TryGet)]
 
 ## The Match Method
 
 Use `Match` for exhaustive handling:
 
-[!code-csharp[Program.cs](examples/ErrorHandling/Program.cs#PatternMatching)]
+[!code-csharp[Program.cs](../core/examples/ErrorHandling/Program.cs#PatternMatching)]
 
 ## Chaining Operations
 
 Transform successful values while propagating failures:
 
-[!code-csharp[Program.cs](examples/ErrorHandling/Program.cs#ChainingOperations)]
+[!code-csharp[Program.cs](../core/examples/ErrorHandling/Program.cs#ChainingOperations)]
 
 ## The Error Record
 
@@ -66,19 +66,19 @@ See the `ErrorCode` enum documentation for the complete list of error codes and 
 
 ## Handling Specific Errors
 
-[!code-csharp[Program.cs](examples/ErrorHandling/Program.cs#SpecificErrors)]
+[!code-csharp[Program.cs](../core/examples/ErrorHandling/Program.cs#SpecificErrors)]
 
 ## Rate Limiting
 
 When rate limited, the error includes retry information:
 
-[!code-csharp[Program.cs](examples/ErrorHandling/Program.cs#RateLimiting)]
+[!code-csharp[Program.cs](../core/examples/ErrorHandling/Program.cs#RateLimiting)]
 
 ## OnSuccess and OnFailure
 
 For side effects without transforming the result:
 
-[!code-csharp[Program.cs](examples/ErrorHandling/Program.cs#OnSuccessOnFailure)]
+[!code-csharp[Program.cs](../core/examples/ErrorHandling/Program.cs#OnSuccessOnFailure)]
 
 ## Next Steps
 

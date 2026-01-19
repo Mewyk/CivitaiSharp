@@ -5,7 +5,7 @@ description: Search for Civitai creators and retrieve profile information using 
 
 # Working with Creators
 
-Creators are users who publish models on Civitai. The `CreatorBuilder` allows you to search for creators and retrieve their profiles.
+Creators are users who publish models on Civitai. The `client.Creators` property allows you to search for creators and retrieve their profiles.
 
 ## Querying Creators
 
@@ -21,7 +21,7 @@ Retrieve all creators with pagination:
 
 ## Page-Based Pagination
 
-The creators endpoint uses traditional page-based pagination. See [Pagination](pagination.md) for comparison of pagination methods.
+The creators endpoint uses traditional page-based pagination. See [Pagination](../common/pagination.md) for comparison of pagination methods.
 
 [!code-csharp[Program.cs](examples/Creators/Program.cs#PageBasedPagination)]
 
@@ -59,7 +59,7 @@ Models include a `Creator` property with basic profile information:
 
 **Username Matching**: The `WhereName` filter performs partial username matching. Searching for "art" will match "artist", "artworks", "art123", etc.
 
-**Page-Based Pagination**: See [Pagination](pagination.md) for details on page-index vs cursor-based pagination.
+**Page-Based Pagination**: See [Pagination](../common/pagination.md) for details on page-index vs cursor-based pagination.
 
 **Link Property**: The `Link` property provides a convenience URL, but using `Models.WhereUsername(creator.Username)` is recommended in code.
 
@@ -76,4 +76,4 @@ Models include a `Creator` property with basic profile information:
 
 - [Working with Models](models.md) - Query models by creator
 - [Working with Tags](tags.md) - Find models by tags
-- [Pagination](pagination.md) - Page-based vs cursor-based pagination
+- [Pagination](../common/pagination.md) - Page-based vs cursor-based pagination

@@ -143,6 +143,64 @@ if (fullParameterJob is Result<JobStatusCollection>.Success jobSuccess)
 }
 #endregion
 
+#region GetJobById
+var jobId = Guid.Parse("12345678-1234-1234-1234-1234567890ab");
+var jobResult = await sdkClient.Jobs.Query.GetByIdAsync(jobId);
+
+if (jobResult is Result<JobStatus>.Success jobStatus)
+{
+    Console.WriteLine($"Status: {jobStatus.Data.Status}");
+    Console.WriteLine($"Job ID: {jobStatus.Data.JobId}");
+}
+#endregion
+
+#region GetJobsByToken
+var batchToken = "your-batch-token-here";
+var tokenResult = await sdkClient.Jobs.Query.GetByTokenAsync(batchToken);
+
+if (tokenResult is Result<JobStatusCollection>.Success tokenSuccess)
+{
+    foreach (var job in tokenSuccess.Data.JobsList)
+    {
+        Console.WriteLine($"Job {job.JobId}: {job.Status}");
+    }
+}
+#endregion
+
+#region QueryWithOptions
+var detailedResult = await sdkClient.Jobs.Query
+    .WithDetailed()  // Include original job specifications
+    .WithWait()      // Wait for jobs to complete (up to ~10 minutes)
+    .GetByTokenAsync(batchToken);
+#endregion
+
+#region FilterByProperties
+var filteredResult = await sdkClient.Jobs.Query
+    .WhereProperty("userId", "12345")
+    .WhereProperty("campaign", "winter-2026")
+    .ExecuteAsync();
+#endregion
+
+#region CancelJob
+var jobToCancel = Guid.Parse("12345678-1234-1234-1234-1234567890ab");
+var cancelResult = await sdkClient.Jobs.Query.CancelAsync(jobToCancel);
+
+if (cancelResult is Result<Unit>.Success)
+{
+    Console.WriteLine("Job cancelled successfully");
+}
+#endregion
+
+#region CancelBatchJobs
+var batchToCancel = "batch-token-to-cancel";
+var batchCancelResult = await sdkClient.Jobs.Query.CancelAsync(batchToCancel);
+#endregion
+
+#region TaintJob
+var jobToTaint = Guid.Parse("12345678-1234-1234-1234-1234567890ab");
+await sdkClient.Jobs.Query.TaintAsync(jobToTaint);
+#endregion
+
 Console.WriteLine("Jobs examples completed successfully.");
 
 await host.StopAsync();

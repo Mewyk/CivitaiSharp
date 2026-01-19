@@ -24,7 +24,6 @@ Understand and work with AIR identifiers for model references:
 | Guide | Description |
 |-------|-------------|
 | [AIR Overview](sdk/air-identifier.md) | Parse, validate, and work with AIR identifiers |
-| [AIR Builder](sdk/air-builder.md) | Fluent builder pattern for constructing AIR identifiers |
 
 ## Core Library
 
@@ -38,9 +37,9 @@ The Core library provides low-level access to the Civitai Public API with fluent
 | [Images](core/images.md) | Search generated images |
 | [Tags](core/tags.md) | Browse model tags |
 | [Creators](core/creators.md) | Find content creators |
-| [Error Handling](core/error-handling.md) | Handle errors with the Result pattern |
-| [Pagination](core/pagination.md) | Navigate paginated results |
-| [API Behavior and Quirks](core/api-quirks.md) | Known API behaviors and workarounds |
+| [Error Handling](common/error-handling.md) | Handle errors with the Result pattern |
+| [Pagination](common/pagination.md) | Navigate paginated results |
+| [API Behavior and Quirks](common/api-quirks.md) | Known API behaviors and workarounds |
 
 ## SDK Library
 
@@ -49,7 +48,8 @@ The SDK provides high-level abstractions for image generation and advanced workf
 | Guide | Description |
 |-------|-------------|
 | [SDK Introduction](sdk/introduction.md) | Overview of CivitaiSharp.Sdk |
-| [Jobs Service](sdk/jobs.md) | Submit and manage image generation jobs |
+| [Create a Job](sdk/create-job.md) | Submit automated image generation jobs |
+| [Query a Job](sdk/query-job.md) | Track status and manage existing jobs |
 | [Coverage Service](sdk/coverage.md) | Check model availability before job submission |
 | [Usage Service](sdk/usage.md) | Monitor resource usage and limits |
 

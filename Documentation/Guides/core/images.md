@@ -5,7 +5,7 @@ description: Query AI-generated images from the Civitai gallery by model, userna
 
 # Working with Images
 
-The `ImageBuilder` allows you to query generated images from the Civitai gallery. These are images created using AI models and shared by the community.
+The `client.Images` property allows you to query generated images from the Civitai gallery. These are images created using AI models and shared by the community.
 
 ## Querying Images
 
@@ -82,5 +82,5 @@ To download an image, use the `Url` property:
 
 ## Next Steps
 
-- [Error Handling](error-handling.md) - Handle API errors gracefully
-- [Pagination](pagination.md) - Navigate large result sets
+- [Error Handling](../common/error-handling.md) - Handle API errors gracefully
+- [Pagination](../common/pagination.md) - Navigate large result sets

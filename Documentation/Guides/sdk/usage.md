@@ -44,7 +44,7 @@ Handle usage query failures gracefully:
 
 ## Next Steps
 
-- [Jobs Service](jobs.md) - Submit and manage generation jobs
+- [Create a Job](create-job.md) - Submit and manage generation jobs
 - [Coverage Service](coverage.md) - Check resource availability
 - [SDK Introduction](introduction.md) - Overview of all SDK services
-- [Error Handling](../core/error-handling.md) - Comprehensive error handling patterns
+- [Error Handling](../common/error-handling.md) - Comprehensive error handling patterns

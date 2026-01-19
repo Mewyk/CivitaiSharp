@@ -5,7 +5,7 @@ description: Query AI models from Civitai including checkpoints, LoRAs, embeddin
 
 # Working with Models
 
-The `ModelBuilder` allows you to query AI models from the Civitai database. Models include checkpoints, LoRAs, embeddings, VAEs, and other AI resources.
+The `client.Models` property allows you to query AI models from the Civitai database. Models include checkpoints, LoRAs, embeddings, VAEs, and other AI resources.
 
 ## Model Types
 
@@ -101,11 +101,11 @@ Configure your API key in the service registration:
 
 ### Known Parameter Quirks
 
-Based on API testing, be aware of these behaviors. For comprehensive details and workarounds, see the [API Behavior and Quirks](api-quirks.md) guide.
+Based on API testing, be aware of these behaviors. For comprehensive details and workarounds, see the [API Behavior and Quirks](../common/api-quirks.md) guide.
 
 #### Commercial Use Permissions
 
-The `WhereCommercialUse()` filter requires **at least two permission values** to return results. See [API Quirks - Commercial Use](api-quirks.md#commercial-use-permissions) for detailed explanation and examples.
+The `WhereCommercialUse()` filter requires **at least two permission values** to return results. See [API Quirks - Commercial Use](../common/api-quirks.md#known-api-quirks) for detailed explanation and examples.
 
 #### License Filters
 
@@ -136,5 +136,5 @@ The library includes automatic retry and timeout handling via resilience policie
 ## Next Steps
 
 - [Working with Images](images.md) - Query generated images
-- [Error Handling](error-handling.md) - Handle API errors gracefully
-- [Pagination](pagination.md) - Navigate large result sets
+- [Error Handling](../common/error-handling.md) - Handle API errors gracefully
+- [Pagination](../common/pagination.md) - Navigate large result sets

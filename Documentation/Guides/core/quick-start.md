@@ -30,11 +30,9 @@ All API operations return a `Result<T>` type that can be either a success or fai
 
 [!code-csharp[Program.cs](examples/QuickStart/Program.cs#result)]
 
-## Complete Example
 
-[!code-csharp[Program.cs](examples/QuickStart/Program.cs)]
 
 ## Next Steps
 
 - [Request Builders](request-builders.md) - Master the fluent API pattern
-- [Error Handling](error-handling.md) - Handle errors gracefully
+- [Error Handling](../common/error-handling.md) - Handle errors gracefully

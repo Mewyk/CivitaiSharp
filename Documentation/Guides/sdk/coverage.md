@@ -90,7 +90,7 @@ Handle coverage check failures gracefully:
 
 ## Next Steps
 
-- [Jobs Service](jobs.md) - Submit jobs with validated resources
+- [Create a Job](create-job.md) - Submit jobs with validated resources
 - [Usage Service](usage.md) - Monitor API consumption
 - [AIR Identifiers](air-identifier.md) - Learn about model identifiers
-- [Error Handling](../core/error-handling.md) - Comprehensive error handling patterns
+- [Error Handling](../common/error-handling.md) - Comprehensive error handling patterns

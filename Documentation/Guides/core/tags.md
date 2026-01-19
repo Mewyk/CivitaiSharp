@@ -5,7 +5,7 @@ description: Query and search tags used to categorize models on Civitai using th
 
 # Working with Tags
 
-Tags are keywords used to categorize models on Civitai. The `TagBuilder` allows you to query available tags.
+Tags are keywords used to categorize models on Civitai. The `client.Tags` property allows you to query available tags.
 
 ## Querying Tags
 
@@ -21,7 +21,7 @@ Filter tags by partial name match:
 
 ### Pagination
 
-Tags support pagination. See [Pagination](pagination.md) for details on page-based vs cursor-based pagination.
+Tags support pagination. See [Pagination](../common/pagination.md) for details on page-based vs cursor-based pagination.
 
 [!code-csharp[Program.cs](examples/Tags/Program.cs#Pagination)]
 
@@ -57,4 +57,4 @@ Models include a `Tags` property containing all associated tags:
 
 - [Working with Models](models.md) - Filter models by tags
 - [Working with Creators](creators.md) - Find content creators
-- [Pagination](pagination.md) - Navigate large tag lists
+- [Pagination](../common/pagination.md) - Navigate large tag lists

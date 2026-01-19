@@ -1,66 +1,29 @@
 ---
 title: CivitaiSharp.Core Introduction
-description: Learn about CivitaiSharp.Core, a low-level typed .NET client for the Civitai API with fluent builders, immutable records, and result-based error handling.
+description: Overview of the CivitaiSharp.Core library for querying Civitai's public API.
 ---
 
 # CivitaiSharp.Core
 
-CivitaiSharp.Core provides a low-level, typed client for the [Civitai public API](https://github.com/civitai/civitai/wiki/REST-API-Reference). It gives you direct access to query models, images, tags, and creators with a fluent builder pattern.
+CivitaiSharp.Core is a low-level, high-performance client for the public Civitai API. It provides typed access to models, images, tags, and creators.
 
-## Key Features
-
-- **Fluent Request Builders** - Compose complex queries with an intuitive, chainable API
-- **Immutable and Thread-Safe** - Builders are immutable records, safe to share across threads
-- **Typed Models** - Strongly-typed response models for all API entities
-- **Result Pattern** - Explicit error handling without exceptions
-- **Pagination Support** - Built-in cursor-based pagination with metadata
-
-## Getting Started
-
-### Installation
+## Installation
 
 ```bash
 dotnet add package CivitaiSharp.Core --prerelease
 ```
 
-### Registration
+## Documentation
 
-Register the API client using dependency injection:
+- **[Quick Start](quick-start.md)** - Get up and running in minutes.
+- **[Request Builder Pattern](request-builders.md)** - Learn how to construct queries using the fluent API.
+- **[Models](models.md)** - Query and filter AI models (Checkpoints, LoRAs, etc.).
+- **[Images](images.md)** - Browse community-generated images.
+- **[Tags](tags.md)** - Explorer content tags.
+- **[Creators](creators.md)** - Find content creators.
 
-[!code-csharp[Program.cs](examples/Introduction/Program.cs#Registration)]
+## Common Topics
 
-> [!NOTE]
-> The Core library can query public endpoints (models, images, tags, creators) without an API key. An API key is only needed for authenticated features like favorites, hidden models, higher rate limits, and accessing NSFW content (e.g., `WhereNsfw(true)` or `ImageNsfwLevel.Mature`/`X`). See [Pagination](pagination.md) for endpoint-specific pagination methods.
-
-### Basic Usage
-
-[!code-csharp[Program.cs](examples/ErrorHandling/Program.cs#PatternMatching)]
-
-## Architecture
-
-The Core library is organized around four main concepts:
-
-### 1. API Client
-
-The `IApiClient` interface exposes cached builder instances for `Models`, `Images`, `Tags`, and `Creators`.
-
-### 2. Request Builders
-
-Each builder provides fluent methods for filtering, sorting, and pagination. Builders are immutable records where each method returns a new instance:
-
-[!code-csharp[Program.cs](examples/RequestBuilders/Program.cs#Immutability)]
-
-### 3. Response Models
-
-All entities are modeled as immutable records with proper JSON serialization attributes. See the [Models guide](models.md) for details.
-
-### 4. Result Pattern
-
-Operations return `Result<T>` which can be either `Success` or `Failure`, enabling explicit error handling without exceptions. See the [Error Handling guide](error-handling.md).
-
-## Next Steps
-
-- [Quick Start](quick-start.md) - Get up and running in minutes
-- [Request Builders](request-builders.md) - Master the fluent builder pattern
-- [Models Guide](models.md) - Query and filter AI models
-- [Error Handling](error-handling.md) - Work with the Result pattern
+- **[Pagination](../common/pagination.md)** - Handling large result sets.
+- **[Error Handling](../common/error-handling.md)** - Using the Result pattern.
+- **[API Quirks](../common/api-quirks.md)** - Important API behaviors to know.

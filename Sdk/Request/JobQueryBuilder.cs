@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using CivitaiSharp.Core;
 using CivitaiSharp.Core.Response;
 using CivitaiSharp.Sdk.Http;
 using CivitaiSharp.Sdk.Json;
@@ -19,7 +20,7 @@ using CivitaiSharp.Sdk.Models.Results;
 public sealed record JobQueryBuilder
 {
     private readonly SdkHttpClient _httpClient;
-    private readonly SdkClientOptions _options;
+    private readonly SdkOptions _options;
     private readonly bool _wait;
     private readonly bool _detailed;
     private readonly ImmutableDictionary<string, JsonElement>? _propertyFilters;
@@ -31,7 +32,7 @@ public sealed record JobQueryBuilder
     /// <param name="httpClient">The HTTP client used to execute requests.</param>
     /// <param name="options">The SDK client options.</param>
     /// <exception cref="ArgumentNullException">Thrown when httpClient or options is null.</exception>
-    internal JobQueryBuilder(SdkHttpClient httpClient, SdkClientOptions options)
+    internal JobQueryBuilder(SdkHttpClient httpClient, SdkOptions options)
         : this(
             httpClient ?? throw new ArgumentNullException(nameof(httpClient)),
             options ?? throw new ArgumentNullException(nameof(options)),
@@ -43,7 +44,7 @@ public sealed record JobQueryBuilder
 
     private JobQueryBuilder(
         SdkHttpClient httpClient,
-        SdkClientOptions options,
+        SdkOptions options,
         bool wait,
         bool detailed,
         ImmutableDictionary<string, JsonElement>? propertyFilters)

@@ -8,7 +8,7 @@ using CivitaiSharp.Core.Services;
 /// thread-safe instances that can be safely shared across threads. Each fluent method on a builder
 /// returns a new instance with the updated configuration, leaving the original builder unchanged.
 /// Obtain an instance through dependency injection using
-/// <see cref="Extensions.ServiceCollectionExtensions.AddCivitaiApi(Microsoft.Extensions.DependencyInjection.IServiceCollection, Action{ApiClientOptions})"/>.
+/// <see cref="Extensions.ServiceCollectionExtensions.AddCivitaiApi(Microsoft.Extensions.DependencyInjection.IServiceCollection, Action{ApiOptions})"/>.
 /// </summary>
 public sealed class ApiClient : IApiClient
 {

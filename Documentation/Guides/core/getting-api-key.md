@@ -33,12 +33,32 @@ After creating the key, it will be displayed once. **Copy it immediately** and s
 
 ## Using Your API Key
 
-Once you have your API key, configure CivitaiSharp using one of these methods:
+Once you have your API key, configure CivitaiSharp. The **recommended approach** is to use automatic configuration from your application settings:
 
-- **Options configuration** - Directly in code via `AddCivitaiApi(options => { options.ApiKey = "your-key"; })`
-- **Configuration file** - From appsettings.json
-- **Environment variables**
-- **User secrets** - For development
+### Recommended: Automatic Configuration
+
+Use `AddCivitaiApi(configuration)` to automatically load settings from your configuration sources:
+
+[!code-csharp[](examples/GettingApiKey/Program.cs#ConfigurationFile)]
+
+This reads from multiple sources in order of priority:
+- **appsettings.json** - For default settings
+- **Environment variables** - For deployment-specific values
+- **User secrets** - For local development (recommended for storing API keys during development)
+
+Example configuration file:
+
+[!code-json[](examples/GettingApiKey/appsettings.json)]
+
+### Manual Configuration (Advanced)
+
+For advanced scenarios where you need dynamic configuration or specific logic:
+
+[!code-csharp[](examples/GettingApiKey/Program.cs#OptionsConfiguration)]
+
+Or load from environment variables:
+
+[!code-csharp[](examples/GettingApiKey/Program.cs#EnvironmentVariable)]
 
 ## Managing API Keys
 
@@ -69,7 +89,7 @@ You can create multiple API keys for different applications or purposes. To revo
 | All SDK operations | **Yes** |
 
 > [!IMPORTANT]
-> The SDK (Generator/Orchestration API) **always requires authentication**. You cannot use CivitaiSharp.Sdk without providing an `ApiToken`. This is different from the Core library which supports anonymous access for public endpoints.
+> The SDK (Generator/Orchestration API) **always requires authentication**. You cannot use CivitaiSharp.Sdk without providing a `Key`. This is different from the Core library which supports anonymous access for public endpoints.
 
 ## Troubleshooting
 

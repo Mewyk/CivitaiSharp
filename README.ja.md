@@ -157,14 +157,16 @@ else
 
 ## 4. 設定
 ### appsettings.jsonの使用
-CivitaiSharp.Coreはデフォルトで`CivitaiApi`セクションから設定を読み込みます。
+CivitaiSharpはデフォルトで`CivitaiSharp`セクションから設定を読み込みます。
 
 <details>
 <summary><strong>最小設定（appsettings.json）</strong></summary>
 
 ```json
 {
-  "CivitaiApi": {
+  "CivitaiSharp": {
+    "Api": {},
+    "Sdk": {}
   }
 }
 ```
@@ -178,25 +180,42 @@ CivitaiSharp.Coreはデフォルトで`CivitaiApi`セクションから設定を
 
 ```json
 {
-  "CivitaiApi": {
-    "BaseUrl": "https://civitai.com",
-    "ApiVersion": "v1",
-    "ApiKey": null,
-    "TimeoutSeconds": 30,
-    "StrictJsonParsing": false
+  "CivitaiSharp": {
+    "Api": {
+      "Key": null,
+      "BaseUrl": "https://civitai.com",
+      "Version": "v1",
+      "TimeoutSeconds": 30
+    },
+    "Sdk": {
+      "Key": null,
+      "BaseUrl": "https://orchestration.civitai.com",
+      "Version": "v2",
+      "TimeoutSeconds": 30
+    }
   }
 }
 ```
 
+### API設定
+
 | プロパティ | 型 | デフォルト | 説明 |
 |-----------|-----|-----------|------|
-| `BaseUrl` | `string` | `https://civitai.com` | Civitai APIのベースURL |
-| `ApiVersion` | `string` | `v1` | APIバージョンのパスセグメント |
-| `ApiKey` | `string?` | `null` | 認証リクエスト用のオプションAPIキー |
-| `TimeoutSeconds` | `int` | `30` | HTTPリクエストのタイムアウト（1-300秒） |
-| `StrictJsonParsing` | `bool` | `false` | マップされていないJSONプロパティで例外をスロー |
+| `Api.Key` | `string?` | `null` | 認証リクエスト用のオプションAPIキー |
+| `Api.BaseUrl` | `string` | `https://civitai.com` | Civitai APIのベースURL |
+| `Api.Version` | `string` | `v1` | APIバージョンのパスセグメント |
+| `Api.TimeoutSeconds` | `int` | `30` | HTTPリクエストのタイムアウト（1-300秒） |
 
-> **認証について:** Coreライブラリは、APIキーなしで公開エンドポイント（モデル、画像、タグ、クリエイター）をクエリできます。APIキーが必要なのは、お気に入り、非公開モデル、より高いレート制限などの認証機能のみです。**NSFWコンテンツ**: モデルで`WhereNsfw(true)`を設定するか、特定の`ImageNsfwLevel`値（Mature、X）を使用する場合は認証が必要です。これはCivitaiSharp.Sdkとは異なり、**すべての操作でAPIトークンが必須**です。
+### SDK設定
+
+| プロパティ | 型 | デフォルト | 説明 |
+|-----------|-----|-----------|------|
+| `Sdk.Key` | `string?` | `null` | SDK操作用のAPIトークン（必須） |
+| `Sdk.BaseUrl` | `string` | `https://orchestration.civitai.com` | Generator/Orchestration APIのベースURL |
+| `Sdk.Version` | `string` | `v2` | APIバージョンのパスセグメント |
+| `Sdk.TimeoutSeconds` | `int` | `30` | HTTPリクエストのタイムアウト（1-300秒） |
+
+> **認証について:** Coreライブラリは、APIキーなしで公開エンドポイント（モデル、画像、タグ、クリエイター）をクエリできます。APIキーが必要なのは、お気に入り、非公開モデル、より高いレート制限などの認証機能のみです。**NSFWコンテンツ**: モデルで`WhereNsfw(true)`を設定するか、特定の`ImageNsfwLevel`値（Mature、X）を使用する場合は認証が必要です。SDKは**すべての操作でAPIトークンが必須**です。
 
 </details>
 
@@ -517,7 +536,7 @@ using Microsoft.Extensions.DependencyInjection;
 var services = new ServiceCollection();
 services.AddCivitaiSdk(options =>
 {
-    options.ApiToken = "your-api-token"; // SDKには必須
+    options.Key = "your-api-token"; // SDKには必須
 });
 
 await using var provider = services.BuildServiceProvider();

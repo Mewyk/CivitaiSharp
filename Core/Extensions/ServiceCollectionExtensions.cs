@@ -14,9 +14,9 @@ using Microsoft.Extensions.Options;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// The default configuration section name for API options.
+    /// The default configuration section name for unified options.
     /// </summary>
-    public const string DefaultConfigurationSectionName = "CivitaiApi";
+    public const string DefaultConfigurationSectionName = "CivitaiSharp";
 
     private const string UserAgentValue = $"CivitaiSharp.Core/{Core.VersionInfo.Version}";
 
@@ -30,7 +30,7 @@ public static class ServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(services);
 
-        services.Configure<ApiClientOptions>(_ => { });
+        services.Configure<CivitaiSharpOptions>(_ => { });
         RegisterApiServices(services);
         return services;
     }
@@ -39,28 +39,28 @@ public static class ServiceCollectionExtensions
     /// Registers the API client and related services with the specified configuration action.
     /// </summary>
     /// <param name="services">The service collection to register services into.</param>
-    /// <param name="configure">Action to configure <see cref="ApiClientOptions"/>.</param>
+    /// <param name="configure">Action to configure <see cref="ApiOptions"/>.</param>
     /// <returns>The service collection for chaining.</returns>
     /// <exception cref="ArgumentNullException">Thrown if services or configure is null.</exception>
     public static IServiceCollection AddCivitaiApi(
         this IServiceCollection services,
-        Action<ApiClientOptions> configure)
+        Action<ApiOptions> configure)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configure);
 
-        services.Configure(configure);
+        services.Configure<CivitaiSharpOptions>(options => configure(options.Api));
         RegisterApiServices(services);
         return services;
     }
 
     /// <summary>
     /// Registers the API client and related services using configuration from the provided <see cref="Microsoft.Extensions.Configuration.IConfiguration"/>.
-    /// Reads configuration from the "CivitaiApi" section by default.
+    /// Reads configuration from the "CivitaiSharp" section by default.
     /// </summary>
     /// <param name="services">The service collection to register services into.</param>
     /// <param name="configuration">The configuration source containing API settings.</param>
-    /// <param name="sectionName">Optional section name to read from configuration. Defaults to "CivitaiApi".</param>
+    /// <param name="sectionName">Optional section name to read from configuration. Defaults to "CivitaiSharp".</param>
     /// <returns>The service collection for chaining.</returns>
     /// <exception cref="ArgumentNullException">Thrown if services or configuration is null.</exception>
     /// <exception cref="ArgumentException">Thrown if sectionName is null or whitespace.</exception>
@@ -73,7 +73,7 @@ public static class ServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentException.ThrowIfNullOrWhiteSpace(sectionName);
 
-        services.Configure<ApiClientOptions>(configuration.GetSection(sectionName));
+        services.Configure<CivitaiSharpOptions>(configuration.GetSection(sectionName));
         RegisterApiServices(services);
         return services;
     }
@@ -98,8 +98,8 @@ public static class ServiceCollectionExtensions
 
         services.AddHttpClient(nameof(ApiHttpClient), (serviceProvider, client) =>
         {
-            var options = serviceProvider.GetRequiredService<IOptions<ApiClientOptions>>().Value;
-            ConfigureHttpClient(client, options);
+            var options = serviceProvider.GetRequiredService<IOptions<CivitaiSharpOptions>>().Value;
+            ConfigureHttpClient(client, options.Api);
         })
         .AddStandardResilienceHandler();
 
@@ -108,9 +108,9 @@ public static class ServiceCollectionExtensions
             var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
             var httpClient = httpClientFactory.CreateClient(nameof(ApiHttpClient));
             var responseHandler = serviceProvider.GetRequiredService<ApiResponseHandler>();
-            var options = serviceProvider.GetRequiredService<IOptions<ApiClientOptions>>().Value;
+            var options = serviceProvider.GetRequiredService<IOptions<CivitaiSharpOptions>>().Value;
             var logger = serviceProvider.GetService<ILogger<ApiHttpClient>>();
-            return new ApiHttpClient(httpClient, responseHandler, options, logger);
+            return new ApiHttpClient(httpClient, responseHandler, options.Api, logger);
         });
 
         services.AddSingleton<IApiClient>(serviceProvider =>
@@ -125,17 +125,19 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="client">The HTTP client to configure.</param>
     /// <param name="options">The API client options containing configuration values.</param>
-    private static void ConfigureHttpClient(HttpClient client, ApiClientOptions options)
+    private static void ConfigureHttpClient(HttpClient client, ApiOptions options)
     {
-        client.BaseAddress = new Uri(options.BaseUrl);
+        options.Validate();
+        
+        client.BaseAddress = new Uri(ApiOptions.DefaultBaseUrl);
         client.Timeout = options.Timeout;
         client.DefaultRequestHeaders.Accept.Clear();
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgentValue);
 
-        if (!string.IsNullOrWhiteSpace(options.ApiKey))
+        if (!string.IsNullOrWhiteSpace(options.Key))
         {
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", options.ApiKey);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", options.Key);
         }
     }
 }

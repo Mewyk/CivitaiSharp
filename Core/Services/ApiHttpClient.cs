@@ -24,7 +24,7 @@ internal sealed class ApiHttpClient : IPagedHttpClient
 
     private readonly HttpClient _httpClient;
     private readonly ApiResponseHandler _responseHandler;
-    private readonly ApiClientOptions _options;
+    private readonly ApiOptions _options;
     private readonly ILogger<ApiHttpClient>? _logger;
 
     /// <summary>
@@ -38,7 +38,7 @@ internal sealed class ApiHttpClient : IPagedHttpClient
     internal ApiHttpClient(
         HttpClient httpClient,
         ApiResponseHandler responseHandler,
-        ApiClientOptions options,
+        ApiOptions options,
         ILogger<ApiHttpClient>? logger = null)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
@@ -52,7 +52,7 @@ internal sealed class ApiHttpClient : IPagedHttpClient
     }
 
     /// <inheritdoc />
-    public ApiClientOptions Options => _options;
+    public ApiOptions Options => _options;
 
     /// <summary>
     /// Executes a GET request with query string parameters to retrieve a page of items with pagination metadata.

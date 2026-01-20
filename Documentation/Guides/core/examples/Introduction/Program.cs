@@ -10,7 +10,7 @@ var builder = Host.CreateApplicationBuilder(args);
 #region Registration
 builder.Services.AddCivitaiApi(options =>
 {
-    options.ApiKey = "your-api-key";
+    options.Key = "your-api-key";
 });
 #endregion
 

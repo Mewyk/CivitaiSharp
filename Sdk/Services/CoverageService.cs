@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CivitaiSharp.Core;
 using CivitaiSharp.Core.Response;
 using CivitaiSharp.Sdk.Air;
 using CivitaiSharp.Sdk.Http;
@@ -20,7 +21,7 @@ using CivitaiSharp.Sdk.Models.Coverage;
 /// <param name="httpClient">The HTTP client for API requests.</param>
 /// <param name="options">The SDK client options.</param>
 /// <exception cref="ArgumentNullException">Thrown when <paramref name="httpClient"/> or <paramref name="options"/> is null.</exception>
-internal sealed class CoverageService(SdkHttpClient httpClient, SdkClientOptions options) : ICoverageService
+internal sealed class CoverageService(SdkHttpClient httpClient, SdkOptions options) : ICoverageService
 {
     /// <inheritdoc />
     public Task<Result<IReadOnlyDictionary<AirIdentifier, ProviderAssetAvailability>>> GetAsync(

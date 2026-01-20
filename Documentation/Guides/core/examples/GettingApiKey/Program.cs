@@ -9,7 +9,7 @@ var builder = Host.CreateApplicationBuilder(args);
 #region OptionsConfiguration
 builder.Services.AddCivitaiApi(options =>
 {
-    options.ApiKey = "your-api-key";
+    options.Key = "your-api-key";
 });
 #endregion
 
@@ -20,7 +20,7 @@ builder.Services.AddCivitaiApi(options =>
 #region EnvironmentVariable
 // builder.Services.AddCivitaiApi(options =>
 // {
-//     options.ApiKey = Environment.GetEnvironmentVariable("CIVITAI_API_KEY");
+//     options.Key = Environment.GetEnvironmentVariable("CIVITAI_API_KEY");
 // });
 #endregion
 

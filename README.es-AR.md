@@ -157,14 +157,16 @@ else
 
 ## 4. Configuración
 ### Usando appsettings.json
-CivitaiSharp.Core lee la configuración de la sección `CivitaiApi` por defecto.
+CivitaiSharp lee la configuración de la sección `CivitaiSharp` por defecto.
 
 <details>
 <summary><strong>Configuración Mínima (appsettings.json)</strong></summary>
 
 ```json
 {
-  "CivitaiApi": {
+  "CivitaiSharp": {
+    "Api": {},
+    "Sdk": {}
   }
 }
 ```
@@ -178,25 +180,42 @@ Todas las configuraciones tienen valores predeterminados sensatos, por lo que un
 
 ```json
 {
-  "CivitaiApi": {
-    "BaseUrl": "https://civitai.com",
-    "ApiVersion": "v1",
-    "ApiKey": null,
-    "TimeoutSeconds": 30,
-    "StrictJsonParsing": false
+  "CivitaiSharp": {
+    "Api": {
+      "Key": null,
+      "BaseUrl": "https://civitai.com",
+      "Version": "v1",
+      "TimeoutSeconds": 30
+    },
+    "Sdk": {
+      "Key": null,
+      "BaseUrl": "https://orchestration.civitai.com",
+      "Version": "v2",
+      "TimeoutSeconds": 30
+    }
   }
 }
 ```
 
+### Configuración API
+
 | Propiedad | Tipo | Predeterminado | Descripción |
 |-----------|------|----------------|-------------|
-| `BaseUrl` | `string` | `https://civitai.com` | URL base para la API de Civitai |
-| `ApiVersion` | `string` | `v1` | Segmento de ruta de la versión de API |
-| `ApiKey` | `string?` | `null` | Clave API opcional para solicitudes autenticadas |
-| `TimeoutSeconds` | `int` | `30` | Tiempo de espera de solicitud HTTP (1-300 segundos) |
-| `StrictJsonParsing` | `bool` | `false` | Lanzar excepción en propiedades JSON no mapeadas |
+| `Api.Key` | `string?` | `null` | Clave API opcional para solicitudes autenticadas |
+| `Api.BaseUrl` | `string` | `https://civitai.com` | URL base para la API de Civitai |
+| `Api.Version` | `string` | `v1` | Segmento de ruta de la versión de API |
+| `Api.TimeoutSeconds` | `int` | `30` | Tiempo de espera de solicitud HTTP (1-300 segundos) |
 
-> **Nota de Autenticación:** La biblioteca Core puede consultar endpoints públicos (modelos, imágenes, tags, creadores) sin clave API. Una clave API solo es necesaria para funcionalidades autenticadas como favoritos, modelos ocultos y límites de tasa más altos. **Contenido NSFW**: Establecer `WhereNsfw(true)` en modelos o usar ciertos valores de `ImageNsfwLevel` (Mature, X) requiere autenticación. Esto es diferente a CivitaiSharp.Sdk que **siempre requiere un token de API** para todas las operaciones.
+### Configuración SDK
+
+| Propiedad | Tipo | Predeterminado | Descripción |
+|-----------|------|----------------|-------------|
+| `Sdk.Key` | `string?` | `null` | Token de API para operaciones SDK (requerido) |
+| `Sdk.BaseUrl` | `string` | `https://orchestration.civitai.com` | URL base para la API de Generator/Orchestration |
+| `Sdk.Version` | `string` | `v2` | Segmento de ruta de la versión de API |
+| `Sdk.TimeoutSeconds` | `int` | `30` | Tiempo de espera de solicitud HTTP (1-300 segundos) |
+
+> **Nota de Autenticación:** La biblioteca Core puede consultar endpoints públicos (modelos, imágenes, tags, creadores) sin clave API. Una clave API solo es necesaria para funcionalidades autenticadas como favoritos, modelos ocultos y límites de tasa más altos. **Contenido NSFW**: Establecer `WhereNsfw(true)` en modelos o usar ciertos valores de `ImageNsfwLevel` (Mature, X) requiere autenticación. El SDK **siempre requiere un token de API** para todas las operaciones.
 
 </details>
 
@@ -517,7 +536,7 @@ using Microsoft.Extensions.DependencyInjection;
 var services = new ServiceCollection();
 services.AddCivitaiSdk(options =>
 {
-    options.ApiToken = "tu-token-api"; // Requerido para SDK
+    options.Key = "tu-token-api"; // Requerido para SDK
 });
 
 await using var provider = services.BuildServiceProvider();

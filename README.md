@@ -153,14 +153,16 @@ else
 
 ## 4. Configuration
 ### Using appsettings.json
-CivitaiSharp.Core reads configuration from the `CivitaiApi` section by default.
+CivitaiSharp reads configuration from the `CivitaiSharp` section by default.
 
 <details>
 <summary><strong>Minimal Configuration (appsettings.json)</strong></summary>
 
 ```json
 {
-  "CivitaiApi": {
+  "CivitaiSharp": {
+    "Api": {},
+    "Sdk": {}
   }
 }
 ```
@@ -174,25 +176,42 @@ All settings have sensible defaults, so an empty section is valid.
 
 ```json
 {
-  "CivitaiApi": {
-    "BaseUrl": "https://civitai.com",
-    "ApiVersion": "v1",
-    "ApiKey": null,
-    "TimeoutSeconds": 30,
-    "StrictJsonParsing": false
+  "CivitaiSharp": {
+    "Api": {
+      "Key": null,
+      "BaseUrl": "https://civitai.com",
+      "Version": "v1",
+      "TimeoutSeconds": 30
+    },
+    "Sdk": {
+      "Key": null,
+      "BaseUrl": "https://orchestration.civitai.com",
+      "Version": "v2",
+      "TimeoutSeconds": 30
+    }
   }
 }
 ```
 
+### API Configuration
+
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| `BaseUrl` | `string` | `https://civitai.com` | Base URL for the Civitai API |
-| `ApiVersion` | `string` | `v1` | API version path segment |
-| `ApiKey` | `string?` | `null` | Optional API key for authenticated requests |
-| `TimeoutSeconds` | `int` | `30` | HTTP request timeout (1-300 seconds) |
-| `StrictJsonParsing` | `bool` | `false` | Throw on unmapped JSON properties |
+| `Api.Key` | `string?` | `null` | Optional API key for authenticated requests |
+| `Api.BaseUrl` | `string` | `https://civitai.com` | Base URL for the Civitai API |
+| `Api.Version` | `string` | `v1` | API version path segment |
+| `Api.TimeoutSeconds` | `int` | `30` | HTTP request timeout (1-300 seconds) |
 
-> **Authentication Note:** The Core library can query public endpoints (models, images, tags, creators) without an API key. An API key is only required for authenticated features like favorites, hidden models, and higher rate limits. **NSFW Content**: Setting `WhereNsfw(true)` on models or using certain `ImageNsfwLevel` values (Mature, X) requires authentication. This is different from CivitaiSharp.Sdk which **always requires an API token** for all operations.
+### SDK Configuration
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `Sdk.Key` | `string?` | `null` | API token for SDK operations (required) |
+| `Sdk.BaseUrl` | `string` | `https://orchestration.civitai.com` | Base URL for the Generator/Orchestration API |
+| `Sdk.Version` | `string` | `v2` | API version path segment |
+| `Sdk.TimeoutSeconds` | `int` | `30` | HTTP request timeout (1-300 seconds) |
+
+> **Authentication Note:** The Core library can query public endpoints (models, images, tags, creators) without an API key. An API key is only required for authenticated features like favorites, hidden models, and higher rate limits. **NSFW Content**: Setting `WhereNsfw(true)` on models or using certain `ImageNsfwLevel` values (Mature, X) requires authentication. The SDK **always requires an API token** for all operations.
 
 </details>
 
@@ -512,7 +531,7 @@ using Microsoft.Extensions.DependencyInjection;
 var services = new ServiceCollection();
 services.AddCivitaiSdk(options =>
 {
-    options.ApiToken = "your-api-token"; // Required for SDK
+    options.Key = "your-api-token"; // Required for SDK
 });
 
 await using var provider = services.BuildServiceProvider();

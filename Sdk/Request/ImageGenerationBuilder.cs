@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using CivitaiSharp.Core;
 using CivitaiSharp.Core.Response;
 using CivitaiSharp.Sdk.Air;
 using CivitaiSharp.Sdk.Enums;
@@ -23,7 +24,7 @@ using CivitaiSharp.Sdk.Models.Results;
 public sealed record ImageGenerationBuilder
 {
     private readonly SdkHttpClient _httpClient;
-    private readonly SdkClientOptions _options;
+    private readonly SdkOptions _options;
     private readonly AirIdentifier? _air;
     private readonly ImageJobParamsBuilder? _paramsBuilder;
     private readonly ImmutableDictionary<AirIdentifier, ImageJobNetworkParams>? _additionalNetworks;
@@ -47,7 +48,7 @@ public sealed record ImageGenerationBuilder
     /// <exception cref="ArgumentNullException">Thrown when httpClient or options is null.</exception>
     internal ImageGenerationBuilder(
         SdkHttpClient httpClient,
-        SdkClientOptions options)
+        SdkOptions options)
         : this(
             httpClient ?? throw new ArgumentNullException(nameof(httpClient)),
             options ?? throw new ArgumentNullException(nameof(options)),
@@ -69,7 +70,7 @@ public sealed record ImageGenerationBuilder
 
     private ImageGenerationBuilder(
         SdkHttpClient httpClient,
-        SdkClientOptions options,
+        SdkOptions options,
         AirIdentifier? air,
         ImageJobParamsBuilder? paramsBuilder,
         ImmutableDictionary<AirIdentifier, ImageJobNetworkParams>? additionalNetworks,

@@ -12,7 +12,7 @@ internal interface IPagedHttpClient : ICivitaiHttpClient
     /// <summary>
     /// Gets the API client configuration options.
     /// </summary>
-    ApiClientOptions Options { get; }
+    ApiOptions Options { get; }
 
     /// <summary>
     /// Performs an HTTP GET request with query string parameters and deserializes a paginated response.

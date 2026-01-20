@@ -82,23 +82,25 @@ public sealed class ApiOptionsTests
     }
 
     [Fact]
-    public void WhenSettingNullApiVersionThenThrowsArgumentNullException()
+    public void WhenSettingNullApiVersionThenValidateThrows()
     {
         // Arrange
         var options = new CivitaiSharpOptions();
+        options.Api.Version = null!;
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => options.Api.Version = null!);
+        Assert.Throws<ArgumentNullException>(() => options.Api.Validate());
     }
 
     [Fact]
-    public void WhenSettingEmptyApiVersionThenThrowsArgumentException()
+    public void WhenSettingEmptyApiVersionThenValidateThrows()
     {
         // Arrange
         var options = new CivitaiSharpOptions();
+        options.Api.Version = "";
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => options.Api.Version = "");
+        Assert.Throws<ArgumentException>(() => options.Api.Validate());
     }
 
     #endregion
@@ -119,23 +121,25 @@ public sealed class ApiOptionsTests
     }
 
     [Fact]
-    public void WhenSettingTimeoutBelowMinimumThenThrowsArgumentOutOfRangeException()
+    public void WhenSettingTimeoutBelowMinimumThenValidateThrows()
     {
         // Arrange
         var options = new CivitaiSharpOptions();
+        options.Api.TimeoutSeconds = 0;
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => options.Api.TimeoutSeconds = 0);
+        Assert.Throws<ArgumentOutOfRangeException>(() => options.Api.Validate());
     }
 
     [Fact]
-    public void WhenSettingTimeoutAboveMaximumThenThrowsArgumentOutOfRangeException()
+    public void WhenSettingTimeoutAboveMaximumThenValidateThrows()
     {
         // Arrange
         var options = new CivitaiSharpOptions();
+        options.Api.TimeoutSeconds = 301;
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => options.Api.TimeoutSeconds = 301);
+        Assert.Throws<ArgumentOutOfRangeException>(() => options.Api.Validate());
     }
 
     [Fact]

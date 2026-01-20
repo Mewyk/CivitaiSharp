@@ -83,33 +83,39 @@ public sealed class SdkOptionsTests
     }
 
     [Fact]
-    public void WhenSettingNullApiVersionThenThrowsArgumentNullException()
+    public void WhenSettingNullApiVersionThenValidateThrows()
     {
         // Arrange
         var options = new CivitaiSharpOptions();
+        options.Sdk.Key = "test-key";
+        options.Sdk.Version = null!;
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => options.Sdk.Version = null!);
+        Assert.Throws<ArgumentNullException>(() => options.Sdk.Validate());
     }
 
     [Fact]
-    public void WhenSettingEmptyApiVersionThenThrowsArgumentException()
+    public void WhenSettingEmptyApiVersionThenValidateThrows()
     {
         // Arrange
         var options = new CivitaiSharpOptions();
+        options.Sdk.Key = "test-key";
+        options.Sdk.Version = "";
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => options.Sdk.Version = "");
+        Assert.Throws<ArgumentException>(() => options.Sdk.Validate());
     }
 
     [Fact]
-    public void WhenSettingWhitespaceApiVersionThenThrowsArgumentException()
+    public void WhenSettingWhitespaceApiVersionThenValidateThrows()
     {
         // Arrange
         var options = new CivitaiSharpOptions();
+        options.Sdk.Key = "test-key";
+        options.Sdk.Version = "   ";
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => options.Sdk.Version = "   ");
+        Assert.Throws<ArgumentException>(() => options.Sdk.Validate());
     }
 
     #endregion
@@ -156,33 +162,39 @@ public sealed class SdkOptionsTests
     }
 
     [Fact]
-    public void WhenSettingZeroTimeoutThenThrowsArgumentOutOfRangeException()
+    public void WhenSettingZeroTimeoutThenValidateThrows()
     {
         // Arrange
         var options = new CivitaiSharpOptions();
+        options.Sdk.Key = "test-key";
+        options.Sdk.TimeoutSeconds = 0;
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => options.Sdk.TimeoutSeconds = 0);
+        Assert.Throws<ArgumentOutOfRangeException>(() => options.Sdk.Validate());
     }
 
     [Fact]
-    public void WhenSettingNegativeTimeoutThenThrowsArgumentOutOfRangeException()
+    public void WhenSettingNegativeTimeoutThenValidateThrows()
     {
         // Arrange
         var options = new CivitaiSharpOptions();
+        options.Sdk.Key = "test-key";
+        options.Sdk.TimeoutSeconds = -1;
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => options.Sdk.TimeoutSeconds = -1);
+        Assert.Throws<ArgumentOutOfRangeException>(() => options.Sdk.Validate());
     }
 
     [Fact]
-    public void WhenSettingTimeoutAboveMaximumThenThrowsArgumentOutOfRangeException()
+    public void WhenSettingTimeoutAboveMaximumThenValidateThrows()
     {
         // Arrange
         var options = new CivitaiSharpOptions();
+        options.Sdk.Key = "test-key";
+        options.Sdk.TimeoutSeconds = SdkOptions.MaxTimeoutSeconds + 1;
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => options.Sdk.TimeoutSeconds = SdkOptions.MaxTimeoutSeconds + 1);
+        Assert.Throws<ArgumentOutOfRangeException>(() => options.Sdk.Validate());
     }
 
     #endregion

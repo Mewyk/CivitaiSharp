@@ -149,8 +149,22 @@ var jobResult = await sdkClient.Jobs.Query.GetByIdAsync(jobId);
 
 if (jobResult is Result<JobStatus>.Success jobStatus)
 {
-    Console.WriteLine($"Status: {jobStatus.Data.Status}");
-    Console.WriteLine($"Job ID: {jobStatus.Data.JobId}");
+    var job = jobStatus.Data;
+    Console.WriteLine($"Job ID: {job.JobId}");
+    
+    if (job.Scheduled)
+    {
+        Console.WriteLine("Status: In Progress");
+        Console.WriteLine($"Queue Position: {job.Position}");
+    }
+    else if (job.LastEvent?.Type == JobEventType.Succeeded)
+    {
+        Console.WriteLine("Status: Succeeded");
+    }
+    else if (job.LastEvent?.Type == JobEventType.Failed)
+    {
+        Console.WriteLine("Status: Failed");
+    }
 }
 #endregion
 
@@ -162,7 +176,8 @@ if (tokenResult is Result<JobStatusCollection>.Success tokenSuccess)
 {
     foreach (var job in tokenSuccess.Data.JobsList)
     {
-        Console.WriteLine($"Job {job.JobId}: {job.Status}");
+        var status = job.Scheduled ? "In Progress" : job.LastEvent?.Type.ToString() ?? "Unknown";
+        Console.WriteLine($"Job {job.JobId}: {status}");
     }
 }
 #endregion

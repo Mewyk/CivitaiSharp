@@ -11,6 +11,7 @@ using CivitaiSharp.Core.Response;
 using CivitaiSharp.Sdk.Air;
 using CivitaiSharp.Sdk.Enums;
 using CivitaiSharp.Sdk.Http;
+using CivitaiSharp.Sdk.Json;
 using CivitaiSharp.Sdk.Models.Jobs;
 using CivitaiSharp.Sdk.Models.Results;
 
@@ -325,16 +326,101 @@ public sealed record ImageGenerationBuilder
         => new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, priority, _properties, _callbackUrl, _retries, _timeout, _clipSkip, _sourceImageUrl, _denoisingStrength);
 
     /// <summary>
-    /// Adds a custom property for job tracking and querying.
+    /// Adds a custom string property for job tracking and querying.
     /// </summary>
     /// <param name="key">The property key.</param>
-    /// <param name="value">The property value (must be JSON-serializable).</param>
+    /// <param name="value">The string value.</param>
     /// <returns>A new builder instance with the added property.</returns>
-    public ImageGenerationBuilder WithProperty(string key, JsonElement value)
+    public ImageGenerationBuilder WithProperty(string key, string value)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        var element = JsonSerializer.SerializeToElement(value, SdkJsonContext.Default.String);
         var properties = _properties ?? [];
-        return new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, properties.SetItem(key, value), _callbackUrl, _retries, _timeout, _clipSkip, _sourceImageUrl, _denoisingStrength);
+        return new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, properties.SetItem(key, element), _callbackUrl, _retries, _timeout, _clipSkip, _sourceImageUrl, _denoisingStrength);
+    }
+
+    /// <summary>
+    /// Adds a custom integer property for job tracking and querying.
+    /// </summary>
+    /// <param name="key">The property key.</param>
+    /// <param name="value">The integer value.</param>
+    /// <returns>A new builder instance with the added property.</returns>
+    public ImageGenerationBuilder WithProperty(string key, int value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        var element = JsonSerializer.SerializeToElement(value, SdkJsonContext.Default.Int32);
+        var properties = _properties ?? [];
+        return new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, properties.SetItem(key, element), _callbackUrl, _retries, _timeout, _clipSkip, _sourceImageUrl, _denoisingStrength);
+    }
+
+    /// <summary>
+    /// Adds a custom long property for job tracking and querying.
+    /// </summary>
+    /// <param name="key">The property key.</param>
+    /// <param name="value">The long value.</param>
+    /// <returns>A new builder instance with the added property.</returns>
+    public ImageGenerationBuilder WithProperty(string key, long value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        var element = JsonSerializer.SerializeToElement(value, SdkJsonContext.Default.Int64);
+        var properties = _properties ?? [];
+        return new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, properties.SetItem(key, element), _callbackUrl, _retries, _timeout, _clipSkip, _sourceImageUrl, _denoisingStrength);
+    }
+
+    /// <summary>
+    /// Adds a custom boolean property for job tracking and querying.
+    /// </summary>
+    /// <param name="key">The property key.</param>
+    /// <param name="value">The boolean value.</param>
+    /// <returns>A new builder instance with the added property.</returns>
+    public ImageGenerationBuilder WithProperty(string key, bool value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        var element = JsonSerializer.SerializeToElement(value, SdkJsonContext.Default.Boolean);
+        var properties = _properties ?? [];
+        return new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, properties.SetItem(key, element), _callbackUrl, _retries, _timeout, _clipSkip, _sourceImageUrl, _denoisingStrength);
+    }
+
+    /// <summary>
+    /// Adds a custom decimal property for job tracking and querying.
+    /// </summary>
+    /// <param name="key">The property key.</param>
+    /// <param name="value">The decimal value.</param>
+    /// <returns>A new builder instance with the added property.</returns>
+    public ImageGenerationBuilder WithProperty(string key, decimal value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        var element = JsonSerializer.SerializeToElement(value, SdkJsonContext.Default.Decimal);
+        var properties = _properties ?? [];
+        return new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, properties.SetItem(key, element), _callbackUrl, _retries, _timeout, _clipSkip, _sourceImageUrl, _denoisingStrength);
+    }
+
+    /// <summary>
+    /// Adds a custom GUID property for job tracking and querying.
+    /// </summary>
+    /// <param name="key">The property key.</param>
+    /// <param name="value">The GUID value.</param>
+    /// <returns>A new builder instance with the added property.</returns>
+    public ImageGenerationBuilder WithProperty(string key, Guid value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        var element = JsonSerializer.SerializeToElement(value, SdkJsonContext.Default.Guid);
+        var properties = _properties ?? [];
+        return new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, properties.SetItem(key, element), _callbackUrl, _retries, _timeout, _clipSkip, _sourceImageUrl, _denoisingStrength);
+    }
+
+    /// <summary>
+    /// Adds a custom DateTime property for job tracking and querying.
+    /// </summary>
+    /// <param name="key">The property key.</param>
+    /// <param name="value">The DateTime value.</param>
+    /// <returns>A new builder instance with the added property.</returns>
+    public ImageGenerationBuilder WithProperty(string key, DateTime value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        var element = JsonSerializer.SerializeToElement(value, SdkJsonContext.Default.DateTime);
+        var properties = _properties ?? [];
+        return new(_httpClient, _options, _air, _paramsBuilder, _additionalNetworks, _controlNets, _quantity, _priority, properties.SetItem(key, element), _callbackUrl, _retries, _timeout, _clipSkip, _sourceImageUrl, _denoisingStrength);
     }
 
     /// <summary>

@@ -1,6 +1,7 @@
 namespace CivitaiSharp.Sdk.Request;
 
 using System;
+using CivitaiSharp.Core;
 using CivitaiSharp.Sdk;
 using CivitaiSharp.Sdk.Http;
 
@@ -11,7 +12,7 @@ using CivitaiSharp.Sdk.Http;
 public sealed record JobsBuilder
 {
     private readonly SdkHttpClient _httpClient;
-    private readonly SdkClientOptions _options;
+    private readonly SdkOptions _options;
     private readonly JobQueryBuilder _queryBuilder;
 
     /// <summary>
@@ -21,7 +22,7 @@ public sealed record JobsBuilder
     /// <param name="httpClient">The HTTP client used to execute requests.</param>
     /// <param name="options">The SDK client options.</param>
     /// <exception cref="ArgumentNullException">Thrown when httpClient or options is null.</exception>
-    internal JobsBuilder(SdkHttpClient httpClient, SdkClientOptions options)
+    internal JobsBuilder(SdkHttpClient httpClient, SdkOptions options)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
         ArgumentNullException.ThrowIfNull(options);

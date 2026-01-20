@@ -1,40 +1,29 @@
 ---
 title: Quick Start
-description: Get started with CivitaiSharp.Core in minutes. Learn how to set up dependency injection and query models from the Civitai API.
+description: Get started with CivitaiSharp.Core.
 ---
 
 # Quick Start
 
-This guide shows you how to get started with CivitaiSharp.Core to query models from the Civitai API.
+## Setup
 
-## Prerequisites
-
-- .NET 10 or higher
-- CivitaiSharp.Core package installed
-
-## Setting Up
-
-CivitaiSharp uses dependency injection. Register the API client in your `IServiceCollection`:
+Register the API client:
 
 [!code-csharp[Program.cs](examples/QuickStart/Program.cs#setup)]
 
-## Querying Models
+## Query Models
 
-Use the fluent builder pattern to construct queries:
+Use the fluent builder pattern:
 
 [!code-csharp[Program.cs](examples/QuickStart/Program.cs#query)]
 
-## Handling Results
+## Handle Results
 
-All API operations return a `Result<T>` type that can be either a success or failure:
+All operations return `Result<T>`:
 
 [!code-csharp[Program.cs](examples/QuickStart/Program.cs#result)]
 
-## Complete Example
-
-[!code-csharp[Program.cs](examples/QuickStart/Program.cs)]
-
 ## Next Steps
 
-- [Request Builders](request-builders.md) - Master the fluent API pattern
-- [Error Handling](error-handling.md) - Handle errors gracefully
+- [Request Builders](request-builders.md)
+- [Error Handling](../common/error-handling.md)

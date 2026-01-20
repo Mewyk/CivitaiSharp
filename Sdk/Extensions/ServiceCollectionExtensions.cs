@@ -1,6 +1,7 @@
 namespace CivitaiSharp.Sdk.Extensions;
 
 using System.Net.Http.Headers;
+using CivitaiSharp.Core;
 using CivitaiSharp.Sdk.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +17,7 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// The default configuration section name for SDK options.
     /// </summary>
-    public const string DefaultConfigurationSectionName = "CivitaiSdk";
+    public const string DefaultConfigurationSectionName = "CivitaiSharp";
 
     private const string UserAgentValue = $"CivitaiSharp.Sdk/{Sdk.VersionInfo.Version}";
 
@@ -24,25 +25,25 @@ public static class ServiceCollectionExtensions
     /// Registers the Civitai SDK client and related services with the specified configuration action.
     /// </summary>
     /// <param name="services">The service collection to register services into.</param>
-    /// <param name="configure">Action to configure <see cref="SdkClientOptions"/>.</param>
+    /// <param name="configure">Action to configure <see cref="SdkOptions"/>.</param>
     /// <returns>The service collection for chaining.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="services"/> or <paramref name="configure"/> is null.</exception>
     /// <example>
     /// <code>
     /// services.AddCivitaiSdk(options =>
     /// {
-    ///     options.ApiToken = "your-api-token";
+    ///     options.Key = "your-api-token";
     /// });
     /// </code>
     /// </example>
     public static IServiceCollection AddCivitaiSdk(
         this IServiceCollection services,
-        Action<SdkClientOptions> configure)
+        Action<SdkOptions> configure)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configure);
 
-        services.Configure(configure);
+        services.Configure<CivitaiSharpOptions>(options => configure(options.Sdk));
         RegisterSdkServices(services);
         return services;
     }
@@ -52,7 +53,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The service collection to register services into.</param>
     /// <param name="configuration">The configuration source containing SDK settings.</param>
-    /// <param name="sectionName">Optional section name to read from configuration. Defaults to "CivitaiSdk".</param>
+    /// <param name="sectionName">Optional section name to read from configuration. Defaults to "CivitaiSharp".</param>
     /// <returns>The service collection for chaining.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="services"/>, <paramref name="configuration"/>, or <paramref name="sectionName"/> is null.</exception>
     /// <exception cref="ArgumentException">Thrown if <paramref name="sectionName"/> is empty or whitespace.</exception>
@@ -60,8 +61,10 @@ public static class ServiceCollectionExtensions
     /// <code>
     /// // appsettings.json:
     /// // {
-    /// //   "CivitaiSdk": {
-    /// //     "ApiToken": "your-api-token"
+    /// //   "CivitaiSharp": {
+    /// //     "Sdk": {
+    /// //       "Key": "your-api-token"
+    /// //     }
     /// //   }
     /// // }
     /// 
@@ -77,7 +80,7 @@ public static class ServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentException.ThrowIfNullOrWhiteSpace(sectionName);
 
-        services.Configure<SdkClientOptions>(configuration.GetSection(sectionName));
+        services.Configure<CivitaiSharpOptions>(configuration.GetSection(sectionName));
         RegisterSdkServices(services);
         return services;
     }
@@ -103,8 +106,8 @@ public static class ServiceCollectionExtensions
 
         services.AddHttpClient(nameof(SdkHttpClient), (serviceProvider, client) =>
         {
-            var options = serviceProvider.GetRequiredService<IOptions<SdkClientOptions>>().Value;
-            ConfigureHttpClient(client, options);
+            var options = serviceProvider.GetRequiredService<IOptions<CivitaiSharpOptions>>().Value;
+            ConfigureHttpClient(client, options.Sdk);
         })
         .AddStandardResilienceHandler();
 
@@ -119,23 +122,23 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ISdkClient>(serviceProvider =>
         {
             var httpClient = serviceProvider.GetRequiredService<SdkHttpClient>();
-            var options = serviceProvider.GetRequiredService<IOptions<SdkClientOptions>>().Value;
-            return new SdkClient(httpClient, options);
+            var options = serviceProvider.GetRequiredService<IOptions<CivitaiSharpOptions>>().Value;
+            return new SdkClient(httpClient, options.Sdk);
         });
     }
 
     /// <summary>
     /// Configures the HTTP client base address, headers, and authentication.
     /// </summary>
-    private static void ConfigureHttpClient(HttpClient client, SdkClientOptions options)
+    private static void ConfigureHttpClient(HttpClient client, SdkOptions options)
     {
         options.Validate();
 
-        client.BaseAddress = new Uri(options.BaseUrl);
+        client.BaseAddress = new Uri(SdkOptions.DefaultBaseUrl);
         client.Timeout = options.Timeout;
         client.DefaultRequestHeaders.Accept.Clear();
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgentValue);
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", options.ApiToken);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", options.Key);
     }
 }

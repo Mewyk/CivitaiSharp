@@ -2,213 +2,184 @@ namespace CivitaiSharp.Core.Tests;
 
 using Xunit;
 
-public sealed class ApiClientOptionsTests
+/// <summary>
+/// Tests for ApiOptions configuration.
+/// </summary>
+public sealed class ApiOptionsTests
 {
+    #region Default Values Tests
+
     [Fact]
     public void WhenCreatingOptionsWithDefaultsThenDefaultValuesAreUsed()
     {
         // Arrange & Act
-        var options = new ApiClientOptions();
+        var options = new CivitaiSharpOptions();
 
         // Assert
-        Assert.Equal(ApiClientOptions.DefaultBaseUrl, options.BaseUrl);
-        Assert.Equal(ApiClientOptions.DefaultApiVersion, options.ApiVersion);
-        Assert.Equal(ApiClientOptions.DefaultTimeoutSeconds, options.TimeoutSeconds);
-        Assert.Null(options.ApiKey);
+        Assert.Equal(ApiOptions.DefaultVersion, options.Api.Version);
+        Assert.Equal(ApiOptions.DefaultTimeoutSeconds, options.Api.TimeoutSeconds);
+        Assert.Null(options.Api.Key);
     }
 
     [Fact]
-    public void WhenSettingValidBaseUrlThenUrlIsStored()
+    public void WhenCheckingDefaultConstantsThenValuesAreCorrect()
+    {
+        // Assert
+        Assert.Equal("https://civitai.com", ApiOptions.DefaultBaseUrl);
+        Assert.Equal("v1", ApiOptions.DefaultVersion);
+        Assert.Equal(30, ApiOptions.DefaultTimeoutSeconds);
+        Assert.Equal(300, ApiOptions.MaxTimeoutSeconds);
+    }
+
+    #endregion
+
+    #region Key Tests
+
+    [Fact]
+    public void WhenSettingValidApiKeyThenKeyIsStored()
     {
         // Arrange
-        var options = new ApiClientOptions();
-        const string expectedUrl = "https://api.example.com";
+        var options = new CivitaiSharpOptions();
+        const string expectedKey = "test-api-key";
 
         // Act
-        options.BaseUrl = expectedUrl;
+        options.Api.Key = expectedKey;
 
         // Assert
-        Assert.Equal(expectedUrl, options.BaseUrl);
+        Assert.Equal(expectedKey, options.Api.Key);
     }
 
     [Fact]
-    public void WhenSettingBaseUrlWithTrailingSlashThenSlashIsRemoved()
+    public void WhenSettingNullApiKeyThenKeyIsNull()
     {
         // Arrange
-        var options = new ApiClientOptions();
+        var options = new CivitaiSharpOptions();
+        options.Api.Key = "initial-key";
 
         // Act
-        options.BaseUrl = "https://api.example.com/";
+        options.Api.Key = null;
 
         // Assert
-        Assert.Equal("https://api.example.com", options.BaseUrl);
+        Assert.Null(options.Api.Key);
     }
 
-    [Fact]
-    public void WhenSettingNullBaseUrlThenThrowsArgumentNullException()
-    {
-        // Arrange
-        var options = new ApiClientOptions();
+    #endregion
 
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => options.BaseUrl = null!);
-    }
-
-    [Fact]
-    public void WhenSettingEmptyBaseUrlThenThrowsArgumentException()
-    {
-        // Arrange
-        var options = new ApiClientOptions();
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => options.BaseUrl = "");
-    }
-
-    [Fact]
-    public void WhenSettingWhitespaceBaseUrlThenThrowsArgumentException()
-    {
-        // Arrange
-        var options = new ApiClientOptions();
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => options.BaseUrl = "   ");
-    }
-
-    [Fact]
-    public void WhenSettingInvalidUrlThenThrowsArgumentException()
-    {
-        // Arrange
-        var options = new ApiClientOptions();
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => options.BaseUrl = "not-a-valid-url");
-    }
-
-    [Fact]
-    public void WhenSettingNonHttpUrlThenThrowsArgumentException()
-    {
-        // Arrange
-        var options = new ApiClientOptions();
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => options.BaseUrl = "ftp://example.com");
-    }
+    #region Version Tests
 
     [Fact]
     public void WhenSettingValidApiVersionThenVersionIsStored()
     {
         // Arrange
-        var options = new ApiClientOptions();
+        var options = new CivitaiSharpOptions();
         const string expectedVersion = "v2";
 
         // Act
-        options.ApiVersion = expectedVersion;
+        options.Api.Version = expectedVersion;
 
         // Assert
-        Assert.Equal(expectedVersion, options.ApiVersion);
+        Assert.Equal(expectedVersion, options.Api.Version);
     }
 
     [Fact]
-    public void WhenSettingNullApiVersionThenThrowsArgumentNullException()
+    public void WhenSettingNullApiVersionThenValidateThrows()
     {
         // Arrange
-        var options = new ApiClientOptions();
+        var options = new CivitaiSharpOptions();
+        options.Api.Version = null!;
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => options.ApiVersion = null!);
+        Assert.Throws<ArgumentNullException>(() => options.Api.Validate());
     }
 
     [Fact]
-    public void WhenSettingEmptyApiVersionThenThrowsArgumentException()
+    public void WhenSettingEmptyApiVersionThenValidateThrows()
     {
         // Arrange
-        var options = new ApiClientOptions();
+        var options = new CivitaiSharpOptions();
+        options.Api.Version = "";
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => options.ApiVersion = "");
+        Assert.Throws<ArgumentException>(() => options.Api.Validate());
     }
+
+    #endregion
+
+    #region TimeoutSeconds Tests
 
     [Fact]
     public void WhenSettingValidTimeoutThenTimeoutIsStored()
     {
         // Arrange
-        var options = new ApiClientOptions();
+        var options = new CivitaiSharpOptions();
 
         // Act
-        options.TimeoutSeconds = 60;
+        options.Api.TimeoutSeconds = 60;
 
         // Assert
-        Assert.Equal(60, options.TimeoutSeconds);
+        Assert.Equal(60, options.Api.TimeoutSeconds);
     }
 
     [Fact]
-    public void WhenSettingTimeoutBelowMinimumThenThrowsArgumentOutOfRangeException()
+    public void WhenSettingTimeoutBelowMinimumThenValidateThrows()
     {
         // Arrange
-        var options = new ApiClientOptions();
+        var options = new CivitaiSharpOptions();
+        options.Api.TimeoutSeconds = 0;
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => options.TimeoutSeconds = 0);
+        Assert.Throws<ArgumentOutOfRangeException>(() => options.Api.Validate());
     }
 
     [Fact]
-    public void WhenSettingTimeoutAboveMaximumThenThrowsArgumentOutOfRangeException()
+    public void WhenSettingTimeoutAboveMaximumThenValidateThrows()
     {
         // Arrange
-        var options = new ApiClientOptions();
+        var options = new CivitaiSharpOptions();
+        options.Api.TimeoutSeconds = 301;
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => options.TimeoutSeconds = 301);
+        Assert.Throws<ArgumentOutOfRangeException>(() => options.Api.Validate());
     }
 
     [Fact]
     public void WhenSettingTimeoutToMaximumValueThenSucceeds()
     {
         // Arrange
-        var options = new ApiClientOptions();
+        var options = new CivitaiSharpOptions();
 
         // Act
-        options.TimeoutSeconds = ApiClientOptions.MaxTimeoutSeconds;
+        options.Api.TimeoutSeconds = ApiOptions.MaxTimeoutSeconds;
 
         // Assert
-        Assert.Equal(300, options.TimeoutSeconds);
+        Assert.Equal(300, options.Api.TimeoutSeconds);
     }
 
     [Fact]
     public void WhenSettingTimeoutToMinimumValueThenSucceeds()
     {
         // Arrange
-        var options = new ApiClientOptions();
+        var options = new CivitaiSharpOptions();
 
         // Act
-        options.TimeoutSeconds = 1;
+        options.Api.TimeoutSeconds = 1;
 
         // Assert
-        Assert.Equal(1, options.TimeoutSeconds);
+        Assert.Equal(1, options.Api.TimeoutSeconds);
     }
 
-    [Fact]
-    public void WhenSettingApiKeyThenKeyIsStored()
-    {
-        // Arrange
-        var options = new ApiClientOptions();
-        const string apiKey = "test-api-key";
+    #endregion
 
-        // Act
-        options.ApiKey = apiKey;
-
-        // Assert
-        Assert.Equal(apiKey, options.ApiKey);
-    }
+    #region GetApiPath Tests
 
     [Fact]
     public void WhenCallingGetApiPathThenReturnsCorrectPath()
     {
         // Arrange
-        var options = new ApiClientOptions();
+        var options = new CivitaiSharpOptions();
 
         // Act
-        var path = options.GetApiPath("models");
+        var path = options.Api.GetApiPath("models");
 
         // Assert
         Assert.Equal("/api/v1/models", path);
@@ -218,10 +189,10 @@ public sealed class ApiClientOptionsTests
     public void WhenCallingGetApiPathWithLeadingSlashThenSlashIsRemoved()
     {
         // Arrange
-        var options = new ApiClientOptions();
+        var options = new CivitaiSharpOptions();
 
         // Act
-        var path = options.GetApiPath("/images");
+        var path = options.Api.GetApiPath("/images");
 
         // Assert
         Assert.Equal("/api/v1/images", path);
@@ -231,10 +202,11 @@ public sealed class ApiClientOptionsTests
     public void WhenCallingGetApiPathWithCustomVersionThenUsesCustomVersion()
     {
         // Arrange
-        var options = new ApiClientOptions { ApiVersion = "v2" };
+        var options = new CivitaiSharpOptions();
+        options.Api.Version = "v2";
 
         // Act
-        var path = options.GetApiPath("tags");
+        var path = options.Api.GetApiPath("tags");
 
         // Assert
         Assert.Equal("/api/v2/tags", path);
@@ -244,19 +216,21 @@ public sealed class ApiClientOptionsTests
     public void WhenCallingGetApiPathWithNullPathThenThrowsArgumentNullException()
     {
         // Arrange
-        var options = new ApiClientOptions();
+        var options = new CivitaiSharpOptions();
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => options.GetApiPath(null!));
+        Assert.Throws<ArgumentNullException>(() => options.Api.GetApiPath(null!));
     }
 
     [Fact]
     public void WhenCallingGetApiPathWithEmptyPathThenThrowsArgumentException()
     {
         // Arrange
-        var options = new ApiClientOptions();
+        var options = new CivitaiSharpOptions();
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => options.GetApiPath(""));
+        Assert.Throws<ArgumentException>(() => options.Api.GetApiPath(""));
     }
+
+    #endregion
 }

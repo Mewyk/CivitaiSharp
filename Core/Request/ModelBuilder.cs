@@ -180,7 +180,7 @@ public sealed record ModelBuilder : RequestBuilder<ModelBuilder, Model>
     /// <returns>A new builder instance with the filter applied.</returns>
     /// <remarks>
     /// <strong>Requires authentication.</strong> This filter requires a valid API key to be configured via
-    /// <see cref="ApiClientOptions.ApiKey"/>. Without authentication, this filter will return 0 results.
+    /// <see cref="ApiOptions.Key"/>. Without authentication, this filter will return 0 results.
     /// </remarks>
     public ModelBuilder WhereFavorites() =>
         WithFilter(FilterKeys.Favorites, true);
@@ -191,7 +191,7 @@ public sealed record ModelBuilder : RequestBuilder<ModelBuilder, Model>
     /// <returns>A new builder instance with the filter applied.</returns>
     /// <remarks>
     /// <strong>Requires authentication.</strong> This filter requires a valid API key to be configured via
-    /// <see cref="ApiClientOptions.ApiKey"/>. Without authentication, this filter will return 0 results.
+    /// <see cref="ApiOptions.Key"/>. Without authentication, this filter will return 0 results.
     /// Hidden models are models that the authenticated user has explicitly hidden from their feed.
     /// </remarks>
     public ModelBuilder WhereHidden() =>

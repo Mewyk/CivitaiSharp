@@ -24,7 +24,7 @@ public sealed class SdkTestFixture
         var services = new ServiceCollection();
         services.AddCivitaiSdk(options =>
         {
-            options.ApiToken = "test-token-for-initialization";
+            options.Key = "test-token-for-initialization";
         });
         
         // Build and dispose - we just need the initialization side effect

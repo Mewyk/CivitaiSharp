@@ -9,12 +9,22 @@ items:
     - name: Quick Start
       href: core/quick-start.md
 
+- name: Common
+  expanded: true
+  items:
+    - name: API Behavior and Quirks
+      href: common/api-quirks.md
+    - name: Error Handling
+      href: common/error-handling.md
+    - name: Pagination
+      href: common/pagination.md
+
 - name: Core Library
   expanded: true
   items:
     - name: Introduction
       href: core/introduction.md
-    - name: Request Builders
+    - name: Request Builder Pattern
       href: core/request-builders.md
     - name: Models
       href: core/models.md
@@ -24,24 +34,18 @@ items:
       href: core/tags.md
     - name: Creators
       href: core/creators.md
-    - name: Error Handling
-      href: core/error-handling.md
-    - name: Pagination
-      href: core/pagination.md
-    - name: API Behavior and Quirks
-      href: core/api-quirks.md
 
 - name: SDK Library
   expanded: true
   items:
     - name: Introduction
       href: sdk/introduction.md
-    - name: AIR Overview
+    - name: AIR Identifier
       href: sdk/air-identifier.md
-    - name: AIR Builder
-      href: sdk/air-builder.md
-    - name: Jobs Service
-      href: sdk/jobs.md
+    - name: Create a Job
+      href: sdk/create-job.md
+    - name: Query a Job
+      href: sdk/query-job.md
     - name: Coverage Service
       href: sdk/coverage.md
     - name: Usage Service

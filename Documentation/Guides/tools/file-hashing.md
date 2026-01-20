@@ -1,98 +1,50 @@
 ---
 title: File Hashing
-description: Compute SHA256, SHA512, BLAKE3, and CRC32 hashes for files using CivitaiSharp.Tools for verification against Civitai model metadata.
+description: Compute cryptographic hashes for verification.
 ---
 
 # File Hashing
 
-CivitaiSharp.Tools provides the `IFileHashingService` for computing cryptographic hashes of files and streams. This is essential for verifying downloaded model files against the hashes provided by Civitai.
+Compute cryptographic hashes to verify downloaded files against Civitai metadata.
 
 ## Supported Algorithms
 
-| Algorithm | Description | Output Length |
-|-----------|-------------|---------------|
-| `Sha256` | SHA-256, widely compatible and used by Civitai | 64 hex characters |
-| `Sha512` | SHA-512, stronger security | 128 hex characters |
-| `Blake3` | BLAKE3, fast and modern, used by Civitai | 64 hex characters |
-| `Crc32` | CRC32, fast integrity check | 8 hex characters |
+- `Sha256` - 64 hex characters
+- `Sha512` - 128 hex characters
+- `Blake3` - 64 hex characters (fast, modern)
+- `Crc32` - 8 hex characters (integrity check)
 
-## Basic Usage
-
-### Hashing a File
+## Hash File
 
 [!code-csharp[Program.cs](examples/Tools/Program.cs#HashFile)]
 
-### Hashing a Stream
+## Hash Stream
 
 [!code-csharp[Program.cs](examples/Tools/Program.cs#HashStream)]
 
-## The HashedFile Record
-
-The `HashedFile` record contains comprehensive hash information:
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `FilePath` | `string?` | Absolute path to the hashed file, or null if from stream |
-| `Hash` | `string` | Computed hash as lowercase hexadecimal |
-| `Algorithm` | `HashAlgorithm` | Algorithm used for computation |
-| `FileSize` | `long` | Size in bytes (-1 for non-seekable streams) |
-| `ComputationTime` | `TimeSpan` | Time taken to compute the hash |
-
-## Verifying Downloads
-
-Use file hashing to verify downloaded model files match Civitai's metadata:
+## Verify Downloads
 
 [!code-csharp[Program.cs](examples/Tools/Program.cs#VerifyDownload)]
 
-## Comparing Multiple Hashes
-
-Compute multiple hash types for a single file:
+## Multiple Hashes
 
 [!code-csharp[Program.cs](examples/Tools/Program.cs#MultipleHashes)]
 
-## Performance Considerations
-
-### Buffer Size
-
-The service uses an 80 KB buffer for efficient streaming. This balances memory usage with I/O performance.
-
-### BLAKE3 Performance
-
-BLAKE3 is significantly faster than SHA256 for large files while maintaining cryptographic security. Consider using BLAKE3 when:
-
-- Processing many large files
-- Hash values are available from Civitai (many models include BLAKE3 hashes)
-- Performance is critical
-
-### Async Operations
-
-All hashing operations are asynchronous and support cancellation:
+## Async with Cancellation
 
 [!code-csharp[Program.cs](examples/Tools/Program.cs#AsyncCancellationExample)]
 
 ## Error Handling
 
-The service returns `Result<HashedFile>` which can indicate various failures:
-
-| Error Code | Description |
-|------------|-------------|
-| `FileNotFound` | The specified file does not exist |
-| `StreamNotReadable` | The provided stream cannot be read |
-| `HashComputationFailed` | An error occurred during hash computation |
-
-Handle errors using pattern matching:
+**Error Codes:** `FileNotFound`, `StreamNotReadable`, `HashComputationFailed`
 
 [!code-csharp[Program.cs](examples/Tools/Program.cs#ErrorHandlingSwitchExample)]
 
 ## Integration with Downloads
 
-The download service automatically verifies hashes when `VerifyHash` is enabled:
-
 [!code-csharp[Program.cs](examples/Tools/Program.cs#IntegrationExample)]
-
-Downloaded files are verified against Civitai's provided hashes, and verification failures result in automatic cleanup of corrupted files.
 
 ## Next Steps
 
-- [Downloading Files](downloading-files.md) - Download with automatic verification
-- [HTML Parsing](html-parsing.md) - Parse model descriptions
+- [Downloading Files](downloading-files.md)
+- [HTML Parsing](html-parsing.md)

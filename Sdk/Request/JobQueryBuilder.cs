@@ -6,8 +6,10 @@ using System.Collections.Immutable;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using CivitaiSharp.Core;
 using CivitaiSharp.Core.Response;
 using CivitaiSharp.Sdk.Http;
+using CivitaiSharp.Sdk.Json;
 using CivitaiSharp.Sdk.Models.Jobs;
 using CivitaiSharp.Sdk.Models.Results;
 
@@ -18,7 +20,7 @@ using CivitaiSharp.Sdk.Models.Results;
 public sealed record JobQueryBuilder
 {
     private readonly SdkHttpClient _httpClient;
-    private readonly SdkClientOptions _options;
+    private readonly SdkOptions _options;
     private readonly bool _wait;
     private readonly bool _detailed;
     private readonly ImmutableDictionary<string, JsonElement>? _propertyFilters;
@@ -30,7 +32,7 @@ public sealed record JobQueryBuilder
     /// <param name="httpClient">The HTTP client used to execute requests.</param>
     /// <param name="options">The SDK client options.</param>
     /// <exception cref="ArgumentNullException">Thrown when httpClient or options is null.</exception>
-    internal JobQueryBuilder(SdkHttpClient httpClient, SdkClientOptions options)
+    internal JobQueryBuilder(SdkHttpClient httpClient, SdkOptions options)
         : this(
             httpClient ?? throw new ArgumentNullException(nameof(httpClient)),
             options ?? throw new ArgumentNullException(nameof(options)),
@@ -42,7 +44,7 @@ public sealed record JobQueryBuilder
 
     private JobQueryBuilder(
         SdkHttpClient httpClient,
-        SdkClientOptions options,
+        SdkOptions options,
         bool wait,
         bool detailed,
         ImmutableDictionary<string, JsonElement>? propertyFilters)
@@ -73,20 +75,101 @@ public sealed record JobQueryBuilder
         => new(_httpClient, _options, wait: true, _detailed, _propertyFilters);
 
     /// <summary>
-    /// Adds a custom property filter to the query.
+    /// Adds a custom string property filter to the query.
     /// </summary>
     /// <param name="key">The property key to filter by.</param>
-    /// <param name="value">The property value to match (must be JSON-serializable).</param>
+    /// <param name="value">The string value to match.</param>
     /// <returns>A new builder instance with the added property filter.</returns>
-    /// <remarks>
-    /// Multiple property filters are combined with AND logic - all must match.
-    /// Use <see cref="JsonSerializer.SerializeToElement{T}(T, System.Text.Json.JsonSerializerOptions?)"/> to create JsonElement values.
-    /// </remarks>
-    public JobQueryBuilder WhereProperty(string key, JsonElement value)
+    public JobQueryBuilder WhereProperty(string key, string value)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        var element = JsonSerializer.SerializeToElement(value, SdkJsonContext.Default.String);
         var filters = _propertyFilters ?? [];
-        return new(_httpClient, _options, _wait, _detailed, filters.SetItem(key, value));
+        return new(_httpClient, _options, _wait, _detailed, filters.SetItem(key, element));
+    }
+
+    /// <summary>
+    /// Adds a custom integer property filter to the query.
+    /// </summary>
+    /// <param name="key">The property key to filter by.</param>
+    /// <param name="value">The integer value to match.</param>
+    /// <returns>A new builder instance with the added property filter.</returns>
+    public JobQueryBuilder WhereProperty(string key, int value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        var element = JsonSerializer.SerializeToElement(value, SdkJsonContext.Default.Int32);
+        var filters = _propertyFilters ?? [];
+        return new(_httpClient, _options, _wait, _detailed, filters.SetItem(key, element));
+    }
+
+    /// <summary>
+    /// Adds a custom long property filter to the query.
+    /// </summary>
+    /// <param name="key">The property key to filter by.</param>
+    /// <param name="value">The long value to match.</param>
+    /// <returns>A new builder instance with the added property filter.</returns>
+    public JobQueryBuilder WhereProperty(string key, long value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        var element = JsonSerializer.SerializeToElement(value, SdkJsonContext.Default.Int64);
+        var filters = _propertyFilters ?? [];
+        return new(_httpClient, _options, _wait, _detailed, filters.SetItem(key, element));
+    }
+
+    /// <summary>
+    /// Adds a custom boolean property filter to the query.
+    /// </summary>
+    /// <param name="key">The property key to filter by.</param>
+    /// <param name="value">The boolean value to match.</param>
+    /// <returns>A new builder instance with the added property filter.</returns>
+    public JobQueryBuilder WhereProperty(string key, bool value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        var element = JsonSerializer.SerializeToElement(value, SdkJsonContext.Default.Boolean);
+        var filters = _propertyFilters ?? [];
+        return new(_httpClient, _options, _wait, _detailed, filters.SetItem(key, element));
+    }
+
+    /// <summary>
+    /// Adds a custom decimal property filter to the query.
+    /// </summary>
+    /// <param name="key">The property key to filter by.</param>
+    /// <param name="value">The decimal value to match.</param>
+    /// <returns>A new builder instance with the added property filter.</returns>
+    public JobQueryBuilder WhereProperty(string key, decimal value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        var element = JsonSerializer.SerializeToElement(value, SdkJsonContext.Default.Decimal);
+        var filters = _propertyFilters ?? [];
+        return new(_httpClient, _options, _wait, _detailed, filters.SetItem(key, element));
+    }
+
+    /// <summary>
+    /// Adds a custom GUID property filter to the query.
+    /// </summary>
+    /// <param name="key">The property key to filter by.</param>
+    /// <param name="value">The GUID value to match.</param>
+    /// <returns>A new builder instance with the added property filter.</returns>
+    public JobQueryBuilder WhereProperty(string key, Guid value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        var element = JsonSerializer.SerializeToElement(value, SdkJsonContext.Default.Guid);
+        var filters = _propertyFilters ?? [];
+        return new(_httpClient, _options, _wait, _detailed, filters.SetItem(key, element));
+    }
+
+    /// <summary>
+    /// Adds a custom DateTime property filter to the query.
+    /// </summary>
+    /// <param name="key">The property key to filter by.</param>
+    /// <param name="value">The DateTime value to match.</param>
+    /// <returns>A new builder instance with the added property filter.</returns>
+    public JobQueryBuilder WhereProperty(string key, DateTime value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        var element = JsonSerializer.SerializeToElement(value, SdkJsonContext.Default.DateTime);
+        var filters = _propertyFilters ?? [];
+        return new(_httpClient, _options, _wait, _detailed, filters.SetItem(key, element));
     }
 
     /// <summary>
@@ -152,7 +235,7 @@ public sealed record JobQueryBuilder
     /// <returns>A task containing the matching jobs.</returns>
     /// <exception cref="InvalidOperationException">Thrown if no property filters are configured.</exception>
     /// <remarks>
-    /// Use <see cref="WhereProperty"/> or <see cref="WhereProperties"/> to add filters before calling this method.
+    /// Use WhereProperty or <see cref="WhereProperties"/> to add filters before calling this method.
     /// </remarks>
     public Task<Result<JobStatusCollection>> ExecuteAsync(CancellationToken cancellationToken = default)
     {

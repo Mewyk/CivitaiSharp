@@ -14,7 +14,7 @@ var builder = Host.CreateApplicationBuilder(args);
 #region ConfigureAuth
 builder.Services.AddCivitaiApi(options =>
 {
-    options.ApiKey = "your-api-key-here";
+    options.Key = "your-api-key-here";
 });
 #endregion
 

@@ -1,72 +1,33 @@
 ---
-title: Request Builders
-description: Master the fluent builder pattern in CivitaiSharp for constructing type-safe, composable API queries with immutable records.
+title: Request Builder Pattern
+description: Fluent builder pattern for type-safe API queries.
 ---
 
-# Request Builders
+# Request Builder Pattern
 
-CivitaiSharp.Core uses a fluent builder pattern for constructing API queries. This pattern provides an intuitive, composable, and type-safe way to build complex queries.
+CivitaiSharp uses a fluent builder pattern for constructing type-safe, validated queries.
 
-## Design Principles
+## Core Principles
 
-### Immutability
+**Immutability:** Builders are immutable records. Each method returns a new copy with updated configuration.
 
-All builders are implemented as immutable `record` types. Each fluent method returns a **new** builder instance with the updated configuration, leaving the original unchanged:
+**Lazy Execution:** No network activity until you call `ExecuteAsync()`, `FirstOrDefaultAsync()`, or `GetByIdAsync()`.
+
+**Immediate Validation:** Invalid parameters throw immediately, not during execution.
+
+## Request Lifecycle
+
+1. **Entry Point:** Access builder via `ApiClient` (`client.Models`, `client.Images`, etc.)
+2. **Configuration:** Chain methods to set filters, sorting, options
+3. **Execution:** Call async method to send request and retrieve results
+
+## Example
 
 [!code-csharp[Program.cs](examples/RequestBuilders/Program.cs#Immutability)]
 
-### Thread Safety
-
-Because builders are immutable, they are inherently thread-safe. You can safely:
-
-- Cache and reuse builder configurations
-- Share builders across threads
-- Build queries concurrently from the same base
-
-### Lazy Execution
-
-Building a query does not execute it. The request is only sent when you call an execution method like `ExecuteAsync()` or `FirstOrDefaultAsync()`.
-
-## Available Builders
-
-CivitaiSharp provides `ModelBuilder`, `ImageBuilder`, `TagBuilder`, and `CreatorBuilder` for querying their respective endpoints. All builders support filtering, sorting, pagination, and both batch (`ExecuteAsync`) and single-item queries (`FirstOrDefaultAsync`, `GetByIdAsync`).
-
-See the API reference documentation for complete method listings and parameters.
-
-## Common Operations
-
-### Filtering
-
-Use `Where*` methods to filter results:
-
-[!code-csharp[Program.cs](examples/RequestBuilders/Program.cs#Filtering)]
-
-### Sorting
-
-Use `OrderBy` methods where available:
-
-[!code-csharp[Program.cs](examples/RequestBuilders/Program.cs#Sorting)]
-
-### Limiting Results
-
-Pass `resultsLimit` to `ExecuteAsync` to control page size:
-
-[!code-csharp[Program.cs](examples/RequestBuilders/Program.cs#Limiting)]
-
-### Getting a Single Item
-
-Use `GetByIdAsync` for direct lookups or `FirstOrDefaultAsync` for the first match:
-
-[!code-csharp[Program.cs](examples/RequestBuilders/Program.cs#SingleItem)]
-
-## Validation
-
-Builders validate parameters immediately when methods are called:
-
-[!code-csharp[Program.cs](examples/RequestBuilders/Program.cs#Validation)]
-
 ## Next Steps
 
-- [Working with Models](models.md) - Deep dive into model queries
-- [Working with Images](images.md) - Query generated images
-- [Pagination](pagination.md) - Navigate large result sets
+- [Models](models.md)
+- [Images](images.md)
+- [Tags](tags.md)
+- [Creators](creators.md)

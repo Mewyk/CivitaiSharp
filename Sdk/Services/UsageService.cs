@@ -3,6 +3,7 @@ namespace CivitaiSharp.Sdk.Services;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using CivitaiSharp.Core;
 using CivitaiSharp.Core.Response;
 using CivitaiSharp.Sdk.Http;
 using CivitaiSharp.Sdk.Models.Usage;
@@ -17,7 +18,7 @@ using CivitaiSharp.Sdk.Models.Usage;
 /// <param name="httpClient">The HTTP client for API requests.</param>
 /// <param name="options">The SDK client options.</param>
 /// <exception cref="ArgumentNullException">Thrown when <paramref name="httpClient"/> or <paramref name="options"/> is null.</exception>
-internal sealed class UsageService(SdkHttpClient httpClient, SdkClientOptions options) : IUsageService
+internal sealed class UsageService(SdkHttpClient httpClient, SdkOptions options) : IUsageService
 {
     /// <inheritdoc />
     public Task<Result<ConsumptionDetails>> GetConsumptionAsync(

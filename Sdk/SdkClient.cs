@@ -1,6 +1,7 @@
 namespace CivitaiSharp.Sdk;
 
 using System;
+using CivitaiSharp.Core;
 using CivitaiSharp.Sdk.Http;
 using CivitaiSharp.Sdk.Request;
 using CivitaiSharp.Sdk.Services;
@@ -9,7 +10,7 @@ using CivitaiSharp.Sdk.Services;
 /// Primary client facade for the Civitai Generator SDK. All properties return cached, immutable,
 /// thread-safe instances that can be safely shared across threads.
 /// Obtain an instance through dependency injection using
-/// <see cref="Extensions.ServiceCollectionExtensions.AddCivitaiSdk(Microsoft.Extensions.DependencyInjection.IServiceCollection, System.Action{SdkClientOptions})"/>.
+/// <see cref="Extensions.ServiceCollectionExtensions.AddCivitaiSdk(Microsoft.Extensions.DependencyInjection.IServiceCollection, System.Action{SdkOptions})"/>.
 /// </summary>
 public sealed class SdkClient : ISdkClient
 {
@@ -20,7 +21,7 @@ public sealed class SdkClient : ISdkClient
     /// <param name="httpClient">The HTTP client used to make API requests.</param>
     /// <param name="options">The SDK client options.</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="httpClient"/> or <paramref name="options"/> is null.</exception>
-    internal SdkClient(SdkHttpClient httpClient, SdkClientOptions options)
+    internal SdkClient(SdkHttpClient httpClient, SdkOptions options)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
         ArgumentNullException.ThrowIfNull(options);

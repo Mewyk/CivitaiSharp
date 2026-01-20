@@ -1,8 +1,12 @@
 namespace CivitaiSharp.Sdk.Tests;
 
+using CivitaiSharp.Core;
 using Xunit;
 
-public sealed class SdkClientOptionsTests
+/// <summary>
+/// Tests for SdkOptions configuration.
+/// </summary>
+public sealed class SdkOptionsTests
 {
     #region Default Values Tests
 
@@ -10,211 +14,108 @@ public sealed class SdkClientOptionsTests
     public void WhenCreatingOptionsWithDefaultsThenDefaultValuesAreUsed()
     {
         // Arrange & Act
-        var options = new SdkClientOptions { ApiToken = "test-token" };
+        var options = new CivitaiSharpOptions();
+        options.Sdk.Key = "test-token";
 
         // Assert
-        Assert.Equal(SdkClientOptions.DefaultBaseUrl, options.BaseUrl);
-        Assert.Equal(SdkClientOptions.DefaultApiVersion, options.ApiVersion);
-        Assert.Equal(SdkClientOptions.DefaultTimeoutSeconds, options.TimeoutSeconds);
-        Assert.Equal("test-token", options.ApiToken);
+        Assert.Equal(SdkOptions.DefaultVersion, options.Sdk.Version);
+        Assert.Equal(SdkOptions.DefaultTimeoutSeconds, options.Sdk.TimeoutSeconds);
+        Assert.Equal("test-token", options.Sdk.Key);
     }
 
     [Fact]
     public void WhenCheckingDefaultConstantsThenValuesAreCorrect()
     {
         // Assert
-        Assert.Equal("https://orchestration.civitai.com", SdkClientOptions.DefaultBaseUrl);
-        Assert.Equal("v1", SdkClientOptions.DefaultApiVersion);
-        Assert.Equal(600, SdkClientOptions.DefaultTimeoutSeconds);
-        Assert.Equal(1800, SdkClientOptions.MaxTimeoutSeconds);
+        Assert.Equal("https://orchestration.civitai.com", SdkOptions.DefaultBaseUrl);
+        Assert.Equal("v1", SdkOptions.DefaultVersion);
+        Assert.Equal(600, SdkOptions.DefaultTimeoutSeconds);
+        Assert.Equal(1800, SdkOptions.MaxTimeoutSeconds);
     }
 
     #endregion
 
-    #region ApiToken Tests
+    #region Key Tests
 
     [Fact]
     public void WhenSettingValidApiTokenThenTokenIsStored()
     {
         // Arrange
-        var options = new SdkClientOptions { ApiToken = "initial-token" };
+        var options = new CivitaiSharpOptions();
+        options.Sdk.Key = "initial-token";
 
         // Act
-        options.ApiToken = "new-valid-token";
+        options.Sdk.Key = "new-valid-token";
 
         // Assert
-        Assert.Equal("new-valid-token", options.ApiToken);
+        Assert.Equal("new-valid-token", options.Sdk.Key);
     }
 
     [Fact]
-    public void WhenSettingNullApiTokenThenThrowsArgumentNullException()
+    public void WhenSettingNullApiTokenThenTokenIsNull()
     {
         // Arrange
-        var options = new SdkClientOptions { ApiToken = "initial-token" };
+        var options = new CivitaiSharpOptions();
+        options.Sdk.Key = "initial-token";
 
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => options.ApiToken = null!);
-    }
+        // Act
+        options.Sdk.Key = null;
 
-    [Fact]
-    public void WhenSettingEmptyApiTokenThenThrowsArgumentException()
-    {
-        // Arrange
-        var options = new SdkClientOptions { ApiToken = "initial-token" };
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => options.ApiToken = "");
-    }
-
-    [Fact]
-    public void WhenSettingWhitespaceApiTokenThenThrowsArgumentException()
-    {
-        // Arrange
-        var options = new SdkClientOptions { ApiToken = "initial-token" };
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => options.ApiToken = "   ");
+        // Assert
+        Assert.Null(options.Sdk.Key);
     }
 
     #endregion
 
-    #region BaseUrl Tests
-
-    [Fact]
-    public void WhenSettingValidBaseUrlThenUrlIsStored()
-    {
-        // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
-        const string expectedUrl = "https://api.example.com";
-
-        // Act
-        options.BaseUrl = expectedUrl;
-
-        // Assert
-        Assert.Equal(expectedUrl, options.BaseUrl);
-    }
-
-    [Fact]
-    public void WhenSettingBaseUrlWithTrailingSlashThenSlashIsRemoved()
-    {
-        // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
-
-        // Act
-        options.BaseUrl = "https://api.example.com/";
-
-        // Assert
-        Assert.Equal("https://api.example.com", options.BaseUrl);
-    }
-
-    [Fact]
-    public void WhenSettingNullBaseUrlThenThrowsArgumentNullException()
-    {
-        // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
-
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => options.BaseUrl = null!);
-    }
-
-    [Fact]
-    public void WhenSettingEmptyBaseUrlThenThrowsArgumentException()
-    {
-        // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => options.BaseUrl = "");
-    }
-
-    [Fact]
-    public void WhenSettingWhitespaceBaseUrlThenThrowsArgumentException()
-    {
-        // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => options.BaseUrl = "   ");
-    }
-
-    [Fact]
-    public void WhenSettingInvalidUrlThenThrowsArgumentException()
-    {
-        // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => options.BaseUrl = "not-a-valid-url");
-    }
-
-    [Fact]
-    public void WhenSettingNonHttpUrlThenThrowsArgumentException()
-    {
-        // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => options.BaseUrl = "ftp://example.com");
-    }
-
-    [Fact]
-    public void WhenSettingHttpUrlThenUrlIsAccepted()
-    {
-        // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
-
-        // Act
-        options.BaseUrl = "http://localhost:8080";
-
-        // Assert
-        Assert.Equal("http://localhost:8080", options.BaseUrl);
-    }
-
-    #endregion
-
-    #region ApiVersion Tests
+    #region Version Tests
 
     [Fact]
     public void WhenSettingValidApiVersionThenVersionIsStored()
     {
         // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
+        var options = new CivitaiSharpOptions();
 
         // Act
-        options.ApiVersion = "v2";
+        options.Sdk.Version = "v2";
 
         // Assert
-        Assert.Equal("v2", options.ApiVersion);
+        Assert.Equal("v2", options.Sdk.Version);
     }
 
     [Fact]
-    public void WhenSettingNullApiVersionThenThrowsArgumentNullException()
+    public void WhenSettingNullApiVersionThenValidateThrows()
     {
         // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
+        var options = new CivitaiSharpOptions();
+        options.Sdk.Key = "test-key";
+        options.Sdk.Version = null!;
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => options.ApiVersion = null!);
+        Assert.Throws<ArgumentNullException>(() => options.Sdk.Validate());
     }
 
     [Fact]
-    public void WhenSettingEmptyApiVersionThenThrowsArgumentException()
+    public void WhenSettingEmptyApiVersionThenValidateThrows()
     {
         // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
+        var options = new CivitaiSharpOptions();
+        options.Sdk.Key = "test-key";
+        options.Sdk.Version = "";
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => options.ApiVersion = "");
+        Assert.Throws<ArgumentException>(() => options.Sdk.Validate());
     }
 
     [Fact]
-    public void WhenSettingWhitespaceApiVersionThenThrowsArgumentException()
+    public void WhenSettingWhitespaceApiVersionThenValidateThrows()
     {
         // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
+        var options = new CivitaiSharpOptions();
+        options.Sdk.Key = "test-key";
+        options.Sdk.Version = "   ";
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => options.ApiVersion = "   ");
+        Assert.Throws<ArgumentException>(() => options.Sdk.Validate());
     }
 
     #endregion
@@ -225,69 +126,75 @@ public sealed class SdkClientOptionsTests
     public void WhenSettingValidTimeoutThenTimeoutIsStored()
     {
         // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
+        var options = new CivitaiSharpOptions();
 
         // Act
-        options.TimeoutSeconds = 300;
+        options.Sdk.TimeoutSeconds = 300;
 
         // Assert
-        Assert.Equal(300, options.TimeoutSeconds);
+        Assert.Equal(300, options.Sdk.TimeoutSeconds);
     }
 
     [Fact]
     public void WhenSettingMinimumTimeoutThenTimeoutIsAccepted()
     {
         // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
+        var options = new CivitaiSharpOptions();
 
         // Act
-        options.TimeoutSeconds = 1;
+        options.Sdk.TimeoutSeconds = 1;
 
         // Assert
-        Assert.Equal(1, options.TimeoutSeconds);
+        Assert.Equal(1, options.Sdk.TimeoutSeconds);
     }
 
     [Fact]
     public void WhenSettingMaximumTimeoutThenTimeoutIsAccepted()
     {
         // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
+        var options = new CivitaiSharpOptions();
 
         // Act
-        options.TimeoutSeconds = SdkClientOptions.MaxTimeoutSeconds;
+        options.Sdk.TimeoutSeconds = SdkOptions.MaxTimeoutSeconds;
 
         // Assert
-        Assert.Equal(SdkClientOptions.MaxTimeoutSeconds, options.TimeoutSeconds);
+        Assert.Equal(SdkOptions.MaxTimeoutSeconds, options.Sdk.TimeoutSeconds);
     }
 
     [Fact]
-    public void WhenSettingZeroTimeoutThenThrowsArgumentOutOfRangeException()
+    public void WhenSettingZeroTimeoutThenValidateThrows()
     {
         // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
+        var options = new CivitaiSharpOptions();
+        options.Sdk.Key = "test-key";
+        options.Sdk.TimeoutSeconds = 0;
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => options.TimeoutSeconds = 0);
+        Assert.Throws<ArgumentOutOfRangeException>(() => options.Sdk.Validate());
     }
 
     [Fact]
-    public void WhenSettingNegativeTimeoutThenThrowsArgumentOutOfRangeException()
+    public void WhenSettingNegativeTimeoutThenValidateThrows()
     {
         // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
+        var options = new CivitaiSharpOptions();
+        options.Sdk.Key = "test-key";
+        options.Sdk.TimeoutSeconds = -1;
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => options.TimeoutSeconds = -1);
+        Assert.Throws<ArgumentOutOfRangeException>(() => options.Sdk.Validate());
     }
 
     [Fact]
-    public void WhenSettingTimeoutAboveMaximumThenThrowsArgumentOutOfRangeException()
+    public void WhenSettingTimeoutAboveMaximumThenValidateThrows()
     {
         // Arrange
-        var options = new SdkClientOptions { ApiToken = "test-token" };
+        var options = new CivitaiSharpOptions();
+        options.Sdk.Key = "test-key";
+        options.Sdk.TimeoutSeconds = SdkOptions.MaxTimeoutSeconds + 1;
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => options.TimeoutSeconds = SdkClientOptions.MaxTimeoutSeconds + 1);
+        Assert.Throws<ArgumentOutOfRangeException>(() => options.Sdk.Validate());
     }
 
     #endregion

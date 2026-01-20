@@ -28,7 +28,7 @@ public sealed class ApiOptions
     public const int MaxTimeoutSeconds = 300;
 
     /// <summary>
-    /// Optional API key for authenticated requests. Required for favorites, hidden models, and higher rate limits.
+    /// Optional API key for authenticated requests. Required for favorites, and hidden models, and NSFW models.
     /// Obtain from: <see href="https://civitai.com/user/account"/>
     /// </summary>
     public string? Key { get; set; }

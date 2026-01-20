@@ -1,11 +1,11 @@
 ---
 title: CivitaiSharp.Sdk Introduction
-description: Overview of the CivitaiSharp.Sdk library for Civitai's Generator API.
+description: Client for Civitai's Generator API.
 ---
 
 # CivitaiSharp.Sdk
 
-CivitaiSharp.Sdk is a client for the Civitai Generator API (orchestration). It handles authenticated tasks like image generation and job management.
+Client for the Civitai Generator API. Handles authenticated tasks like image generation and job management.
 
 ## Installation
 
@@ -13,10 +13,10 @@ CivitaiSharp.Sdk is a client for the Civitai Generator API (orchestration). It h
 dotnet add package CivitaiSharp.Sdk --prerelease
 ```
 
-## Documentation
+## Guides
 
-- **[AIR Identifiers](air-identifier.md)** - Understanding resource identifiers.
-- **[Create a Job](create-job.md)** - Submit new image generation tasks.
-- **[Query a Job](query-job.md)** - Track status and manage existing jobs.
-- **[Coverage Service](coverage.md)** - Check resource availability.
-- **[Usage Service](usage.md)** - Monitor your API credit usage.
+- [AIR Identifiers](air-identifier.md)
+- [Create a Job](create-job.md)
+- [Query a Job](query-job.md)
+- [Coverage Service](coverage.md)
+- [Usage Service](usage.md)

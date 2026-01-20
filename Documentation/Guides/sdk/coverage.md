@@ -1,96 +1,53 @@
 ---
 title: Coverage Service
-description: Learn how to check model and resource availability on the Civitai generation infrastructure before submitting jobs.
+description: Check model availability before submitting jobs.
 ---
 
 # Coverage Service
 
-The Coverage service allows you to check the availability of AI models and resources across the Civitai generation infrastructure before submitting jobs. This helps prevent job failures due to unavailable resources.
+Check AI model availability across Civitai infrastructure before submitting jobs.
 
-## Overview
-
-The Coverage service provides methods to:
-- Check availability of single or multiple models
-- Identify which providers support specific models
-- Get queue depth information for resource planning
-
-## Basic Usage
-
-### Check Single Model Availability
-
-Once you have an AIR identifier, check its availability:
+## Check Single Model
 
 [!code-csharp[Program.cs](examples/Coverage/Program.cs#CheckSingleModelAvailability)]
 
-### Check Multiple Models
+## Check Multiple Models
 
 [!code-csharp[Program.cs](examples/Coverage/Program.cs#CheckMultipleModels)]
 
-## Understanding Results
+## Result Properties
 
-### ProviderAssetAvailability
+**ProviderAssetAvailability:**
+- `Availability` - Status (`Available`, `Unavailable`, `Degraded`)
+- `Workers` - Worker count (0 = unavailable)
 
-The main result type containing availability information:
+**AvailabilityStatus:**
+- `Available` - Ready for generation
+- `Unavailable` - Not available
+- `Degraded` - Limited capacity
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `Availability` | `AvailabilityStatus` | The availability status (Available, Unavailable, Degraded) |
-| `Workers` | `int` | Number of workers with this model loaded (0 means unavailable) |
+**JobSupport:**
+- `Unsupported` - Provider doesn't support model
+- `Unavailable` - Temporarily unavailable
+- `Available` - Ready to process
 
-### AvailabilityStatus
-
-Enum values for model availability status:
-
-| Value | Description | Meaning |
-|-------|-------------|---------|
-| `Available` | Model is available and ready for generation | Workers are loaded and ready |
-| `Unavailable` | Model is not currently available | No workers have this model loaded |
-| `Degraded` | Model is available but with limited capacity | Some workers available, may experience delays |
-
-### Provider
-
-Complete list of infrastructure providers:
-
-| Value | Description | Use Case |
-|-------|-------------|----------|
-| `Civitai` | Civitai's first-party infrastructure | Primary recommended provider |
-| `OctoML` | OctoML cloud provider | High-performance GPU infrastructure |
-| `SaladML` | SaladML distributed computing | Cost-effective distributed processing |
-| `PicFinder` | PicFinder specialized provider | Specialized image generation infrastructure |
-| `RunPods` | RunPods cloud GPU provider | Flexible GPU cloud computing |
-| `ValdiAI` | ValdiAI infrastructure | AI-optimized infrastructure |
-| `OctoMLNext` | Next-generation OctoML | Enhanced OctoML infrastructure |
-| `RunDiffusion` | RunDiffusion specialized provider | Diffusion model specialized infrastructure |
-| `SaladShared` | SaladCloud shared resources | Shared distributed computing resources |
-
-### JobSupport
-
-Provider capability levels:
-
-| Value | Description | Action Recommended |
-|-------|-------------|-------------------|
-| `Unsupported` | Provider does not support this model type | Try different provider or model |
-| `Unavailable` | Provider supports but temporarily unavailable | Wait and retry, or use different provider |
-| `Available` | Provider supports and ready to process | Safe to submit jobs |
+## Availability Checking
 
 [!code-csharp[Program.cs](examples/Coverage/Program.cs#AvailabilityStatusChecking)]
 
 ## Error Handling
 
-Handle coverage check failures gracefully:
-
 [!code-csharp[Program.cs](examples/Coverage/Program.cs#ErrorHandling)]
 
 ## Best Practices
 
-1. **Cache coverage results** - Coverage rarely changes rapidly, cache to reduce API calls
-2. **Batch checks** - Check multiple resources in one call when possible
-3. **Make coverage optional** - Add latency only when needed based on context
-4. **Resource discovery** - Identify consistently available resources
+- Cache coverage results
+- Batch checks when possible
+- Make coverage checks optional
+- Use for resource discovery
 
 ## Next Steps
 
-- [Create a Job](create-job.md) - Submit jobs with validated resources
-- [Usage Service](usage.md) - Monitor API consumption
-- [AIR Identifiers](air-identifier.md) - Learn about model identifiers
-- [Error Handling](../common/error-handling.md) - Comprehensive error handling patterns
+- [Create a Job](create-job.md)
+- [Usage Service](usage.md)
+- [AIR Identifiers](air-identifier.md)

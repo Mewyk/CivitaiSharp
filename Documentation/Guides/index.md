@@ -1,65 +1,61 @@
 ---
 title: Documentation
-description: Comprehensive guides and tutorials for CivitaiSharp - the .NET client library for Civitai.com
+description: Guides for CivitaiSharp - .NET client library for Civitai.com
 ---
 
 # Documentation
 
-Welcome to the CivitaiSharp documentation. These guides will help you get started and make the most of the library.
-
 ## Getting Started
 
-New to CivitaiSharp? Start here:
-
 | Guide | Description |
 |-------|-------------|
-| [Installation](installation.md) | Install CivitaiSharp via NuGet |
-| [Getting an API Key](core/getting-api-key.md) | Obtain your Civitai API key |
-| [Quick Start](core/quick-start.md) | Get up and running in minutes |
-
-## AI Resource Identifier (AIR)
-
-Understand and work with AIR identifiers for model references:
-
-| Guide | Description |
-|-------|-------------|
-| [AIR Overview](sdk/air-identifier.md) | Parse, validate, and work with AIR identifiers |
+| [Installation](installation.md) | Install via NuGet |
+| [Getting an API Key](core/getting-api-key.md) | Obtain Civitai API key |
+| [Quick Start](core/quick-start.md) | Get started quickly |
 
 ## Core Library
 
-The Core library provides low-level access to the Civitai Public API with fluent request builders.
+Low-level access to Civitai Public API with fluent builders.
 
 | Guide | Description |
 |-------|-------------|
-| [Introduction](core/introduction.md) | Overview of CivitaiSharp.Core |
-| [Request Builders](core/request-builders.md) | Build type-safe API queries |
-| [Models](core/models.md) | Query and filter AI models |
-| [Images](core/images.md) | Search generated images |
-| [Tags](core/tags.md) | Browse model tags |
-| [Creators](core/creators.md) | Find content creators |
-| [Error Handling](common/error-handling.md) | Handle errors with the Result pattern |
-| [Pagination](common/pagination.md) | Navigate paginated results |
-| [API Behavior and Quirks](common/api-quirks.md) | Known API behaviors and workarounds |
+| [Introduction](core/introduction.md) | Core library overview |
+| [Request Builders](core/request-builders.md) | Build type-safe queries |
+| [Models](core/models.md) | Query AI models |
+| [Images](core/images.md) | Search images |
+| [Tags](core/tags.md) | Browse tags |
+| [Creators](core/creators.md) | Find creators |
+
+## Common
+
+Shared patterns and behaviors across all libraries.
+
+| Guide | Description |
+|-------|-------------|
+| [Error Handling](common/error-handling.md) | Result pattern |
+| [Pagination](common/pagination.md) | Navigate results |
+| [API Quirks](common/api-quirks.md) | Known behaviors |
 
 ## SDK Library
 
-The SDK provides high-level abstractions for image generation and advanced workflows.
+High-level abstractions for image generation and workflows.
 
 | Guide | Description |
 |-------|-------------|
-| [SDK Introduction](sdk/introduction.md) | Overview of CivitaiSharp.Sdk |
-| [Create a Job](sdk/create-job.md) | Submit automated image generation jobs |
-| [Query a Job](sdk/query-job.md) | Track status and manage existing jobs |
-| [Coverage Service](sdk/coverage.md) | Check model availability before job submission |
-| [Usage Service](sdk/usage.md) | Monitor resource usage and limits |
+| [SDK Introduction](sdk/introduction.md) | SDK overview |
+| [AIR Identifier](sdk/air-identifier.md) | Resource identifiers |
+| [Create a Job](sdk/create-job.md) | Submit generation jobs |
+| [Query a Job](sdk/query-job.md) | Track and manage jobs |
+| [Coverage Service](sdk/coverage.md) | Check availability |
+| [Usage Service](sdk/usage.md) | Monitor usage |
 
 ## Tools Library
 
-The Tools library provides utilities for file hashing, downloading, and HTML parsing.
+Utilities for file operations and parsing.
 
 | Guide | Description |
 |-------|-------------|
-| [Tools Introduction](tools/introduction.md) | Overview of CivitaiSharp.Tools |
-| [File Hashing](tools/file-hashing.md) | Compute SHA256, SHA512, BLAKE3, and CRC32 hashes |
-| [Downloading Files](tools/downloading-files.md) | Download images and models with path patterns |
-| [HTML Parsing](tools/html-parsing.md) | Convert descriptions to Markdown or plain text |
+| [Tools Introduction](tools/introduction.md) | Tools overview |
+| [File Hashing](tools/file-hashing.md) | Compute hashes |
+| [Downloading Files](tools/downloading-files.md) | Download with verification |
+| [HTML Parsing](tools/html-parsing.md) | Convert to Markdown |

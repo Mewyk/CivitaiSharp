@@ -1,115 +1,47 @@
 ---
 title: Getting a Civitai API Key
-description: Learn how to obtain a Civitai API key for authenticated requests, accessing favorites, hidden models, NSFW content, and higher rate limits.
+description: Obtain a Civitai API key for authenticated requests.
 ---
 
-# Getting a Civitai.com API Key
+# Getting a Civitai API Key
 
-This guide walks you through the process of obtaining an API key from Civitai. An API key is required for authenticated requests, including accessing your favorites, hidden models, NSFW content (Mature/X levels), and getting higher rate limits.
-
-## Prerequisites
-
-- A Civitai account. If you don't have one, visit [civitai.com](https://civitai.com) and sign up.
+An API key is required for authenticated requests: favorites, hidden models, NSFW content, and all SDK operations.
 
 ## Create an API Key
 
-1. Navigate to your [Account Settings](https://civitai.com/user/account) page on Civitai
-2. Select your profile icon in the top right corner
-3. Click **Account settings** from the dropdown menu
-4. Scroll down to find the **API Keys** section
-5. Click **Add API key** to generate a new key
+1. Go to [Account Settings](https://civitai.com/user/account)
+2. Navigate to **API Keys** section
+3. Click **Add API key**
+4. Copy the key immediately (shown only once)
 
-<!-- TODO: Add screenshot once available
-![API key management section in profile](Images/api-key-generation.png)
--->
+Keep your API key secret. Never commit it to source control.
 
-> [!NOTE]
-> The API key works for both the public REST API and CivitaiSharp.
+## Configuration
 
-After creating the key, it will be displayed once. **Copy it immediately** and store it securely. You won't be able to see the full key again after leaving this page.
-
-> [!WARNING]
-> **Keep your API key secret!** Never commit your API key to source control or share it publicly. Anyone with your API key can make requests on your behalf.
-
-## Using Your API Key
-
-Once you have your API key, configure CivitaiSharp. The **recommended approach** is to use automatic configuration from your application settings:
-
-### Recommended: Automatic Configuration
-
-Use `AddCivitaiApi(configuration)` to automatically load settings from your configuration sources:
+Use application settings (recommended):
 
 [!code-csharp[](examples/GettingApiKey/Program.cs#ConfigurationFile)]
 
-This reads from multiple sources in order of priority:
-- **appsettings.json** - For default settings
-- **Environment variables** - For deployment-specific values
-- **User secrets** - For local development (recommended for storing API keys during development)
-
-Example configuration file:
+Example `appsettings.json`:
 
 [!code-json[](examples/GettingApiKey/appsettings.json)]
 
-### Manual Configuration (Advanced)
+For local development, use User Secrets to store the API key securely.
 
-For advanced scenarios where you need dynamic configuration or specific logic:
+## What Requires Authentication
 
-[!code-csharp[](examples/GettingApiKey/Program.cs#OptionsConfiguration)]
+**Core Library:**
+- Favorites
+- Hidden models
+- Higher rate limits
+- NSFW content (Mature/X levels)
 
-Or load from environment variables:
-
-[!code-csharp[](examples/GettingApiKey/Program.cs#EnvironmentVariable)]
-
-## Managing API Keys
-
-You can create multiple API keys for different applications or purposes. To revoke a key:
-
-1. Go back to your [Account Settings](https://civitai.com/user/account)
-2. Navigate to the API Keys section
-3. Find the key you want to revoke
-4. Click the delete/revoke button next to it
-
-## What Requires an API Key?
-
-### CivitaiSharp.Core (Public API)
-
-| Feature | API Key Required |
-|---------|------------------|
-| Public model queries | No |
-| Public image queries | No |
-| Tag and creator queries | No |
-| Favorites | **Yes** |
-| Hidden models | **Yes** |
-| Higher rate limits | **Yes** |
-
-### CivitaiSharp.Sdk (Generator API)
-
-| Feature | API Token Required |
-|---------|--------------------|
-| All SDK operations | **Yes** |
-
-> [!IMPORTANT]
-> The SDK (Generator/Orchestration API) **always requires authentication**. You cannot use CivitaiSharp.Sdk without providing a `Key`. This is different from the Core library which supports anonymous access for public endpoints.
-
-## Troubleshooting
-
-### "Unauthorized" Error
-
-If you receive an `Unauthorized` error:
-
-- Verify your API key is correct and hasn't been revoked
-- Check that the key is properly configured in your application
-- Ensure there are no extra spaces or characters in the key
-
-### Rate Limiting
-
-If you're being rate limited even with an API key:
-
-- Check the `RetryAfter` value in the error response
-- Implement exponential backoff in your requests
-- Consider caching responses where appropriate
+**SDK Library:**
+- All operations (authentication always required)
 
 ## Next Steps
+
+- [Quick Start](quick-start.md)
 
 - [Quick Start Guide](quick-start.md) - Get started with CivitaiSharp
 - [Error Handling](../common/error-handling.md) - Handle API errors gracefully

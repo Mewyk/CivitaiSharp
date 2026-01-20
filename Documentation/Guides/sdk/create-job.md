@@ -1,49 +1,37 @@
 ---
 title: Create a Job
-description: Learn how to create and submit image generation jobs using the CivitaiSharp.Sdk Jobs service.
+description: Submit image generation jobs.
 ---
 
 # Create a Job
 
-The Jobs service provides a fluent interface for creating and submitting image generation jobs via `sdkClient.Jobs.CreateImage()`. It supports both text-to-image and image-to-image generation modes.
+Submit image generation jobs via `sdkClient.Jobs.CreateImage()`.
 
-## Basic Image Generation
-
-Use the `CreateImage()` method to get a fluent builder:
+## Basic Generation
 
 [!code-csharp[Program.cs](examples/Jobs/Program.cs#BasicImageGeneration)]
 
 ## Advanced Configuration
 
-Configure additional parameters for more control:
-
 [!code-csharp[Program.cs](examples/Jobs/Program.cs#AdvancedConfiguration)]
 
-## Using Additional Networks (LoRAs)
-
-Add LoRAs and other networks to enhance generation:
+## Additional Networks (LoRAs)
 
 [!code-csharp[Program.cs](examples/Jobs/Program.cs#UsingAdditionalNetworks)]
 
-## Using ControlNet
-
-Guide generation with ControlNet:
+## ControlNet
 
 [!code-csharp[Program.cs](examples/Jobs/Program.cs#UsingControlNet)]
 
-## Batch Job Submission
-
-Submit multiple jobs at once:
+## Batch Submission
 
 [!code-csharp[Program.cs](examples/Jobs/Program.cs#BatchJobSubmission)]
 
-## Complete Parameter Example
-
-Demonstration of all available image generation parameters:
+## Complete Example
 
 [!code-csharp[Program.cs](examples/Jobs/Program.cs#CompleteParameterExample)]
 
 ## Next Steps
 
-- [Query a Job](query-job.md) - Track status and manage submitted jobs
-- [Coverage Service](coverage.md) - Check model availability before submitting jobs
+- [Query a Job](query-job.md)
+- [Coverage Service](coverage.md)
